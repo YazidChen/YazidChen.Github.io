@@ -8,27 +8,18 @@ menu: 关于
 permalink: /about/
 ---
 
-路途甚远，早些起行
+## 不归路，因兴趣而铺。路途甚远，早些起行 ##
 
-## Skill Keywords
+**博主：**YazidChen
 
-#### Software Engineer Keywords
-<div class="btn-inline">
-    {% for keyword in site.skill_software_keywords %}
-    <button class="btn btn-outline" type="button">{{ keyword }}</button>
-    {% endfor %}
-</div>
+**关键字：**后端、安全、JAVA
 
-#### Mobile Developer Keywords
-<div class="btn-inline">
-    {% for keyword in site.skill_mobile_app_keywords %}
-    <button class="btn btn-outline" type="button">{{ keyword }}</button>
-    {% endfor %}
-</div>
+### 联系 ###
 
-#### Windows Developer Keywords
-<div class="btn-inline">
-    {% for keyword in site.skill_windows_keywords %}
-    <button class="btn btn-outline" type="button">{{ keyword }}</button>
-    {% endfor %}
-</div>
+**邮箱：**chenzesheng1994@163.com
+
+**Github:**https://github.com/YazidChen/
+
+
+
+

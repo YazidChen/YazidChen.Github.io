@@ -6,13 +6,12 @@ url: yazidchen.github.io
 date_format: "ordinal"
 title: YazidChen Blog
 subtitle: "路途甚远，早些起行"
-description: "不归路，因兴趣而生"
+description: "不归路，因兴趣而铺"
 keywords: YazidChen, YazidChen Blog
 favicon: /favicon.ico
 timezone: Asia/ShenZhen
 encoding: "utf-8"
 source_code: https://github.com/YazidChen/yazidchen.github.io
-side_bar_repo_limit: 5
 
 # ---------------- #
 #      Author      #
@@ -27,15 +26,15 @@ email: chenzesheng1994@163.com
 navs:
   -
     href: /
-    label: 首页
+    label: Home
 
   -
     href: /categories/
-    label: 分类
+    label: Categories
 
   -
     href: /about/
-    label: 关于
+    label: About
 
 # ---------------- #
 #       RSS        #
@@ -72,9 +71,3 @@ collections:
 # ---------------- #
 github_username: YazidChen
 
-# ---------------- #
-#      Datas       #
-# ---------------- #
-skill_software_keywords: [Java, C++, Python, Design Patterns]
-skill_mobile_app_keywords: [Android, Reverse Engineering]
-skill_windows_keywords: [Win32 SDK, DuiLib, WTL, COM, WinDbg]
