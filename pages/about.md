@@ -17,7 +17,7 @@ permalink: /about/
 
 **Email：**chenzesheng1994@163.com
 
-**Github:**https://github.com/YazidChen/
+**Github：**https://github.com/YazidChen/
 
 
 
