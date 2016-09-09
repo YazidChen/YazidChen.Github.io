@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Win环境Jekyll+Markdown+Github Pages搭建个人Blogs &mdash; YazidChen Blog</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="yazidchen.github.io/2016/08/19/CreateBlogsForJekyllOnGithub/">
+    <link rel="alternate" type="application/atom+xml" title="YazidChen Blog" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="Win环境Jekyll+Markdown+Github Pages搭建个人Blogs">
+      
+    <meta name="keywords" content="Jekyll, Blogs, Github">
+    <meta name="og:keywords" content="Jekyll, Blogs, Github">
+      
+    <meta name="description" content="开启Github Pages1、在github中建立一个基于你的用户名的repository2、进入仓库 -&gt; Setting -&gt;找到Launch automatic page generator进入3、此时相当于一篇博客页，填入必要的字段后，点击Continue to layouts4、选样式 -&gt; Publish page5、之后，你就能在Setting的GitHub Pages下看到你的地址了">
+    <meta name="og:description" content="开启Github Pages1、在github中建立一个基于你的用户名的repository2、进入仓库 -&gt; Setting -&gt;找到Launch automatic page generator进入3、此时相当于一篇博客页，填入必要的字段后，点击Continue to layouts4、选样式 -&gt; Publish page5、之后，你就能在Setting的GitHub Pages下看到你的地址了">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="yazidchen.github.io/2016/08/19/CreateBlogsForJekyllOnGithub/">
+    <meta property="og:site_name" content="YazidChen Blog">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2016-08-19">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="YazidChen Blog"><span class="octicon octicon-mark-github"></span> YazidChen Blog</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="首页">首页</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="分类">分类</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="关于">关于</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Win环境Jekyll+Mar">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Win环境Jekyll+Markdown+Github Pages搭建个人Blogs</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2016/08/19
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#Other" title="Other">Other</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h2 id="github-pages">开启Github Pages</h2>
+<p><strong>1、</strong>在github中建立一个基于你的用户名的repository
+<img src="http://i.imgur.com/pJBemgT.png" alt="" />
+<strong>2、</strong>进入仓库 -&gt; Setting -&gt;找到Launch automatic page generator进入
+<img src="http://i.imgur.com/NX82S2v.png" alt="" />
+<strong>3、</strong>此时相当于一篇博客页，填入必要的字段后，点击Continue to layouts
+<strong>4、</strong>选样式 -&gt; Publish page
+<strong>5、</strong>之后，你就能在Setting的GitHub Pages下看到你的地址了
+<img src="http://i.imgur.com/RhpshMR.png" alt="" /></p>
+
+<h2 id="jekyll">部署Jekyll</h2>
+<h3 id="rubyrubygems">安装Ruby、RubyGems</h3>
+<p><strong>1、</strong>下载<a href="http://rubyinstaller.org/downloads/" title="RubyInstallers">http://rubyinstaller.org/downloads/</a>安装
+<strong>2、</strong>配置环境变量：</p>
+<ul>
+  <li>RUBY_HOME=D:\OfficeSoft\Ruby23-x64（目录地址）</li>
+  <li>在Path中添加 %RUBY_HOME%\bin</li>
+  <li>进cmd， ruby -v，如果显示ruby版本信息说明安装成功。</li>
+</ul>
+
+<p><strong>3、</strong>安装rubyGems</p>
+<ul>
+  <li>cd d:\OfficeSoft\rubygems-2.6.6</li>
+  <li>ruby setup.rb
+    <h3 id="jekyll-1">安装Jekyll</h3>
+  </li>
+  <li>gem install jekyll</li>
+</ul>
+
+<h3 id="blog">创建本地blog站点</h3>
+<ul>
+  <li>cd进入想要存放blog的目录</li>
+  <li>jekyll new YazidChen.Github.io（目录名自拟）</li>
+</ul>
+
+<h3 id="section">开启站点服务</h3>
+<p><code class="highlighter-rouge">jekll serve</code> 开启服务。可能会报错，一般为缺少包，根据报错做相应处理
+    gem install bundler
+    gem install minima
+minima报错时，在\Ruby23-x64\lib\ruby\gems\2.3.0\gems\jekyll-3.2.1\lib\jekyll目录下找到layout.rb，</p>
+<div class="highlighter-rouge"><pre class="highlight"><code># Replace Line 38 with:
+
+@path = base + "/" + name
+</code></pre>
+</div>
+
+<h3 id="section-1">目录解读</h3>
+<p>刚生成的YazidChen.Github.io下存在以下结构
+<img src="http://i.imgur.com/xCQ3uNM.png" alt="" /></p>
+<ul>
+  <li>.sass-cache	-&gt;	sass编译缓存文件的目录</li>
+  <li>_posts		-&gt;	存放博文的目录，博文文件类型必须为markdown，文件名统一格式：YEAR-MONTH-DAY-TITLE，如<code class="highlighter-rouge">2016-08-19-welcome-to-jekyll.markdown</code>或<code class="highlighter-rouge">2016-08-19-welcome-to-jekyll.md</code></li>
+  <li>_site		-&gt;	Jekyll解析完整个网站,会将源代码存在此目录</li>
+  <li>_config.yml	-&gt;	Jekyll的配置文件</li>
+</ul>
+
+<h2 id="jekyll-2">使用Jekyll写博文</h2>
+<h3 id="section-2">把仓库克隆到本地</h3>
+<p><strong>1、</strong>下载<a href="https://desktop.github.com/">GitHub Desktop</a>
+<strong>2、</strong>克隆仓库到本地
+<img src="http://i.imgur.com/iyNOqSe.png" alt="" />
+<strong>3、</strong>拷贝本地Jekyll创建的YazidChen.Github.io的所有子目录及文件到本地仓库中的。
+<strong>4、</strong>进入仓库启动jekyll 
+<img src="http://i.imgur.com/c2tOmeS.png" alt="" />
+<strong>5、</strong>github 提交修改并同步</p>
+
+<h2 id="section-3">参考</h2>
+<p>本文参考以下文章，并对原作者表示感谢！
+<a href="http://jekyll.bootcss.com/docs/home/">jekyll 中文文档</a>
+<a href="http://jekyllrb.com/docs/home/">jekyll English Docs</a>
+<a href="http://pwnny.cn/original/2016/06/26/MakeBlog.html">Jekyll和Github搭建个人静态博客</a>
+<a href="http://kresnik.wang/works/tech/2015/06/07/%E5%9C%A8github-pages%E7%BD%91%E7%AB%99%E4%B8%8B%E7%94%A8jekyll%E5%88%B6%E4%BD%9C%E5%8D%9A%E5%AE%A2%E6%95%99%E7%A8%8B.html">在github pages网站下用jekyll制作博客教程</a>
+<a href="http://pizida.com/technology/2016/03/03/use-jekyll-create-blog-on-github/">Jekyll本地搭建开发环境以及Github部署流程</a></p>
+
+
+    </article>
+    <div class="share">
+      <div class="share-component"></div>
+    </div>
+    <div class="comment">
+      
+  
+
+
+    </div>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+    
+<h3>Post Directory</h3>
+<div id="post-directory-module" class="mobile-hidden">
+  <section class="post-directory">
+  <!-- Links that trigger the jumping -->
+  <!-- Added by javascript below -->
+  <dl></dl>
+  </section>
+</div>
+
+<script src="/assets/js/jquery.toc.js"></script>
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2016
+                    <span title="YazidChen">YazidChen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="首页" target="">首页</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="分类" target="">分类</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="关于" target="">关于</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+</body>
+</html>

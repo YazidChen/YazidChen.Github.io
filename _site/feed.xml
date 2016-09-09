@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-09-09T08:08:47+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而生</subtitle><author><name>YazidChen</name></author><entry><title>Win环境Jekyll+Markdown+Github Pages搭建个人Blogs</title><link href="yazidchen.github.io/2016/08/19/CreateBlogsForJekyllOnGithub/" rel="alternate" type="text/html" title="Win环境Jekyll+Markdown+Github Pages搭建个人Blogs" /><published>2016-08-19T00:00:00+00:00</published><updated>2016-08-19T00:00:00+00:00</updated><id>yazidchen.github.io/2016/08/19/CreateBlogsForJekyllOnGithub</id><content type="html" xml:base="yazidchen.github.io/2016/08/19/CreateBlogsForJekyllOnGithub/">&lt;h2 id=&quot;github-pages&quot;&gt;开启Github Pages&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;1、&lt;/strong&gt;在github中建立一个基于你的用户名的repository
+&lt;img src=&quot;http://i.imgur.com/pJBemgT.png&quot; alt=&quot;&quot; /&gt;
+&lt;strong&gt;2、&lt;/strong&gt;进入仓库 -&amp;gt; Setting -&amp;gt;找到Launch automatic page generator进入
+&lt;img src=&quot;http://i.imgur.com/NX82S2v.png&quot; alt=&quot;&quot; /&gt;
+&lt;strong&gt;3、&lt;/strong&gt;此时相当于一篇博客页，填入必要的字段后，点击Continue to layouts
+&lt;strong&gt;4、&lt;/strong&gt;选样式 -&amp;gt; Publish page
+&lt;strong&gt;5、&lt;/strong&gt;之后，你就能在Setting的GitHub Pages下看到你的地址了
+&lt;img src=&quot;http://i.imgur.com/RhpshMR.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;jekyll&quot;&gt;部署Jekyll&lt;/h2&gt;
+&lt;h3 id=&quot;rubyrubygems&quot;&gt;安装Ruby、RubyGems&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;1、&lt;/strong&gt;下载&lt;a href=&quot;http://rubyinstaller.org/downloads/&quot; title=&quot;RubyInstallers&quot;&gt;http://rubyinstaller.org/downloads/&lt;/a&gt;安装
+&lt;strong&gt;2、&lt;/strong&gt;配置环境变量：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;RUBY_HOME=D:\OfficeSoft\Ruby23-x64（目录地址）&lt;/li&gt;
+  &lt;li&gt;在Path中添加 %RUBY_HOME%\bin&lt;/li&gt;
+  &lt;li&gt;进cmd， ruby -v，如果显示ruby版本信息说明安装成功。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;3、&lt;/strong&gt;安装rubyGems&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;cd d:\OfficeSoft\rubygems-2.6.6&lt;/li&gt;
+  &lt;li&gt;ruby setup.rb
+    &lt;h3 id=&quot;jekyll-1&quot;&gt;安装Jekyll&lt;/h3&gt;
+  &lt;/li&gt;
+  &lt;li&gt;gem install jekyll&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;blog&quot;&gt;创建本地blog站点&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;cd进入想要存放blog的目录&lt;/li&gt;
+  &lt;li&gt;jekyll new YazidChen.Github.io（目录名自拟）&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;section&quot;&gt;开启站点服务&lt;/h3&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;jekll serve&lt;/code&gt; 开启服务。可能会报错，一般为缺少包，根据报错做相应处理
+    gem install bundler
+    gem install minima
+minima报错时，在\Ruby23-x64\lib\ruby\gems\2.3.0\gems\jekyll-3.2.1\lib\jekyll目录下找到layout.rb，&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# Replace Line 38 with:
+
+@path = base + &quot;/&quot; + name
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;目录解读&lt;/h3&gt;
+&lt;p&gt;刚生成的YazidChen.Github.io下存在以下结构
+&lt;img src=&quot;http://i.imgur.com/xCQ3uNM.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;.sass-cache	-&amp;gt;	sass编译缓存文件的目录&lt;/li&gt;
+  &lt;li&gt;_posts		-&amp;gt;	存放博文的目录，博文文件类型必须为markdown，文件名统一格式：YEAR-MONTH-DAY-TITLE，如&lt;code class=&quot;highlighter-rouge&quot;&gt;2016-08-19-welcome-to-jekyll.markdown&lt;/code&gt;或&lt;code class=&quot;highlighter-rouge&quot;&gt;2016-08-19-welcome-to-jekyll.md&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;_site		-&amp;gt;	Jekyll解析完整个网站,会将源代码存在此目录&lt;/li&gt;
+  &lt;li&gt;_config.yml	-&amp;gt;	Jekyll的配置文件&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;jekyll-2&quot;&gt;使用Jekyll写博文&lt;/h2&gt;
+&lt;h3 id=&quot;section-2&quot;&gt;把仓库克隆到本地&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;1、&lt;/strong&gt;下载&lt;a href=&quot;https://desktop.github.com/&quot;&gt;GitHub Desktop&lt;/a&gt;
+&lt;strong&gt;2、&lt;/strong&gt;克隆仓库到本地
+&lt;img src=&quot;http://i.imgur.com/iyNOqSe.png&quot; alt=&quot;&quot; /&gt;
+&lt;strong&gt;3、&lt;/strong&gt;拷贝本地Jekyll创建的YazidChen.Github.io的所有子目录及文件到本地仓库中的。
+&lt;strong&gt;4、&lt;/strong&gt;进入仓库启动jekyll 
+&lt;img src=&quot;http://i.imgur.com/c2tOmeS.png&quot; alt=&quot;&quot; /&gt;
+&lt;strong&gt;5、&lt;/strong&gt;github 提交修改并同步&lt;/p&gt;
+
+&lt;h2 id=&quot;section-3&quot;&gt;参考&lt;/h2&gt;
+&lt;p&gt;本文参考以下文章，并对原作者表示感谢！
+&lt;a href=&quot;http://jekyll.bootcss.com/docs/home/&quot;&gt;jekyll 中文文档&lt;/a&gt;
+&lt;a href=&quot;http://jekyllrb.com/docs/home/&quot;&gt;jekyll English Docs&lt;/a&gt;
+&lt;a href=&quot;http://pwnny.cn/original/2016/06/26/MakeBlog.html&quot;&gt;Jekyll和Github搭建个人静态博客&lt;/a&gt;
+&lt;a href=&quot;http://kresnik.wang/works/tech/2015/06/07/%E5%9C%A8github-pages%E7%BD%91%E7%AB%99%E4%B8%8B%E7%94%A8jekyll%E5%88%B6%E4%BD%9C%E5%8D%9A%E5%AE%A2%E6%95%99%E7%A8%8B.html&quot;&gt;在github pages网站下用jekyll制作博客教程&lt;/a&gt;
+&lt;a href=&quot;http://pizida.com/technology/2016/03/03/use-jekyll-create-blog-on-github/&quot;&gt;Jekyll本地搭建开发环境以及Github部署流程&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary>开启Github Pages
+1、在github中建立一个基于你的用户名的repository
+
+2、进入仓库 -&amp;gt; Setting -&amp;gt;找到Launch automatic page generator进入
+
+3、此时相当于一篇博客页，填入必要的字段后，点击Continue to layouts
+4、选样式 -&amp;gt; Publish page
+5、之后，你就能在Setting的GitHub Pages下看到你的地址了</summary></entry></feed>
