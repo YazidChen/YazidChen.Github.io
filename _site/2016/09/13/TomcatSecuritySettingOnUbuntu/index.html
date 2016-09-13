@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Linux环境Tomcat安全配置 &mdash; YazidChen Blog</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="yazidchen.github.io/2016/09/13/TomcatSecuritySettingOnUbuntu/">
+    <link rel="alternate" type="application/atom+xml" title="YazidChen Blog" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="Linux环境Tomcat安全配置">
+      
+    <meta name="keywords" content="Jekyll, Blogs, Github">
+    <meta name="og:keywords" content="Jekyll, Blogs, Github">
+      
+    <meta name="description" content="Tomcat For Ubuntu16.04">
+    <meta name="og:description" content="Tomcat For Ubuntu16.04">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="yazidchen.github.io/2016/09/13/TomcatSecuritySettingOnUbuntu/">
+    <meta property="og:site_name" content="YazidChen Blog">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2016-09-13">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="YazidChen Blog"><span class="octicon octicon-mark-github"></span> YazidChen Blog</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="Home">Home</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="Categories">Categories</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="About">About</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="Linux环境Tomcat安全">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">Linux环境Tomcat安全配置</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2016/09/13
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#Other" title="Other">Other</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="tomcat-for-ubuntu1604">Tomcat For Ubuntu16.04</h1>
+
+<h2 id="section">一、权限</h2>
+
+<h3 id="tomcat">1.1 创建tomcat用户</h3>
+
+<p>为了提高系统安全，tomcat不应该使用root运行。为它创建一个新用户和组。
+创建一个tomcat组：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>sudo groupadd tomcat
+</code></pre>
+</div>
+
+<p>创建一个叫tomcat的用户：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+</code></pre>
+</div>
+
+<p>tomcat用户属于tomcat组，家目录是<code class="highlighter-rouge">/opt/tomcat</code>，我要把tomcat安装在这个目录。<code class="highlighter-rouge">/bin/false</code>代表这个用户是不能登录的。</p>
+
+<h3 id="section-1">1.2 更改权限</h3>
+
+<p>赋给tomcat用户各种权限：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>cd /opt
+sudo chgrp -R tomcat tomcat
+
+cd /opt/tomcat
+sudo chgrp -R tomcat conf
+sudo chmod g+rwx conf
+sudo chmod g+r conf/*
+
+</code></pre>
+</div>
+
+<p>修改各种目录的所有者：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>cd /opt
+sudo chown -R tomcat tomcat
+
+cd /opt/tomcat
+sudo chown -R tomcat webapps/ work/ temp/ logs/ bin/ lib/
+</code></pre>
+</div>
+
+<h3 id="section-2">1.3 配置定时登出</h3>
+
+<p>如果使用启用了Tomcat用户，则需要设置Tomcat定时登出，将<code class="highlighter-rouge">$CATALINA_HOME\conf\server.xml</code>配置如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;Connector port="8080" protocol="HTTP/1.1"
+           connectionTimeout="20000"
+           redirectPort="8443" /&gt;
+</code></pre>
+</div>
+
+<h2 id="section-3">二、配置开机启动</h2>
+
+<p>我们需要把tomcat配置为服务，为了做到这一点，需要创建systemd服务配置文件。</p>
+
+<p>使用下面命令查看Java安装路径：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>sudo update-java-alternatives -l
+</code></pre>
+</div>
+
+<p>现在在<code class="highlighter-rouge">/etc/systemd/system</code>目录创建服务文件tomcat.service：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>sudo vim /etc/systemd/system/tomcat.service
+</code></pre>
+</div>
+
+<p>tomcat.service内容如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[Unit]
+Description=Apache Tomcat Web Application Container
+After=network.target
+ 
+[Service]
+Type=forking
+ 
+Environment=JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64/jre
+Environment=CATALINA_PID=/opt/tomcat/temp/tomcat.pid
+Environment=CATALINA_HOME=/opt/tomcat
+Environment=CATALINA_BASE=/opt/tomcat
+Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
+Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
+ 
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/opt/tomcat/bin/shutdown.sh
+ 
+User=tomcat
+Group=tomcat
+ 
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+</div>
+
+<p>替换JAVA_HOME的值，注意在路径后加jre；上面配置内存要根据需要修改。</p>
+
+<p>修改完成之后，重新加载systemd：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>sudo systemctl daemon-reload
+</code></pre>
+</div>
+
+<p>启动tomcat：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>sudo systemctl enable tomcat
+sudo systemctl start tomcat
+</code></pre>
+</div>
+
+<p>确认tomcat启动状态：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>sudo systemctl status tomcat
+</code></pre>
+</div>
+
+<p><img src="http://i.imgur.com/wD55zo0.png" alt="" /></p>
+
+<h2 id="section-4">三、安全加固配置</h2>
+
+<h3 id="section-5">3.1 删除应用包</h3>
+
+<p>除了需要部署上去的应用，其余位于<code class="highlighter-rouge">$CATALINA_HOME\webapps</code>文件夹中的应用如docs、examples、host-manager、manager和ROOT，若无业务必要，请执行删除上述的应用包。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>rm -rf docs/ examples/ host-manager/ manager/ ROOT/
+</code></pre>
+</div>
+
+<h3 id="tomcat-1">3.2 禁止Tomcat目录列表</h3>
+
+<p>确保<code class="highlighter-rouge">$CATALINA_HOME\conf\web.xml</code>中listings的值为false：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;init-param&gt;
+    &lt;param-name&gt;listings&lt;/param-name&gt;
+    &lt;param-value&gt;false&lt;/param-value&gt;
+&lt;/init-param&gt;
+
+</code></pre>
+</div>
+
+<h3 id="cookiehttponly">3.3 设置Cookie的HttpOnly属性</h3>
+
+<p>如果您在cookie中设置了HttpOnly属性，那么通过js脚本将无法读取到cookie信息，这样能有效的防止XSS攻击。</p>
+
+<p>在<code class="highlighter-rouge">$CATALINA_HOME\conf\context.xml</code>文件中添加<code class="highlighter-rouge">useHttpOnly="true"</code>配置如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;Context useHttpOnly="true"&gt;
+    &lt;WatchedResource&gt;WEB-INF/web.xml&lt;/WatchedResource&gt;
+    &lt;WatchedResource&gt;${catalina.base}/conf/web.xml&lt;/WatchedResource&gt;
+&lt;/Context&gt;
+
+</code></pre>
+</div>
+
+<p>进入项目路径找到web.xml：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>root@yazid-chen:/opt/tomcat/webapps/api/WEB-INF# vim web.xml 
+
+</code></pre>
+</div>
+
+<p>加入http-only配置：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;session-config&gt;
+      &lt;session-timeout&gt;30&lt;/session-timeout&gt;
+      &lt;cookie-config&gt;
+            &lt;http-only&gt;true&lt;/http-only&gt;
+            &lt;secure&gt;true&lt;/secure&gt;
+      &lt;/cookie-config&gt;
+&lt;/session-config&gt;
+</code></pre>
+</div>
+
+<h3 id="shutdown">3.4 配置shutdown端口</h3>
+
+<p>在<code class="highlighter-rouge">$CATALINA_HOME\conf\server.xml</code>中有<code class="highlighter-rouge">“&lt;Server port="8005" shutdown="SHUTDOWN"&gt;”</code>的配置。</p>
+
+<p>任何人只要telnet到服务器的8005端口，输入”SHUTDOWN”，然后回车，服务器立即就被关掉了。</p>
+
+<p>从安全的角度上考虑，需要把这个shutdown指令改成一个别人不容易猜测的字符串。而且这个修改不影响shutdown.bat或shutdown.sh的执行。</p>
+
+<p>配置如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;Serverport="未被占用的端口" shutdown="较为复杂的字符串"&gt;
+#注：配置的端口需要大于1024。
+</code></pre>
+</div>
+
+<h3 id="tomcat-2">3.5 隐藏Tomcat版本信息</h3>
+
+<p>在默认配置下，当应用出现异常时，客户端会显示Tomcat的版本信息。攻击者可以根据Tomcat版本信息选择漏洞库攻击，所以需要将Tomcat的版本信息隐藏，解压<code class="highlighter-rouge">$CATALINA_HOME\lib\catalina.jar</code>：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>root@yazid-chen:/opt/tomcat/lib# jar xf catalina.jar 
+
+</code></pre>
+</div>
+
+<p>将<code class="highlighter-rouge">\org\apache\catalina\util</code>中的配置ServerInfo.properties如下,info和number随意：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>server.info=Server
+server.number=Y
+server.built=Jul 4 2016 18:22:47 UTC
+
+</code></pre>
+</div>
+
+<h3 id="war">3.6 关闭war自动部署</h3>
+
+<p>默认的配置war放在<code class="highlighter-rouge">$CATALINA_HOME\webapps</code>中会自动部署，所以关闭war自动部署防止被植入木马等恶意程序。将<code class="highlighter-rouge">$CATALINA_HOME\conf\server.xml</code>配置如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;Host name="localhost"  appBase="webapps"
+      unpackWARs="false" autoDeploy="false"&gt;
+
+</code></pre>
+</div>
+
+<h3 id="ajp">3.7 管理AJP端口</h3>
+
+<p>AJP是为 Tomcat 与 HTTP 服务器之间通信而定制的协议，能提供较高的通信速度和效率。如果tomcat前端放的是apache的时候，会使用到AJP这个连接器。如果用nginx做的反向代理，因此不使用此连接器，因此需要注销掉该连接器。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;!--
+    &lt;Connector port="8009" protocol="AJP/1.3" redirectPort="8443" /&gt;
+--&gt;
+</code></pre>
+</div>
+
+<h3 id="tomcat-3">3.8 用普通用户启动Tomcat</h3>
+
+<p>用root用户启动tomcat有一个严重的问题，那就是tomcat具有root权限。这意味着你的任何一个jsp脚本都具有root权限，所以可以轻易地用jsp脚本删除你整个硬盘里的东西！所以我们最好不要使用root启动tomcat。</p>
+
+<p>权限修改见上文1.2所示。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>#查看由哪个用户启动
+ps aux | grep tomcat 
+</code></pre>
+</div>
+
+<p><img src="http://i.imgur.com/24sEcMq.png" alt="" /></p>
+
+<h2 id="section-6">参考</h2>
+
+<p>本文参考以下文章，在此对原作者表示感谢！</p>
+
+<p><a href="http://blog.topspeedsnail.com/archives/4551">Ubuntu 16.04安装Tomcat 8</a></p>
+
+<p><a href="http://www.51itong.net/tomcat-4687.html">Tomcat安全加固配置手册</a></p>
+
+<p><a href="http://www.tuicool.com/articles/BRF732f">Tomcat 安全配置与性能优化</a></p>
+
+
+    <br><br>
+    <span class="content end">本文由<a href="mailto:https://yazidchen.github.io/?subject=feedback">YazidChen</a>整理编辑，引用转载请注明出处。</span>
+    </article>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2016
+                    <span title="YazidChen">YazidChen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/YazidChen/yazidchen.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="Home" target="">Home</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="Categories" target="">Categories</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="About" target="">About</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+</body>
+</html>

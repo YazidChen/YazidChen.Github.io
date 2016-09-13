@@ -1,5 +1,11 @@
 {
   
+  "2016-09-13-tomcatsecuritysettingonubuntu": {
+    "title": "Linux环境Tomcat安全配置",
+    "url": " /2016/09/13/TomcatSecuritySettingOnUbuntu/",
+    "category": "Other"
+  },
+  
   "2016-08-19-createblogsforjekyllongithub": {
     "title": "Win环境Jekyll+Markdown+Github Pages搭建个人Blogs",
     "url": " /2016/08/19/CreateBlogsForJekyllOnGithub/",
@@ -40,6 +46,12 @@
   "2016-08-19-createblogsforjekyllongithub": {
     "title": "Win环境Jekyll+Markdown+Github Pages搭建个人Blogs",
     "url": "/2016/08/19/CreateBlogsForJekyllOnGithub/",
+    "category": "[&quot;Other&quot;]"
+  },
+  
+  "2016-09-13-tomcatsecuritysettingonubuntu": {
+    "title": "Linux环境Tomcat安全配置",
+    "url": "/2016/09/13/TomcatSecuritySettingOnUbuntu/",
     "category": "[&quot;Other&quot;]"
   }
   

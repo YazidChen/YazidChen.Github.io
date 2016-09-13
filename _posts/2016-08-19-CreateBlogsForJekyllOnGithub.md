@@ -97,7 +97,7 @@ minima报错时，在\Ruby23-x64\lib\ruby\gems\2.3.0\gems\jekyll-3.2.1\lib\jekyl
 
 ## 参考 ##
 
-本文参考以下文章，并对原作者表示感谢！
+本文参考以下文章，在此对原作者表示感谢！
 
 [jekyll 中文文档](http://jekyll.bootcss.com/docs/home/)
 
