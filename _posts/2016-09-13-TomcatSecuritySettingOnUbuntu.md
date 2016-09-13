@@ -1,11 +1,11 @@
 ---
 layout: post
 title:  "Linux环境Tomcat安全配置"
-categories: Other
+categories: Security
 description: Linux环境Tomcat安全配置，Tomcat For Ubuntu16.04。
-keywords: Jekyll, Blogs, Github
+keywords: Tomcat, Linux, 安全, Security, Tomcat安全
 ---
-# Tomcat For Ubuntu16.04 #
+# Tomcat Security For Ubuntu16.04 #
 
 ## 一、权限 ##
 
