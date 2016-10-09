@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Linux环境Tomcat安全配置"
-categories: Security
+categories: Tomcat
 description: Linux环境Tomcat安全配置，Tomcat For Ubuntu16.04。
 keywords: Tomcat, Linux, 安全, Security, Tomcat安全
 ---

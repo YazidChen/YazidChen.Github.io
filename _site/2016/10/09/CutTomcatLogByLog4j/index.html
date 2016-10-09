@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>以Log4j切分Tomcat日志 &mdash; YazidChen Blog</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/">
+    <link rel="alternate" type="application/atom+xml" title="YazidChen Blog" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="以Log4j切分Tomcat日志">
+      
+    <meta name="keywords" content="Tomcat, log4j, 日志, log, log4j切分tomcat日志,log4j切分log">
+    <meta name="og:keywords" content="Tomcat, log4j, 日志, log, log4j切分tomcat日志,log4j切分log">
+      
+    <meta name="description" content="一、Log4j.properties解析">
+    <meta name="og:description" content="一、Log4j.properties解析">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/">
+    <meta property="og:site_name" content="YazidChen Blog">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2016-10-09">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="YazidChen Blog"><span class="octicon octicon-mark-github"></span> YazidChen Blog</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="Home">Home</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="Categories">Categories</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="About">About</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="以Log4j切分Tomcat日">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">以Log4j切分Tomcat日志</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2016/10/09
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#Tomcat" title="Tomcat">Tomcat</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="log4jproperties">一、Log4j.properties解析</h1>
+
+<div class="language-properties highlighter-rouge"><pre class="highlight"><code><span class="c"># 根日志的级别定义为 DEBUG，并将名为 CATALINA 的 appender 添加其上。
+</span><span class="py">log4j.rootLogger</span> <span class="p">=</span> <span class="s">DEBUG, CATALINA</span>
+
+<span class="c"># 将名为 CATALINA 的 appender 设置为DailyRollingFileAppender。
+</span><span class="py">log4j.appender.CATALINA</span><span class="p">=</span><span class="s">org.apache.Log4j.DailyRollingFileAppender</span>
+
+<span class="c"># 他将日志写入 log 目录下一个名为 log.out 的文件中。
+</span><span class="py">log4j.appender.CATALINA.File</span><span class="p">=</span><span class="s">${log}/log.out</span>
+
+<span class="c"># 该标志位默认为 true，意味着每次日志追加操作都将输出流刷新至文件。
+</span><span class="py">log4j.appender.CATALINA.ImmediateFlush</span><span class="p">=</span><span class="s">true</span>
+
+<span class="c"># 设置appender 对象的阀值。
+</span><span class="py">log4j.appender.CATALINA.Threshold</span><span class="p">=</span><span class="s">debug</span>
+
+<span class="c"># 该值默认为 true，其含义是让日志追加至文件末尾。
+</span><span class="py">log4j.appender.CATALINA.Append</span><span class="p">=</span><span class="s">true</span>
+
+<span class="c"># 设置回滚规则，在此我们设置为每分钟回滚方便测试。
+</span><span class="py">log4j.appender.CATALINA.DatePattern</span><span class="p">=</span><span class="s">'.'</span> <span class="s">yyyy-MM-dd-HH-mm</span>
+
+<span class="c"># 设置 appender CATALINA 的 layout。
+</span><span class="py">log4j.appender.CATALINA.layout</span><span class="p">=</span><span class="s">org.apache.Log4j.PatternLayout</span>
+
+<span class="c"># layout 被定义为 %m%n，即打印出来的日志信息末尾加入换行。
+</span><span class="py">log4j.appender.CATALINA.layout.conversionPattern</span><span class="p">=</span><span class="s">%m%n</span>
+
+</code></pre>
+</div>
+<p><code class="highlighter-rouge">conversionPattern</code>可以自定义log的格式，相关参数有：</p>
+<ul>
+  <li>%p 输出优先级，即<code class="highlighter-rouge">DEBUG，INFO，WARN，ERROR，FATAL</code>。</li>
+  <li>%r 输出自应用启动到输出该log信息耗费的毫秒数。</li>
+  <li>%c 输出所属的类目，通常就是所在类的全名。</li>
+  <li>%t 输出产生该日志事件的线程名。</li>
+  <li>%m 输出代码中指定的消息。</li>
+  <li>%n 输出一个回车换行符，Windows平台为“rn”，Unix平台为“n”。</li>
+  <li>%d 输出日志时间点的日期或时间，默认格式为ISO8601，也可以在其后指定格式，比如：<code class="highlighter-rouge">%d{yyyy MMM dd HH:mm:ss,SSS}</code>，输出类似：2016年10月09日 ：15：41，628。</li>
+  <li>%l 输出日志事件的发生位置，包括类目名、发生的线程，以及在代码中的行数。</li>
+  <li>%L 输出当前记录器所在的文件行号，如输出: “51”。</li>
+  <li>%F 输出当前记录器所在的文件名称，如输出: “main.cpp”。</li>
+  <li>%x 输出和当前线程相关联的NDC(嵌套诊断环境),尤其用到像java servlets这样的多客户多线程的应用中。</li>
+</ul>
+
+<h1 id="log4jcatalinaout">二、使用Log4j接管catalina.out</h1>
+
+<h2 id="section">2.1 接管前置准备</h2>
+
+<p><strong>1、</strong>修改<code class="highlighter-rouge">$CATALINA_HOME/bin/</code>下的<code class="highlighter-rouge">catalina.sh</code></p>
+<div class="highlighter-rouge"><pre class="highlight"><code># 1)将下条隐藏。
+# touch "$CATALINA_OUT"
+
+# 2)下条有两处需要隐藏。
+#  &gt;&gt; "$CATALINA_OUT" 2&gt;&amp;1 "&amp;"
+
+# 3)下条有两处需要修改。
+org.apache.catalina.startup.Bootstrap "$@" start \
+# 修改为
+org.apache.catalina.startup.Bootstrap "$@" start &amp;\
+
+</code></pre>
+</div>
+
+<p><img src="http://i.imgur.com/syYTpXt.png" alt="" /></p>
+
+<p><strong>2、</strong>重命名<code class="highlighter-rouge">$CATALINA_HOME/bin/</code>下的<code class="highlighter-rouge">logging.properties</code>成其他名字，该文件不需要了，建议重命名。</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>mv logging.properties loggin.properties
+</code></pre>
+</div>
+
+<h2 id="section-1">2.2 切分方式</h2>
+
+<h3 id="section-2">2.2.1 按时间切分</h3>
+
+<p>如需按时段生成日志文件，需要使用<code class="highlighter-rouge">org.apache.Log4j.DailyRollingFileAppender</code>，该类继承了<code class="highlighter-rouge">FileAppender</code>类。该类多包涵了一个重要的属性：
+<code class="highlighter-rouge">DatePattern</code>：该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。
+<code class="highlighter-rouge">DatePattern</code>使用如下规则控制回滚计划：</p>
+<ul>
+  <li><code class="highlighter-rouge">yyyy-MM</code>				在本月末，下月初回滚文件。</li>
+  <li><code class="highlighter-rouge">yyyy-MM-dd	</code>		在每天午夜回滚文件，这是缺省值。</li>
+  <li><code class="highlighter-rouge">yyyy-MM-dd-a</code>			在每天中午和午夜回滚文件。</li>
+  <li><code class="highlighter-rouge">yyyy-MM-dd-HH</code>		在每个整点回滚文件。</li>
+  <li><code class="highlighter-rouge">yyyy-MM-dd-HH-mm</code>		每分钟回滚文件。</li>
+  <li><code class="highlighter-rouge">yyyy-ww</code>				根据地域，在每周的第一天回滚。</li>
+</ul>
+
+<p>在项目中添加或修改<code class="highlighter-rouge">log4j.properties</code>文件。</p>
+<div class="language-properties highlighter-rouge"><pre class="highlight"><code><span class="py">log4j.rootLogger</span><span class="p">=</span><span class="s">INFO, CATALINA</span>
+
+<span class="py">log4j.appender.CATALINA</span><span class="p">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
+<span class="py">log4j.appender.CATALINA.File</span><span class="p">=</span><span class="s">${catalina.base}/logs/catalina.</span>
+<span class="py">log4j.appender.CATALINA.Append</span><span class="p">=</span><span class="s">true</span>
+<span class="py">log4j.appender.CATALINA.Encoding</span><span class="p">=</span><span class="s">UTF-8</span>
+<span class="c"># 为方便测试，此处设置为每分钟分割一次
+</span><span class="py">log4j.appender.CATALINA.DatePattern</span><span class="p">=</span><span class="s">yyyy-MM-dd-HH-mm'.log'</span>
+<span class="py">log4j.appender.CATALINA.layout</span> <span class="p">=</span> <span class="s">org.apache.log4j.PatternLayout</span>
+<span class="py">log4j.appender.CATALINA.layout.ConversionPattern</span> <span class="p">=</span> <span class="s">%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %m%n</span>
+
+<span class="py">log4j.logger.org.springframework</span><span class="p">=</span><span class="s">DEBUG</span>
+
+<span class="c"># 以下按需要选择
+</span><span class="py">log4j.appender.LOCALHOST</span><span class="p">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
+<span class="py">log4j.appender.LOCALHOST.File</span><span class="p">=</span><span class="s">${catalina.base}/logs/localhost.</span>
+<span class="py">log4j.appender.LOCALHOST.Append</span><span class="p">=</span><span class="s">true</span>
+<span class="py">log4j.appender.LOCALHOST.Encoding</span><span class="p">=</span><span class="s">UTF-8</span>
+<span class="py">log4j.appender.LOCALHOST.DatePattern</span><span class="p">=</span><span class="s">yyyy-MM-dd-HH-mm'.log'</span>
+<span class="py">log4j.appender.LOCALHOST.layout</span> <span class="p">=</span> <span class="s">org.apache.log4j.PatternLayout</span>
+<span class="py">log4j.appender.LOCALHOST.layout.ConversionPattern</span> <span class="p">=</span> <span class="s">%d [%t] %-5p %c- %m%n</span>
+
+<span class="py">log4j.appender.MANAGER</span><span class="p">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
+<span class="py">log4j.appender.MANAGER.File</span><span class="p">=</span><span class="s">${catalina.base}/logs/manager.</span>
+<span class="py">log4j.appender.MANAGER.Append</span><span class="p">=</span><span class="s">true</span>
+<span class="py">log4j.appender.MANAGER.Encoding</span><span class="p">=</span><span class="s">UTF-8</span>
+<span class="py">log4j.appender.MANAGER.DatePattern</span><span class="p">=</span><span class="s">yyyy-MM-dd-HH-mm'.log'</span>
+<span class="py">log4j.appender.MANAGER.layout</span> <span class="p">=</span> <span class="s">org.apache.log4j.PatternLayout</span>
+<span class="py">log4j.appender.MANAGER.layout.ConversionPattern</span> <span class="p">=</span> <span class="s">%d [%t] %-5p %c- %m%n</span>
+
+<span class="err">log4j.appender.HOST-</span><span class="py">MANAGER</span><span class="p">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
+<span class="err">log4j.appender.HOST-</span><span class="py">MANAGER.File</span><span class="p">=</span><span class="s">${catalina.base}/logs/host-manager.</span>
+<span class="err">log4j.appender.HOST-</span><span class="py">MANAGER.Append</span><span class="p">=</span><span class="s">true</span>
+<span class="err">log4j.appender.HOST-</span><span class="py">MANAGER.Encoding</span><span class="p">=</span><span class="s">UTF-8</span>
+<span class="err">log4j.appender.HOST-</span><span class="py">MANAGER.DatePattern</span><span class="p">=</span><span class="s">yyyy-MM-dd-HH-mm'.log'</span>
+<span class="err">log4j.appender.HOST-</span><span class="py">MANAGER.layout</span> <span class="p">=</span> <span class="s">org.apache.log4j.PatternLayout</span>
+<span class="err">log4j.appender.HOST-</span><span class="py">MANAGER.layout.ConversionPattern</span> <span class="p">=</span> <span class="s">%d [%t] %-5p %c- %m%n</span>
+
+<span class="c"># 配置哪个loggers属于哪个appenders，按需选择配置
+</span><span class="err">log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=INFO,</span> <span class="err">LOCALHOST</span>
+<span class="err">log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager]=</span><span class="se">\
+</span>  <span class="err">INFO,</span> <span class="err">MANAGER</span>
+<span class="err">log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/host-manager]=</span><span class="se">\
+</span>  <span class="err">INFO,</span> <span class="err">HOST-MANAGER</span>
+
+</code></pre>
+</div>
+
+<h3 id="section-3">2.2.2 按日志文件大小拆分</h3>
+
+<p>如需按日志文件大小分割日志，则需要使用 org.apache.Log4j.RollingFileAppender，该类继承了 FileAppender 类，继承了它的所有属性。
+该类多包括了以下可配置属性：</p>
+<ul>
+  <li><code class="highlighter-rouge">maxFileSize</code>：这是文件大小的阀值，大于该值时，文件会回滚。该值默认为 10 MB。</li>
+  <li><code class="highlighter-rouge">maxBackupIndex</code>：该值表示备份文件的个数，默认为 1。</li>
+</ul>
+
+<p>对log4j.properties配置引入以下关键项：</p>
+<div class="language-properties highlighter-rouge"><pre class="highlight"><code><span class="c"># 设置日志文件阀值最大为5MB
+</span><span class="py">Log4j.appender.CATALINA.MaxFileSize</span><span class="p">=</span><span class="s">5MB</span>
+
+<span class="c"># 设置日志文件个数为2
+</span><span class="py">Log4j.appender.CATALINA.MaxBackupIndex</span><span class="p">=</span><span class="s">2</span>
+</code></pre>
+</div>
+<p>该示例配置文件展示了每个日志文件最大为 5 MB，如果超过该最大值，则会生成一个新的日志文件。由于 <code class="highlighter-rouge">maxBackupIndex</code> 的值为 2，当第二个文件的大小超过最大值时，会擦去第一个日志文件的内容，所有的日志都回滚至第一个日志文件。</p>
+
+<h1 id="section-4">参考</h1>
+<p>本文参考以下文章，在此对原作者表示感谢！</p>
+
+<p><a href="https://my.oschina.net/jsan/blog/205669">Tomcat下使用Log4j 接管 catalina.out 日志文件生成方式</a></p>
+
+
+    <br><br>
+    <span class="content end">本文由<a href="mailto:https://yazidchen.github.io/?subject=feedback">YazidChen</a>整理编辑，引用转载请注明出处。</span>
+    </article>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2016
+                    <span title="YazidChen">YazidChen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/YazidChen/yazidchen.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="Home" target="">Home</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="Categories" target="">Categories</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="About" target="">About</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+</body>
+</html>

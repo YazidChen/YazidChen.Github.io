@@ -1,9 +1,15 @@
 {
   
+  "2016-10-09-cuttomcatlogbylog4j": {
+    "title": "以Log4j切分Tomcat日志",
+    "url": " /2016/10/09/CutTomcatLogByLog4j/",
+    "category": "Tomcat"
+  },
+  
   "2016-09-13-tomcatsecuritysettingonubuntu": {
     "title": "Linux环境Tomcat安全配置",
     "url": " /2016/09/13/TomcatSecuritySettingOnUbuntu/",
-    "category": "Security"
+    "category": "Tomcat"
   },
   
   "2016-08-19-createblogsforjekyllongithub": {
@@ -52,7 +58,13 @@
   "2016-09-13-tomcatsecuritysettingonubuntu": {
     "title": "Linux环境Tomcat安全配置",
     "url": "/2016/09/13/TomcatSecuritySettingOnUbuntu/",
-    "category": "[&quot;Security&quot;]"
+    "category": "[&quot;Tomcat&quot;]"
+  },
+  
+  "2016-10-09-cuttomcatlogbylog4j": {
+    "title": "以Log4j切分Tomcat日志",
+    "url": "/2016/10/09/CutTomcatLogByLog4j/",
+    "category": "[&quot;Tomcat&quot;]"
   }
   
 }
