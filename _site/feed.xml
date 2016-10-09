@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-10-09T08:13:01+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>以Log4j切分Tomcat日志</title><link href="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/" rel="alternate" type="text/html" title="以Log4j切分Tomcat日志" /><published>2016-10-09T00:00:00+00:00</published><updated>2016-10-09T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j</id><content type="html" xml:base="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/">&lt;h1 id=&quot;log4jproperties&quot;&gt;一、Log4j.properties解析&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-10-09T08:19:16+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>以Log4j切分Tomcat日志</title><link href="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/" rel="alternate" type="text/html" title="以Log4j切分Tomcat日志" /><published>2016-10-09T00:00:00+00:00</published><updated>2016-10-09T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j</id><content type="html" xml:base="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/">&lt;h1 id=&quot;log4jproperties&quot;&gt;一、Log4j.properties解析&lt;/h1&gt;
 
 &lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 根日志的级别定义为 DEBUG，并将名为 CATALINA 的 appender 添加其上。
 &lt;/span&gt;&lt;span class=&quot;py&quot;&gt;log4j.rootLogger&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DEBUG, CATALINA&lt;/span&gt;
@@ -29,7 +29,9 @@
 
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
+
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;conversionPattern&lt;/code&gt;可以自定义log的格式，相关参数有：&lt;/p&gt;
+
 &lt;ul&gt;
   &lt;li&gt;%p 输出优先级，即&lt;code class=&quot;highlighter-rouge&quot;&gt;DEBUG，INFO，WARN，ERROR，FATAL&lt;/code&gt;。&lt;/li&gt;
   &lt;li&gt;%r 输出自应用启动到输出该log信息耗费的毫秒数。&lt;/li&gt;
@@ -49,6 +51,7 @@
 &lt;h2 id=&quot;section&quot;&gt;2.1 接管前置准备&lt;/h2&gt;
 
 &lt;p&gt;&lt;strong&gt;1、&lt;/strong&gt;修改&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME/bin/&lt;/code&gt;下的&lt;code class=&quot;highlighter-rouge&quot;&gt;catalina.sh&lt;/code&gt;&lt;/p&gt;
+
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# 1)将下条隐藏。
 # touch &quot;$CATALINA_OUT&quot;
 
@@ -65,7 +68,8 @@ org.apache.catalina.startup.Bootstrap &quot;$@&quot; start &amp;amp;\
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/syYTpXt.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;2、&lt;/strong&gt;重命名&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME/bin/&lt;/code&gt;下的&lt;code class=&quot;highlighter-rouge&quot;&gt;logging.properties&lt;/code&gt;成其他名字，该文件不需要了，建议重命名。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2、&lt;/strong&gt;重命名&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME/bin/&lt;/code&gt;下的&lt;code class=&quot;highlighter-rouge&quot;&gt;logging.properties&lt;/code&gt;成其他名字，该文件不需要了，建议重命名:&lt;/p&gt;
+
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mv logging.properties loggin.properties
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
@@ -74,8 +78,9 @@ org.apache.catalina.startup.Bootstrap &quot;$@&quot; start &amp;amp;\
 
 &lt;h3 id=&quot;section-2&quot;&gt;2.2.1 按时间切分&lt;/h3&gt;
 
-&lt;p&gt;如需按时段生成日志文件，需要使用&lt;code class=&quot;highlighter-rouge&quot;&gt;org.apache.Log4j.DailyRollingFileAppender&lt;/code&gt;，该类继承了&lt;code class=&quot;highlighter-rouge&quot;&gt;FileAppender&lt;/code&gt;类。该类多包涵了一个重要的属性：
-&lt;code class=&quot;highlighter-rouge&quot;&gt;DatePattern&lt;/code&gt;：该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。
+&lt;p&gt;如需按时段生成日志文件，需要使用&lt;code class=&quot;highlighter-rouge&quot;&gt;org.apache.Log4j.DailyRollingFileAppender&lt;/code&gt;，该类继承了&lt;code class=&quot;highlighter-rouge&quot;&gt;FileAppender&lt;/code&gt;类。该类多包涵了一个重要的属性：&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;DatePattern&lt;/code&gt;：该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。
 &lt;code class=&quot;highlighter-rouge&quot;&gt;DatePattern&lt;/code&gt;使用如下规则控制回滚计划：&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;yyyy-MM&lt;/code&gt;				在本月末，下月初回滚文件。&lt;/li&gt;
@@ -86,7 +91,8 @@ org.apache.catalina.startup.Bootstrap &quot;$@&quot; start &amp;amp;\
   &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;yyyy-ww&lt;/code&gt;				根据地域，在每周的第一天回滚。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;在项目中添加或修改&lt;code class=&quot;highlighter-rouge&quot;&gt;log4j.properties&lt;/code&gt;文件。&lt;/p&gt;
+&lt;p&gt;在项目中添加或修改&lt;code class=&quot;highlighter-rouge&quot;&gt;log4j.properties&lt;/code&gt;文件:&lt;/p&gt;
+
 &lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;py&quot;&gt;log4j.rootLogger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;INFO, CATALINA&lt;/span&gt;
 
 &lt;span class=&quot;py&quot;&gt;log4j.appender.CATALINA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;org.apache.log4j.DailyRollingFileAppender&lt;/span&gt;
@@ -139,12 +145,14 @@ org.apache.catalina.startup.Bootstrap &quot;$@&quot; start &amp;amp;\
 
 &lt;p&gt;如需按日志文件大小分割日志，则需要使用 org.apache.Log4j.RollingFileAppender，该类继承了 FileAppender 类，继承了它的所有属性。
 该类多包括了以下可配置属性：&lt;/p&gt;
+
 &lt;ul&gt;
   &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;maxFileSize&lt;/code&gt;：这是文件大小的阀值，大于该值时，文件会回滚。该值默认为 10 MB。&lt;/li&gt;
   &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;maxBackupIndex&lt;/code&gt;：该值表示备份文件的个数，默认为 1。&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;对log4j.properties配置引入以下关键项：&lt;/p&gt;
+
 &lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 设置日志文件阀值最大为5MB
 &lt;/span&gt;&lt;span class=&quot;py&quot;&gt;Log4j.appender.CATALINA.MaxFileSize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;5MB&lt;/span&gt;
 
@@ -152,6 +160,7 @@ org.apache.catalina.startup.Bootstrap &quot;$@&quot; start &amp;amp;\
 &lt;/span&gt;&lt;span class=&quot;py&quot;&gt;Log4j.appender.CATALINA.MaxBackupIndex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
+
 &lt;p&gt;该示例配置文件展示了每个日志文件最大为 5 MB，如果超过该最大值，则会生成一个新的日志文件。由于 &lt;code class=&quot;highlighter-rouge&quot;&gt;maxBackupIndex&lt;/code&gt; 的值为 2，当第二个文件的大小超过最大值时，会擦去第一个日志文件的内容，所有的日志都回滚至第一个日志文件。&lt;/p&gt;
 
 &lt;h1 id=&quot;section-4&quot;&gt;参考&lt;/h1&gt;

@@ -5,6 +5,7 @@ categories: Tomcat
 description: 使用log4j切分tomcat日志，按时间或者按大小，Tomcat For Ubuntu16.04。
 keywords: Tomcat, log4j, 日志, log, log4j切分tomcat日志,log4j切分log
 ---
+
 # 一、Log4j.properties解析 #
 
 ```properties  
@@ -36,7 +37,9 @@ log4j.appender.CATALINA.layout=org.apache.Log4j.PatternLayout
 log4j.appender.CATALINA.layout.conversionPattern=%m%n
 
 ```
+
 `conversionPattern`可以自定义log的格式，相关参数有：
+
 - %p 输出优先级，即`DEBUG，INFO，WARN，ERROR，FATAL`。
 - %r 输出自应用启动到输出该log信息耗费的毫秒数。
 - %c 输出所属的类目，通常就是所在类的全名。
@@ -55,6 +58,7 @@ log4j.appender.CATALINA.layout.conversionPattern=%m%n
 ## 2.1 接管前置准备 ##
 
 **1、**修改`$CATALINA_HOME/bin/`下的`catalina.sh`
+
 ```
 # 1)将下条隐藏。
 # touch "$CATALINA_OUT"
@@ -72,7 +76,8 @@ org.apache.catalina.startup.Bootstrap "$@" start &\
 ![](http://i.imgur.com/syYTpXt.png)
 
 
-**2、**重命名`$CATALINA_HOME/bin/`下的`logging.properties`成其他名字，该文件不需要了，建议重命名。
+**2、**重命名`$CATALINA_HOME/bin/`下的`logging.properties`成其他名字，该文件不需要了，建议重命名:
+
 ```
 mv logging.properties loggin.properties
 ```
@@ -82,6 +87,7 @@ mv logging.properties loggin.properties
 ### 2.2.1 按时间切分 ###
 
 如需按时段生成日志文件，需要使用`org.apache.Log4j.DailyRollingFileAppender`，该类继承了`FileAppender`类。该类多包涵了一个重要的属性：
+
 `DatePattern`：该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。
 `DatePattern`使用如下规则控制回滚计划：
 - `yyyy-MM`				在本月末，下月初回滚文件。
@@ -91,7 +97,8 @@ mv logging.properties loggin.properties
 - `yyyy-MM-dd-HH-mm`		每分钟回滚文件。
 - `yyyy-ww`				根据地域，在每周的第一天回滚。
 
-在项目中添加或修改`log4j.properties`文件。
+在项目中添加或修改`log4j.properties`文件:
+
 ```properties
 log4j.rootLogger=INFO, CATALINA
 
@@ -144,10 +151,12 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
 
 如需按日志文件大小分割日志，则需要使用 org.apache.Log4j.RollingFileAppender，该类继承了 FileAppender 类，继承了它的所有属性。
 该类多包括了以下可配置属性：
+
 - `maxFileSize`：这是文件大小的阀值，大于该值时，文件会回滚。该值默认为 10 MB。
 - `maxBackupIndex`：该值表示备份文件的个数，默认为 1。
 
 对log4j.properties配置引入以下关键项：
+
 ```properties
 # 设置日志文件阀值最大为5MB
 Log4j.appender.CATALINA.MaxFileSize=5MB
@@ -155,10 +164,10 @@ Log4j.appender.CATALINA.MaxFileSize=5MB
 # 设置日志文件个数为2
 Log4j.appender.CATALINA.MaxBackupIndex=2
 ```
+
 该示例配置文件展示了每个日志文件最大为 5 MB，如果超过该最大值，则会生成一个新的日志文件。由于 `maxBackupIndex` 的值为 2，当第二个文件的大小超过最大值时，会擦去第一个日志文件的内容，所有的日志都回滚至第一个日志文件。
 
 # 参考 #
 本文参考以下文章，在此对原作者表示感谢！
 
 [Tomcat下使用Log4j 接管 catalina.out 日志文件生成方式](https://my.oschina.net/jsan/blog/205669)
-

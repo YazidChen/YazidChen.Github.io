@@ -139,7 +139,9 @@
 
 </code></pre>
 </div>
+
 <p><code class="highlighter-rouge">conversionPattern</code>可以自定义log的格式，相关参数有：</p>
+
 <ul>
   <li>%p 输出优先级，即<code class="highlighter-rouge">DEBUG，INFO，WARN，ERROR，FATAL</code>。</li>
   <li>%r 输出自应用启动到输出该log信息耗费的毫秒数。</li>
@@ -159,6 +161,7 @@
 <h2 id="section">2.1 接管前置准备</h2>
 
 <p><strong>1、</strong>修改<code class="highlighter-rouge">$CATALINA_HOME/bin/</code>下的<code class="highlighter-rouge">catalina.sh</code></p>
+
 <div class="highlighter-rouge"><pre class="highlight"><code># 1)将下条隐藏。
 # touch "$CATALINA_OUT"
 
@@ -175,7 +178,8 @@ org.apache.catalina.startup.Bootstrap "$@" start &amp;\
 
 <p><img src="http://i.imgur.com/syYTpXt.png" alt="" /></p>
 
-<p><strong>2、</strong>重命名<code class="highlighter-rouge">$CATALINA_HOME/bin/</code>下的<code class="highlighter-rouge">logging.properties</code>成其他名字，该文件不需要了，建议重命名。</p>
+<p><strong>2、</strong>重命名<code class="highlighter-rouge">$CATALINA_HOME/bin/</code>下的<code class="highlighter-rouge">logging.properties</code>成其他名字，该文件不需要了，建议重命名:</p>
+
 <div class="highlighter-rouge"><pre class="highlight"><code>mv logging.properties loggin.properties
 </code></pre>
 </div>
@@ -184,8 +188,9 @@ org.apache.catalina.startup.Bootstrap "$@" start &amp;\
 
 <h3 id="section-2">2.2.1 按时间切分</h3>
 
-<p>如需按时段生成日志文件，需要使用<code class="highlighter-rouge">org.apache.Log4j.DailyRollingFileAppender</code>，该类继承了<code class="highlighter-rouge">FileAppender</code>类。该类多包涵了一个重要的属性：
-<code class="highlighter-rouge">DatePattern</code>：该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。
+<p>如需按时段生成日志文件，需要使用<code class="highlighter-rouge">org.apache.Log4j.DailyRollingFileAppender</code>，该类继承了<code class="highlighter-rouge">FileAppender</code>类。该类多包涵了一个重要的属性：</p>
+
+<p><code class="highlighter-rouge">DatePattern</code>：该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。
 <code class="highlighter-rouge">DatePattern</code>使用如下规则控制回滚计划：</p>
 <ul>
   <li><code class="highlighter-rouge">yyyy-MM</code>				在本月末，下月初回滚文件。</li>
@@ -196,7 +201,8 @@ org.apache.catalina.startup.Bootstrap "$@" start &amp;\
   <li><code class="highlighter-rouge">yyyy-ww</code>				根据地域，在每周的第一天回滚。</li>
 </ul>
 
-<p>在项目中添加或修改<code class="highlighter-rouge">log4j.properties</code>文件。</p>
+<p>在项目中添加或修改<code class="highlighter-rouge">log4j.properties</code>文件:</p>
+
 <div class="language-properties highlighter-rouge"><pre class="highlight"><code><span class="py">log4j.rootLogger</span><span class="p">=</span><span class="s">INFO, CATALINA</span>
 
 <span class="py">log4j.appender.CATALINA</span><span class="p">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
@@ -249,12 +255,14 @@ org.apache.catalina.startup.Bootstrap "$@" start &amp;\
 
 <p>如需按日志文件大小分割日志，则需要使用 org.apache.Log4j.RollingFileAppender，该类继承了 FileAppender 类，继承了它的所有属性。
 该类多包括了以下可配置属性：</p>
+
 <ul>
   <li><code class="highlighter-rouge">maxFileSize</code>：这是文件大小的阀值，大于该值时，文件会回滚。该值默认为 10 MB。</li>
   <li><code class="highlighter-rouge">maxBackupIndex</code>：该值表示备份文件的个数，默认为 1。</li>
 </ul>
 
 <p>对log4j.properties配置引入以下关键项：</p>
+
 <div class="language-properties highlighter-rouge"><pre class="highlight"><code><span class="c"># 设置日志文件阀值最大为5MB
 </span><span class="py">Log4j.appender.CATALINA.MaxFileSize</span><span class="p">=</span><span class="s">5MB</span>
 
@@ -262,13 +270,13 @@ org.apache.catalina.startup.Bootstrap "$@" start &amp;\
 </span><span class="py">Log4j.appender.CATALINA.MaxBackupIndex</span><span class="p">=</span><span class="s">2</span>
 </code></pre>
 </div>
+
 <p>该示例配置文件展示了每个日志文件最大为 5 MB，如果超过该最大值，则会生成一个新的日志文件。由于 <code class="highlighter-rouge">maxBackupIndex</code> 的值为 2，当第二个文件的大小超过最大值时，会擦去第一个日志文件的内容，所有的日志都回滚至第一个日志文件。</p>
 
 <h1 id="section-4">参考</h1>
 <p>本文参考以下文章，在此对原作者表示感谢！</p>
 
 <p><a href="https://my.oschina.net/jsan/blog/205669">Tomcat下使用Log4j 接管 catalina.out 日志文件生成方式</a></p>
-
 
     <br><br>
     <span class="content end">本文由<a href="mailto:https://yazidchen.github.io/?subject=feedback">YazidChen</a>整理编辑，引用转载请注明出处。</span>
