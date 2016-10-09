@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-10-09T08:24:26+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>以Log4j切分Tomcat日志</title><link href="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/" rel="alternate" type="text/html" title="以Log4j切分Tomcat日志" /><published>2016-10-09T00:00:00+00:00</published><updated>2016-10-09T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j</id><content type="html" xml:base="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/">&lt;h1 id=&quot;log4jproperties&quot;&gt;一、Log4j.properties解析&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-10-09T08:26:41+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>以Log4j切分Tomcat日志</title><link href="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/" rel="alternate" type="text/html" title="以Log4j切分Tomcat日志" /><published>2016-10-09T00:00:00+00:00</published><updated>2016-10-09T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j</id><content type="html" xml:base="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/">&lt;h1 id=&quot;log4jproperties&quot;&gt;一、Log4j.properties解析&lt;/h1&gt;
 
 &lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 根日志的级别定义为 DEBUG，并将名为 CATALINA 的 appender 添加其上。
 &lt;/span&gt;&lt;span class=&quot;py&quot;&gt;log4j.rootLogger&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DEBUG, CATALINA&lt;/span&gt;
@@ -78,8 +78,9 @@ org.apache.catalina.startup.Bootstrap &quot;$@&quot; start &amp;amp;\
 
 &lt;h3 id=&quot;section-2&quot;&gt;2.2.1 按时间切分&lt;/h3&gt;
 
-&lt;p&gt;如需按时段生成日志文件，需要使用&lt;code class=&quot;highlighter-rouge&quot;&gt;org.apache.Log4j.DailyRollingFileAppender&lt;/code&gt;，该类继承了&lt;code class=&quot;highlighter-rouge&quot;&gt;FileAppender&lt;/code&gt;类。该类多包涵了一个重要的属性：&lt;code class=&quot;highlighter-rouge&quot;&gt;DatePattern&lt;/code&gt;,该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。
-&lt;code class=&quot;highlighter-rouge&quot;&gt;DatePattern&lt;/code&gt;使用如下规则控制回滚计划：&lt;/p&gt;
+&lt;p&gt;如需按时段生成日志文件，需要使用&lt;code class=&quot;highlighter-rouge&quot;&gt;org.apache.Log4j.DailyRollingFileAppender&lt;/code&gt;，该类继承了&lt;code class=&quot;highlighter-rouge&quot;&gt;FileAppender&lt;/code&gt;类。该类多包涵了一个重要的属性：&lt;code class=&quot;highlighter-rouge&quot;&gt;DatePattern&lt;/code&gt;,该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;DatePattern&lt;/code&gt;使用如下规则控制回滚计划：&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;yyyy-MM&lt;/code&gt;				在本月末，下月初回滚文件。&lt;/li&gt;

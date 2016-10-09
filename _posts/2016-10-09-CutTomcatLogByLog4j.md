@@ -87,6 +87,7 @@ mv logging.properties loggin.properties
 ### 2.2.1 按时间切分 ###
 
 如需按时段生成日志文件，需要使用`org.apache.Log4j.DailyRollingFileAppender`，该类继承了`FileAppender`类。该类多包涵了一个重要的属性：`DatePattern`,该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。
+
 `DatePattern`使用如下规则控制回滚计划：
 
 - `yyyy-MM`				在本月末，下月初回滚文件。
