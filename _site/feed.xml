@@ -78,8 +78,7 @@ org.apache.catalina.startup.Bootstrap &quot;$@&quot; start &amp;amp;\
 
 &lt;h3 id=&quot;section-2&quot;&gt;2.2.1 按时间切分&lt;/h3&gt;
 
-&lt;p&gt;如需按时段生成日志文件，需要使用&lt;code class=&quot;highlighter-rouge&quot;&gt;org.apache.Log4j.DailyRollingFileAppender&lt;/code&gt;，该类继承了&lt;code class=&quot;highlighter-rouge&quot;&gt;FileAppender&lt;/code&gt;类。该类多包涵了一个重要的属性：
-&lt;code class=&quot;highlighter-rouge&quot;&gt;DatePattern&lt;/code&gt;：该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。
+&lt;p&gt;如需按时段生成日志文件，需要使用&lt;code class=&quot;highlighter-rouge&quot;&gt;org.apache.Log4j.DailyRollingFileAppender&lt;/code&gt;，该类继承了&lt;code class=&quot;highlighter-rouge&quot;&gt;FileAppender&lt;/code&gt;类。该类多包涵了一个重要的属性：&lt;code class=&quot;highlighter-rouge&quot;&gt;DatePattern&lt;/code&gt;,该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。
 &lt;code class=&quot;highlighter-rouge&quot;&gt;DatePattern&lt;/code&gt;使用如下规则控制回滚计划：&lt;/p&gt;
 
 &lt;ul&gt;
