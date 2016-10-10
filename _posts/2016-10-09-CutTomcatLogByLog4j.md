@@ -69,11 +69,20 @@ log4j.appender.CATALINA.layout.conversionPattern=%m%n
 # 3)下条有两处需要修改。
 org.apache.catalina.startup.Bootstrap "$@" start \
 # 修改为
-org.apache.catalina.startup.Bootstrap "$@" start &\
+org.apache.catalina.startup.Bootstrap "$@" start "&"
 
 ```
 
-![](http://i.imgur.com/syYTpXt.png)
+![](http://i.imgur.com/kIFeTNQ.png)
+
+
+上面这种修改方式，在使用`./startup.sh`启动时，会有日志在终端打出。如用service方式启动则无所谓。
+
+如果不想在控制台打日志，可进行如下修改：
+
+![](http://i.imgur.com/3q7K6wz.png)
+
+**注意：**在shell中，句末的"\"表示此句未结束，即下一行也属于该句命令，所以切不可将注释语句放在句末有"\"的下一行；"&"表示后台执行。
 
 
 **2、**重命名`$CATALINA_HOME/bin/`下的`logging.properties`成其他名字，该文件不需要了，建议重命名:
@@ -81,6 +90,7 @@ org.apache.catalina.startup.Bootstrap "$@" start &\
 ```
 mv logging.properties loggin.properties
 ```
+
 
 ## 2.2 切分方式 ##
 
