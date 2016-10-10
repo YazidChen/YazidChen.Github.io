@@ -82,7 +82,7 @@ org.apache.catalina.startup.Bootstrap "$@" start "&"
 
 ![](http://i.imgur.com/3q7K6wz.png)
 
-**注意：**在shell中，句末的"\"表示此句未结束，即下一行也属于该句命令，所以切不可将注释语句放在句末有"\"的下一行；"&"表示后台执行。
+**注意：**在shell中，句末的斜杠表示此句未结束，即下一行也属于该句命令，所以切不可将注释语句放在句末有斜杠的下一行；"&"表示后台执行。
 
 
 **2、**重命名`$CATALINA_HOME/bin/`下的`logging.properties`成其他名字，该文件不需要了，建议重命名:

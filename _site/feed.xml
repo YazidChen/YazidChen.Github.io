@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-10-10T04:14:30+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>以Log4j切分Tomcat日志</title><link href="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/" rel="alternate" type="text/html" title="以Log4j切分Tomcat日志" /><published>2016-10-09T00:00:00+00:00</published><updated>2016-10-09T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j</id><content type="html" xml:base="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/">&lt;h1 id=&quot;log4jproperties&quot;&gt;一、Log4j.properties解析&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-10-10T05:36:12+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>以Log4j切分Tomcat日志</title><link href="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/" rel="alternate" type="text/html" title="以Log4j切分Tomcat日志" /><published>2016-10-09T00:00:00+00:00</published><updated>2016-10-09T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j</id><content type="html" xml:base="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/">&lt;h1 id=&quot;log4jproperties&quot;&gt;一、Log4j.properties解析&lt;/h1&gt;
 
 &lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 根日志的级别定义为 DEBUG，并将名为 CATALINA 的 appender 添加其上。
 &lt;/span&gt;&lt;span class=&quot;py&quot;&gt;log4j.rootLogger&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DEBUG, CATALINA&lt;/span&gt;
@@ -74,7 +74,7 @@ org.apache.catalina.startup.Bootstrap &quot;$@&quot; start &quot;&amp;amp;&quot;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/3q7K6wz.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;注意：&lt;/strong&gt;在shell中，句末的”&quot;表示此句未结束，即下一行也属于该句命令，所以切不可将注释语句放在句末有”&quot;的下一行；”&amp;amp;”表示后台执行。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;注意：&lt;/strong&gt;在shell中，句末的斜杠表示此句未结束，即下一行也属于该句命令，所以切不可将注释语句放在句末有斜杠的下一行；”&amp;amp;”表示后台执行。&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;2、&lt;/strong&gt;重命名&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME/bin/&lt;/code&gt;下的&lt;code class=&quot;highlighter-rouge&quot;&gt;logging.properties&lt;/code&gt;成其他名字，该文件不需要了，建议重命名:&lt;/p&gt;
 
