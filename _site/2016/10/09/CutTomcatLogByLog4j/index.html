@@ -162,16 +162,16 @@
 
 <p><strong>1、</strong>修改<code class="highlighter-rouge">$CATALINA_HOME/bin/</code>下的<code class="highlighter-rouge">catalina.sh</code></p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code># 1)将下条隐藏。
-# touch "$CATALINA_OUT"
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c"># 1)将下条隐藏。</span>
+<span class="c"># touch "$CATALINA_OUT"</span>
 
-# 2)下条有两处需要隐藏。
-#  &gt;&gt; "$CATALINA_OUT" 2&gt;&amp;1 "&amp;"
+<span class="c"># 2)下条有两处需要隐藏。</span>
+<span class="c">#  &gt;&gt; "$CATALINA_OUT" 2&gt;&amp;1 "&amp;"</span>
 
-# 3)下条有两处需要修改。
-org.apache.catalina.startup.Bootstrap "$@" start \
-# 修改为
-org.apache.catalina.startup.Bootstrap "$@" start "&amp;"
+<span class="c"># 3)下条有两处需要修改。</span>
+org.apache.catalina.startup.Bootstrap <span class="s2">"</span><span class="nv">$@</span><span class="s2">"</span> start <span class="se">\</span>
+<span class="c"># 修改为</span>
+org.apache.catalina.startup.Bootstrap <span class="s2">"</span><span class="nv">$@</span><span class="s2">"</span> start <span class="s2">"&amp;"</span>
 
 </code></pre>
 </div>
@@ -181,6 +181,11 @@ org.apache.catalina.startup.Bootstrap "$@" start "&amp;"
 <p>上面这种修改方式，在使用<code class="highlighter-rouge">./startup.sh</code>启动时，会有日志在终端打出。如用service方式启动则无所谓。</p>
 
 <p>如果不想在控制台打日志，可进行如下修改：</p>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code>org.apache.catalina.startup.Bootstrap <span class="s2">"</span><span class="nv">$@</span><span class="s2">"</span> start <span class="se">\</span>
+&gt;/dev/null 2&gt;&amp;1 <span class="s2">"&amp;"</span>
+</code></pre>
+</div>
 
 <p><img src="http://i.imgur.com/3q7K6wz.png" alt="" /></p>
 

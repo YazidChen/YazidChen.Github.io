@@ -59,7 +59,7 @@ log4j.appender.CATALINA.layout.conversionPattern=%m%n
 
 **1、**修改`$CATALINA_HOME/bin/`下的`catalina.sh`
 
-```
+```shell
 # 1)将下条隐藏。
 # touch "$CATALINA_OUT"
 
@@ -79,6 +79,11 @@ org.apache.catalina.startup.Bootstrap "$@" start "&"
 上面这种修改方式，在使用`./startup.sh`启动时，会有日志在终端打出。如用service方式启动则无所谓。
 
 如果不想在控制台打日志，可进行如下修改：
+
+```shell
+org.apache.catalina.startup.Bootstrap "$@" start \
+>/dev/null 2>&1 "&"
+```
 
 ![](http://i.imgur.com/3q7K6wz.png)
 
