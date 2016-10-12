@@ -140,17 +140,20 @@ mv <span class="k">${</span><span class="nv">LOG_PATH</span><span class="k">}${<
 <h1 id="section-1">二、设置定时执行脚本</h1>
 
 <p><strong>1、</strong>给脚本执行权限：</p>
+
 <div class="language-shell highlighter-rouge"><pre class="highlight"><code>chmod +x cut_nginx_log.sh 
 </code></pre>
 </div>
 
 <p><strong>2、</strong>使用crontab工具添加定时任务：</p>
+
 <div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c"># 编辑crontab文件</span>
 crontab -e
 </code></pre>
 </div>
 
 <p><strong>3、</strong>编写定时任务，保存退出：</p>
+
 <div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c"># 每天0点执行任务</span>
 0 0 <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> /bin/sh /usr/local/nginx/sbin/cut_nginx_log.sh
 </code></pre>
@@ -165,6 +168,7 @@ crontab -e
 <p><img src="http://i.imgur.com/cFDuNKZ.png" alt="" /></p>
 
 <p>测试中可能会使用到以下命令：</p>
+
 <div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c"># 列出crontab文件内容</span>
 crontab -l
 <span class="c"># 删除crontab文件</span>

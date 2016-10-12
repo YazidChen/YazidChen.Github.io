@@ -38,17 +38,20 @@ kill -USR1 `cat ${PID_PATH}`
 # 二、设置定时执行脚本 #
 
 **1、**给脚本执行权限：
+
 ```shell
 chmod +x cut_nginx_log.sh 
 ```
 
 **2、**使用crontab工具添加定时任务：
+
 ```shell
 # 编辑crontab文件
 crontab -e
 ```
 
 **3、**编写定时任务，保存退出：
+
 ```shell
 # 每天0点执行任务
 0 0 * * * /bin/sh /usr/local/nginx/sbin/cut_nginx_log.sh
@@ -63,6 +66,7 @@ crontab -e
 ![](http://i.imgur.com/cFDuNKZ.png)
 
 测试中可能会使用到以下命令：
+
 ```shell
 # 列出crontab文件内容
 crontab -l
