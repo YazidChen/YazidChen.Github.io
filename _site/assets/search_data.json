@@ -1,5 +1,11 @@
 {
   
+  "2016-10-12-cutnginxlog": {
+    "title": "定时切分Nginx日志",
+    "url": " /2016/10/12/CutNginxLog/",
+    "category": "Nginx"
+  },
+  
   "2016-10-09-cuttomcatlogbylog4j": {
     "title": "以Log4j切分Tomcat日志",
     "url": " /2016/10/09/CutTomcatLogByLog4j/",
@@ -65,6 +71,12 @@
     "title": "以Log4j切分Tomcat日志",
     "url": "/2016/10/09/CutTomcatLogByLog4j/",
     "category": "[&quot;Tomcat&quot;]"
+  },
+  
+  "2016-10-12-cutnginxlog": {
+    "title": "定时切分Nginx日志",
+    "url": "/2016/10/12/CutNginxLog/",
+    "category": "[&quot;Nginx&quot;]"
   }
   
 }

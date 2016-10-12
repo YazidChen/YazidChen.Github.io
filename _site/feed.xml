@@ -1,4 +1,72 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-10-10T05:36:12+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>以Log4j切分Tomcat日志</title><link href="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/" rel="alternate" type="text/html" title="以Log4j切分Tomcat日志" /><published>2016-10-09T00:00:00+00:00</published><updated>2016-10-09T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j</id><content type="html" xml:base="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/">&lt;h1 id=&quot;log4jproperties&quot;&gt;一、Log4j.properties解析&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-10-12T02:30:41+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>定时切分Nginx日志</title><link href="yazidchen.github.io/2016/10/12/CutNginxLog/" rel="alternate" type="text/html" title="定时切分Nginx日志" /><published>2016-10-12T00:00:00+00:00</published><updated>2016-10-12T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/12/CutNginxLog</id><content type="html" xml:base="yazidchen.github.io/2016/10/12/CutNginxLog/">&lt;h1 id=&quot;section&quot;&gt;一、编写日志自动切割脚本&lt;/h1&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim /usr/local/nginx/sbin/cut_nginx_log.sh
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;脚本编写：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# author YazidChen&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# 一般设定切割时间是0点，切除昨天的日志。&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;DATE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;date -d &lt;span class=&quot;s2&quot;&gt;&quot;yesterday&quot;&lt;/span&gt; +&lt;span class=&quot;s2&quot;&gt;&quot;%Y%m%d&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/usr/local/nginx/logs/
+&lt;span class=&quot;nv&quot;&gt;ACCESS_LOG_NAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;access.log
+&lt;span class=&quot;nv&quot;&gt;ERROR_LOG_NAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;error.log
+&lt;span class=&quot;nv&quot;&gt;CUT_ACCESS_LOG_NAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DATE&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ACCESS_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;CUT_ERROR_LOG_NAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;DATE&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;.&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ERROR_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;PID_PATH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/usr/local/nginx/logs/nginx.pid
+
+&lt;span class=&quot;c&quot;&gt;# 重命名原始日志文件&lt;/span&gt;
+mv &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ACCESS_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CUT_ACCESS_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;
+mv &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ERROR_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CUT_ERROR_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# 向nginx主进程发信号，重新打开日志文件，当原始文件不存在时，重新生成新的日志文件access.log及error.log&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;kill&lt;/span&gt; -USR1 &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;cat &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;PID_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;section-1&quot;&gt;二、设置定时执行脚本&lt;/h1&gt;
+
+&lt;p&gt;&lt;strong&gt;1、&lt;/strong&gt;给脚本执行权限：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;chmod +x cut_nginx_log.sh 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;2、&lt;/strong&gt;使用crontab工具添加定时任务：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 编辑crontab文件&lt;/span&gt;
+crontab -e
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;3、&lt;/strong&gt;编写定时任务，保存退出：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 每天0点执行任务&lt;/span&gt;
+0 0 &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; /bin/sh /usr/local/nginx/sbin/cut_nginx_log.sh
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;为方便测试将时间修改：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/PmS5NG6.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;测试过程中校验了日志内容，发现没有内容缺失，测试成功：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/cFDuNKZ.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;测试中可能会使用到以下命令：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 列出crontab文件内容&lt;/span&gt;
+crontab -l
+&lt;span class=&quot;c&quot;&gt;# 删除crontab文件&lt;/span&gt;
+crontab -r
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;section-2&quot;&gt;参考&lt;/h1&gt;
+
+&lt;p&gt;本文参考以下文章，在此对原作者表示感谢！&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://pvbutler.blog.51cto.com/7662323/1653088&quot;&gt;Linux下定时切割nginx日志并删除指定天数前的日志记录&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary>一、编写日志自动切割脚本</summary></entry><entry><title>以Log4j切分Tomcat日志</title><link href="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/" rel="alternate" type="text/html" title="以Log4j切分Tomcat日志" /><published>2016-10-09T00:00:00+00:00</published><updated>2016-10-09T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j</id><content type="html" xml:base="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/">&lt;h1 id=&quot;log4jproperties&quot;&gt;一、Log4j.properties解析&lt;/h1&gt;
 
 &lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 根日志的级别定义为 DEBUG，并将名为 CATALINA 的 appender 添加其上。
 &lt;/span&gt;&lt;span class=&quot;py&quot;&gt;log4j.rootLogger&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DEBUG, CATALINA&lt;/span&gt;
