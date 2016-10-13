@@ -57,45 +57,35 @@ log4j.appender.CATALINA.layout.conversionPattern=%m%n
 
 ## 2.1 接管前置准备 ##
 
-**1、**修改`$CATALINA_HOME/bin/`下的`catalina.sh`
+我们先来了解一下`$CATALINA_HOME/bin/`下的`catalina.sh`的日志输出代码段：
+
+![](http://i.imgur.com/XF5gMJn.png)
+
+`$CATALINA_OUT`是日志存放地址，默认为`$CATALINA_BASE/logs/catalina.out`，而`>> "$CATALINA_OUT" 2>&1 "&"`则是将启动时的主线程日志输出到`$CATALINA_OUT`中。
+
+#### 前置一 ####
+
+假如你要分割后的主日志名还是`catalina.out`，那这个文件可不必修改，跳过此步骤，只需修改接下来要讲的`log4j.properties`文件即可；倘若你要修改主日志文件名为其他文件名，则需要修改`catalina.sh`文件：
 
 ```shell
-# 1)将下条隐藏。
-# touch "$CATALINA_OUT"
+if [ -z "$CATALINA_OUT" ] ; then
+  CATALINA_OUT="$CATALINA_BASE"/logs/catalina.out
+fi
 
-# 2)下条有两处需要隐藏。
-#  >> "$CATALINA_OUT" 2>&1 "&"
+# 修改为你的日志路径，在这里我设置主日志文件名为"catalina."
 
-# 3)下条有两处需要修改。
-org.apache.catalina.startup.Bootstrap "$@" start \
-# 修改为
-org.apache.catalina.startup.Bootstrap "$@" start "&"
-
+if [ -z "$CATALINA_OUT" ] ; then
+  CATALINA_OUT="$CATALINA_BASE"/logs/catalina.
+fi
 ```
 
-![](http://i.imgur.com/kIFeTNQ.png)
+#### 前置二 ####
 
-
-上面这种修改方式，在使用`./startup.sh`启动时，会有日志在终端打出。如用service方式启动则无所谓。
-
-如果不想在控制台打日志，可进行如下修改：
+重命名`$CATALINA_HOME/bin/`下的`logging.properties`成其他名字，该文件不需要了，建议重命名保留:
 
 ```shell
-org.apache.catalina.startup.Bootstrap "$@" start \
->/dev/null 2>&1 "&"
-```
-
-![](http://i.imgur.com/3q7K6wz.png)
-
-**注意：**在shell中，句末的斜杠表示此句未结束，即下一行也属于该句命令，所以切不可将注释语句放在句末有斜杠的下一行；"&"表示后台执行。
-
-
-**2、**重命名`$CATALINA_HOME/bin/`下的`logging.properties`成其他名字，该文件不需要了，建议重命名:
-
-```
 mv logging.properties loggin.properties
 ```
-
 
 ## 2.2 切分方式 ##
 
@@ -118,6 +108,7 @@ mv logging.properties loggin.properties
 log4j.rootLogger=INFO, CATALINA
 
 log4j.appender.CATALINA=org.apache.log4j.DailyRollingFileAppender
+# 此处文件路径对应前置准备中设置的路径
 log4j.appender.CATALINA.File=${catalina.base}/logs/catalina.
 log4j.appender.CATALINA.Append=true
 log4j.appender.CATALINA.Encoding=UTF-8

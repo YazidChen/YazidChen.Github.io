@@ -160,46 +160,39 @@
 
 <h2 id="section">2.1 接管前置准备</h2>
 
-<p><strong>1、</strong>修改<code class="highlighter-rouge">$CATALINA_HOME/bin/</code>下的<code class="highlighter-rouge">catalina.sh</code></p>
+<p>我们先来了解一下<code class="highlighter-rouge">$CATALINA_HOME/bin/</code>下的<code class="highlighter-rouge">catalina.sh</code>的日志输出代码段：</p>
 
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c"># 1)将下条隐藏。</span>
-<span class="c"># touch "$CATALINA_OUT"</span>
+<p><img src="http://i.imgur.com/XF5gMJn.png" alt="" /></p>
 
-<span class="c"># 2)下条有两处需要隐藏。</span>
-<span class="c">#  &gt;&gt; "$CATALINA_OUT" 2&gt;&amp;1 "&amp;"</span>
+<p><code class="highlighter-rouge">$CATALINA_OUT</code>是日志存放地址，默认为<code class="highlighter-rouge">$CATALINA_BASE/logs/catalina.out</code>，而<code class="highlighter-rouge">&gt;&gt; "$CATALINA_OUT" 2&gt;&amp;1 "&amp;"</code>则是将启动时的主线程日志输出到<code class="highlighter-rouge">$CATALINA_OUT</code>中。</p>
 
-<span class="c"># 3)下条有两处需要修改。</span>
-org.apache.catalina.startup.Bootstrap <span class="s2">"</span><span class="nv">$@</span><span class="s2">"</span> start <span class="se">\</span>
-<span class="c"># 修改为</span>
-org.apache.catalina.startup.Bootstrap <span class="s2">"</span><span class="nv">$@</span><span class="s2">"</span> start <span class="s2">"&amp;"</span>
+<h4 id="section-1">前置一</h4>
 
+<p>假如你要分割后的主日志名还是<code class="highlighter-rouge">catalina.out</code>，那这个文件可不必修改，跳过此步骤，只需修改接下来要讲的<code class="highlighter-rouge">log4j.properties</code>文件即可；倘若你要修改主日志文件名为其他文件名，则需要修改<code class="highlighter-rouge">catalina.sh</code>文件：</p>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="o">[</span> -z <span class="s2">"</span><span class="nv">$CATALINA_OUT</span><span class="s2">"</span> <span class="o">]</span> ; <span class="k">then
+  </span><span class="nv">CATALINA_OUT</span><span class="o">=</span><span class="s2">"</span><span class="nv">$CATALINA_BASE</span><span class="s2">"</span>/logs/catalina.out
+<span class="k">fi</span>
+
+<span class="c"># 修改为你的日志路径，在这里我设置主日志文件名为"catalina."</span>
+
+<span class="k">if</span> <span class="o">[</span> -z <span class="s2">"</span><span class="nv">$CATALINA_OUT</span><span class="s2">"</span> <span class="o">]</span> ; <span class="k">then
+  </span><span class="nv">CATALINA_OUT</span><span class="o">=</span><span class="s2">"</span><span class="nv">$CATALINA_BASE</span><span class="s2">"</span>/logs/catalina.
+<span class="k">fi</span>
 </code></pre>
 </div>
 
-<p><img src="http://i.imgur.com/kIFeTNQ.png" alt="" /></p>
+<h4 id="section-2">前置二</h4>
 
-<p>上面这种修改方式，在使用<code class="highlighter-rouge">./startup.sh</code>启动时，会有日志在终端打出。如用service方式启动则无所谓。</p>
+<p>重命名<code class="highlighter-rouge">$CATALINA_HOME/bin/</code>下的<code class="highlighter-rouge">logging.properties</code>成其他名字，该文件不需要了，建议重命名保留:</p>
 
-<p>如果不想在控制台打日志，可进行如下修改：</p>
-
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code>org.apache.catalina.startup.Bootstrap <span class="s2">"</span><span class="nv">$@</span><span class="s2">"</span> start <span class="se">\</span>
-&gt;/dev/null 2&gt;&amp;1 <span class="s2">"&amp;"</span>
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code>mv logging.properties loggin.properties
 </code></pre>
 </div>
 
-<p><img src="http://i.imgur.com/3q7K6wz.png" alt="" /></p>
+<h2 id="section-3">2.2 切分方式</h2>
 
-<p><strong>注意：</strong>在shell中，句末的斜杠表示此句未结束，即下一行也属于该句命令，所以切不可将注释语句放在句末有斜杠的下一行；”&amp;”表示后台执行。</p>
-
-<p><strong>2、</strong>重命名<code class="highlighter-rouge">$CATALINA_HOME/bin/</code>下的<code class="highlighter-rouge">logging.properties</code>成其他名字，该文件不需要了，建议重命名:</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>mv logging.properties loggin.properties
-</code></pre>
-</div>
-
-<h2 id="section-1">2.2 切分方式</h2>
-
-<h3 id="section-2">2.2.1 按时间切分</h3>
+<h3 id="section-4">2.2.1 按时间切分</h3>
 
 <p>如需按时段生成日志文件，需要使用<code class="highlighter-rouge">org.apache.Log4j.DailyRollingFileAppender</code>，该类继承了<code class="highlighter-rouge">FileAppender</code>类。该类多包涵了一个重要的属性：<code class="highlighter-rouge">DatePattern</code>,该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。</p>
 
@@ -219,7 +212,8 @@ org.apache.catalina.startup.Bootstrap <span class="s2">"</span><span class="nv">
 <div class="language-properties highlighter-rouge"><pre class="highlight"><code><span class="py">log4j.rootLogger</span><span class="p">=</span><span class="s">INFO, CATALINA</span>
 
 <span class="py">log4j.appender.CATALINA</span><span class="p">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
-<span class="py">log4j.appender.CATALINA.File</span><span class="p">=</span><span class="s">${catalina.base}/logs/catalina.</span>
+<span class="c"># 此处文件路径对应前置准备中设置的路径
+</span><span class="py">log4j.appender.CATALINA.File</span><span class="p">=</span><span class="s">${catalina.base}/logs/catalina.</span>
 <span class="py">log4j.appender.CATALINA.Append</span><span class="p">=</span><span class="s">true</span>
 <span class="py">log4j.appender.CATALINA.Encoding</span><span class="p">=</span><span class="s">UTF-8</span>
 <span class="c"># 为方便测试，此处设置为每分钟分割一次
@@ -264,7 +258,7 @@ org.apache.catalina.startup.Bootstrap <span class="s2">"</span><span class="nv">
 </code></pre>
 </div>
 
-<h3 id="section-3">2.2.2 按日志文件大小拆分</h3>
+<h3 id="section-5">2.2.2 按日志文件大小拆分</h3>
 
 <p>如需按日志文件大小分割日志，则需要使用 org.apache.Log4j.RollingFileAppender，该类继承了 FileAppender 类，继承了它的所有属性。
 该类多包括了以下可配置属性：</p>
@@ -286,7 +280,7 @@ org.apache.catalina.startup.Bootstrap <span class="s2">"</span><span class="nv">
 
 <p>该示例配置文件展示了每个日志文件最大为 5 MB，如果超过该最大值，则会生成一个新的日志文件。由于 <code class="highlighter-rouge">maxBackupIndex</code> 的值为 2，当第二个文件的大小超过最大值时，会擦去第一个日志文件的内容，所有的日志都回滚至第一个日志文件。</p>
 
-<h1 id="section-4">参考</h1>
+<h1 id="section-6">参考</h1>
 <p>本文参考以下文章，在此对原作者表示感谢！</p>
 
 <p><a href="https://my.oschina.net/jsan/blog/205669">Tomcat下使用Log4j 接管 catalina.out 日志文件生成方式</a></p>

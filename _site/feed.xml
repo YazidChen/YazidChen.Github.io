@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-10-12T02:33:46+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>定时切分Nginx日志</title><link href="yazidchen.github.io/2016/10/12/CutNginxLog/" rel="alternate" type="text/html" title="定时切分Nginx日志" /><published>2016-10-12T00:00:00+00:00</published><updated>2016-10-12T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/12/CutNginxLog</id><content type="html" xml:base="yazidchen.github.io/2016/10/12/CutNginxLog/">&lt;h1 id=&quot;section&quot;&gt;一、编写日志自动切割脚本&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-10-13T11:14:15+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>定时切分Nginx日志</title><link href="yazidchen.github.io/2016/10/12/CutNginxLog/" rel="alternate" type="text/html" title="定时切分Nginx日志" /><published>2016-10-12T00:00:00+00:00</published><updated>2016-10-12T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/12/CutNginxLog</id><content type="html" xml:base="yazidchen.github.io/2016/10/12/CutNginxLog/">&lt;h1 id=&quot;section&quot;&gt;一、编写日志自动切割脚本&lt;/h1&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim /usr/local/nginx/sbin/cut_nginx_log.sh
 &lt;/code&gt;&lt;/pre&gt;
@@ -122,46 +122,39 @@ crontab -r
 
 &lt;h2 id=&quot;section&quot;&gt;2.1 接管前置准备&lt;/h2&gt;
 
-&lt;p&gt;&lt;strong&gt;1、&lt;/strong&gt;修改&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME/bin/&lt;/code&gt;下的&lt;code class=&quot;highlighter-rouge&quot;&gt;catalina.sh&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;我们先来了解一下&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME/bin/&lt;/code&gt;下的&lt;code class=&quot;highlighter-rouge&quot;&gt;catalina.sh&lt;/code&gt;的日志输出代码段：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 1)将下条隐藏。&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# touch &quot;$CATALINA_OUT&quot;&lt;/span&gt;
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/XF5gMJn.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;span class=&quot;c&quot;&gt;# 2)下条有两处需要隐藏。&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#  &amp;gt;&amp;gt; &quot;$CATALINA_OUT&quot; 2&amp;gt;&amp;amp;1 &quot;&amp;amp;&quot;&lt;/span&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_OUT&lt;/code&gt;是日志存放地址，默认为&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_BASE/logs/catalina.out&lt;/code&gt;，而&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;gt;&amp;gt; &quot;$CATALINA_OUT&quot; 2&amp;gt;&amp;amp;1 &quot;&amp;amp;&quot;&lt;/code&gt;则是将启动时的主线程日志输出到&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_OUT&lt;/code&gt;中。&lt;/p&gt;
 
-&lt;span class=&quot;c&quot;&gt;# 3)下条有两处需要修改。&lt;/span&gt;
-org.apache.catalina.startup.Bootstrap &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$@&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; start &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# 修改为&lt;/span&gt;
-org.apache.catalina.startup.Bootstrap &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$@&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; start &lt;span class=&quot;s2&quot;&gt;&quot;&amp;amp;&quot;&lt;/span&gt;
+&lt;h4 id=&quot;section-1&quot;&gt;前置一&lt;/h4&gt;
 
+&lt;p&gt;假如你要分割后的主日志名还是&lt;code class=&quot;highlighter-rouge&quot;&gt;catalina.out&lt;/code&gt;，那这个文件可不必修改，跳过此步骤，只需修改接下来要讲的&lt;code class=&quot;highlighter-rouge&quot;&gt;log4j.properties&lt;/code&gt;文件即可；倘若你要修改主日志文件名为其他文件名，则需要修改&lt;code class=&quot;highlighter-rouge&quot;&gt;catalina.sh&lt;/code&gt;文件：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; -z &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CATALINA_OUT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; ; &lt;span class=&quot;k&quot;&gt;then
+  &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CATALINA_OUT&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CATALINA_BASE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/logs/catalina.out
+&lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;# 修改为你的日志路径，在这里我设置主日志文件名为&quot;catalina.&quot;&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; -z &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CATALINA_OUT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; ; &lt;span class=&quot;k&quot;&gt;then
+  &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CATALINA_OUT&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CATALINA_BASE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/logs/catalina.
+&lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/kIFeTNQ.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h4 id=&quot;section-2&quot;&gt;前置二&lt;/h4&gt;
 
-&lt;p&gt;上面这种修改方式，在使用&lt;code class=&quot;highlighter-rouge&quot;&gt;./startup.sh&lt;/code&gt;启动时，会有日志在终端打出。如用service方式启动则无所谓。&lt;/p&gt;
+&lt;p&gt;重命名&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME/bin/&lt;/code&gt;下的&lt;code class=&quot;highlighter-rouge&quot;&gt;logging.properties&lt;/code&gt;成其他名字，该文件不需要了，建议重命名保留:&lt;/p&gt;
 
-&lt;p&gt;如果不想在控制台打日志，可进行如下修改：&lt;/p&gt;
-
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;org.apache.catalina.startup.Bootstrap &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$@&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; start &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&amp;gt;/dev/null 2&amp;gt;&amp;amp;1 &lt;span class=&quot;s2&quot;&gt;&quot;&amp;amp;&quot;&lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mv logging.properties loggin.properties
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/3q7K6wz.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;h2 id=&quot;section-3&quot;&gt;2.2 切分方式&lt;/h2&gt;
 
-&lt;p&gt;&lt;strong&gt;注意：&lt;/strong&gt;在shell中，句末的斜杠表示此句未结束，即下一行也属于该句命令，所以切不可将注释语句放在句末有斜杠的下一行；”&amp;amp;”表示后台执行。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;2、&lt;/strong&gt;重命名&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME/bin/&lt;/code&gt;下的&lt;code class=&quot;highlighter-rouge&quot;&gt;logging.properties&lt;/code&gt;成其他名字，该文件不需要了，建议重命名:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mv logging.properties loggin.properties
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h2 id=&quot;section-1&quot;&gt;2.2 切分方式&lt;/h2&gt;
-
-&lt;h3 id=&quot;section-2&quot;&gt;2.2.1 按时间切分&lt;/h3&gt;
+&lt;h3 id=&quot;section-4&quot;&gt;2.2.1 按时间切分&lt;/h3&gt;
 
 &lt;p&gt;如需按时段生成日志文件，需要使用&lt;code class=&quot;highlighter-rouge&quot;&gt;org.apache.Log4j.DailyRollingFileAppender&lt;/code&gt;，该类继承了&lt;code class=&quot;highlighter-rouge&quot;&gt;FileAppender&lt;/code&gt;类。该类多包涵了一个重要的属性：&lt;code class=&quot;highlighter-rouge&quot;&gt;DatePattern&lt;/code&gt;,该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。&lt;/p&gt;
 
@@ -181,7 +174,8 @@ org.apache.catalina.startup.Bootstrap &lt;span class=&quot;s2&quot;&gt;&quot;&lt
 &lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;py&quot;&gt;log4j.rootLogger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;INFO, CATALINA&lt;/span&gt;
 
 &lt;span class=&quot;py&quot;&gt;log4j.appender.CATALINA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;org.apache.log4j.DailyRollingFileAppender&lt;/span&gt;
-&lt;span class=&quot;py&quot;&gt;log4j.appender.CATALINA.File&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;${catalina.base}/logs/catalina.&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# 此处文件路径对应前置准备中设置的路径
+&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;log4j.appender.CATALINA.File&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;${catalina.base}/logs/catalina.&lt;/span&gt;
 &lt;span class=&quot;py&quot;&gt;log4j.appender.CATALINA.Append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;true&lt;/span&gt;
 &lt;span class=&quot;py&quot;&gt;log4j.appender.CATALINA.Encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;UTF-8&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;# 为方便测试，此处设置为每分钟分割一次
@@ -226,7 +220,7 @@ org.apache.catalina.startup.Bootstrap &lt;span class=&quot;s2&quot;&gt;&quot;&lt
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h3 id=&quot;section-3&quot;&gt;2.2.2 按日志文件大小拆分&lt;/h3&gt;
+&lt;h3 id=&quot;section-5&quot;&gt;2.2.2 按日志文件大小拆分&lt;/h3&gt;
 
 &lt;p&gt;如需按日志文件大小分割日志，则需要使用 org.apache.Log4j.RollingFileAppender，该类继承了 FileAppender 类，继承了它的所有属性。
 该类多包括了以下可配置属性：&lt;/p&gt;
@@ -248,7 +242,7 @@ org.apache.catalina.startup.Bootstrap &lt;span class=&quot;s2&quot;&gt;&quot;&lt
 
 &lt;p&gt;该示例配置文件展示了每个日志文件最大为 5 MB，如果超过该最大值，则会生成一个新的日志文件。由于 &lt;code class=&quot;highlighter-rouge&quot;&gt;maxBackupIndex&lt;/code&gt; 的值为 2，当第二个文件的大小超过最大值时，会擦去第一个日志文件的内容，所有的日志都回滚至第一个日志文件。&lt;/p&gt;
 
-&lt;h1 id=&quot;section-4&quot;&gt;参考&lt;/h1&gt;
+&lt;h1 id=&quot;section-6&quot;&gt;参考&lt;/h1&gt;
 &lt;p&gt;本文参考以下文章，在此对原作者表示感谢！&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://my.oschina.net/jsan/blog/205669&quot;&gt;Tomcat下使用Log4j 接管 catalina.out 日志文件生成方式&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary>一、Log4j.properties解析</summary></entry><entry><title>Linux环境Tomcat安全配置</title><link href="yazidchen.github.io/2016/09/13/TomcatSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Tomcat安全配置" /><published>2016-09-13T00:00:00+00:00</published><updated>2016-09-13T00:00:00+00:00</updated><id>yazidchen.github.io/2016/09/13/TomcatSecuritySettingOnUbuntu</id><content type="html" xml:base="yazidchen.github.io/2016/09/13/TomcatSecuritySettingOnUbuntu/">&lt;h1 id=&quot;tomcat-security-for-ubuntu1604&quot;&gt;Tomcat Security For Ubuntu16.04&lt;/h1&gt;
