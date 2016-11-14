@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-11-14T02:35:28+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>Linux环境Nginx安全配置</title><link href="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Nginx安全配置" /><published>2016-11-14T00:00:00+00:00</published><updated>2016-11-14T00:00:00+00:00</updated><id>yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu</id><content type="html" xml:base="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/">&lt;h1 id=&quot;nginx-security-for-ubuntu1604&quot;&gt;Nginx Security For Ubuntu16.04&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-11-14T02:42:39+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>Linux环境Nginx安全配置</title><link href="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Nginx安全配置" /><published>2016-11-14T00:00:00+00:00</published><updated>2016-11-14T00:00:00+00:00</updated><id>yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu</id><content type="html" xml:base="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/">&lt;h1 id=&quot;nginx-security-for-ubuntu1604&quot;&gt;Nginx Security For Ubuntu16.04&lt;/h1&gt;
 
 &lt;h2 id=&quot;section&quot;&gt;一、隐藏版本号&lt;/h2&gt;
 
@@ -105,13 +105,11 @@ static u_char ngx_http_error_tail[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&g
 
 &lt;h2 id=&quot;nginx&quot;&gt;二、给Nginx以普通用户运行的权限&lt;/h2&gt;
 
-&lt;h3 id=&quot;nginx-1&quot;&gt;2.1 给Nginx配置普通用户及用户组&lt;/h3&gt;
-
 &lt;p&gt;nginx服务默认启动用户是nobody&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/lhzo8nw.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;1) 建立nginx用户&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1)&lt;/strong&gt; 建立nginx用户&lt;/p&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#用户禁止登录，且无家目录&lt;/span&gt;
 useradd nginx -s /sbin/nologin -M
@@ -124,7 +122,7 @@ useradd nginx -s /sbin/nologin -M
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;2) 修改nginx.conf&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2)&lt;/strong&gt; 修改nginx.conf&lt;/p&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;user  nobody;
 &lt;span class=&quot;c&quot;&gt;# 将上句修改为&lt;/span&gt;
@@ -134,14 +132,14 @@ user  nginx;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/8KL0RsH.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;3) 给关键目录普通用户及组权限&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3)&lt;/strong&gt; 给关键目录普通用户及组权限&lt;/p&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;chown -R nginx conf/ logs/ sbin/
 chgrp -R nginx conf/ logs/ sbin/
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;4) 普通用户不能通过bind函数绑定小于1024的端口,而root用户可以做到,&lt;code class=&quot;highlighter-rouge&quot;&gt;CAP_NET_BIND_SERVICE&lt;/code&gt;的作用就是让普通用户也可以绑端口到1024以下的端口。让普通用户启动nginx绑定在80端口：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;4)&lt;/strong&gt; 普通用户不能通过bind函数绑定小于1024的端口,而root用户可以做到,&lt;code class=&quot;highlighter-rouge&quot;&gt;CAP_NET_BIND_SERVICE&lt;/code&gt;的作用就是让普通用户也可以绑端口到1024以下的端口。让普通用户启动nginx绑定在80端口：&lt;/p&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;setcap &lt;span class=&quot;nv&quot;&gt;CAP_NET_BIND_SERVICE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;+ep /usr/local/nginx/sbin/nginx
 &lt;/code&gt;&lt;/pre&gt;
@@ -149,14 +147,14 @@ chgrp -R nginx conf/ logs/ sbin/
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;setcap&lt;/code&gt;来源于&lt;code class=&quot;highlighter-rouge&quot;&gt;Capabilities&lt;/code&gt;（能力），它打破了UNIX/LINUX操作系统中超级用户/普通用户的概念,由普通用户也可以做只有超级用户可以完成的工作。&lt;code class=&quot;highlighter-rouge&quot;&gt;setcap&lt;/code&gt;可以设置程序文件的能力。另还有&lt;code class=&quot;highlighter-rouge&quot;&gt;getcap&lt;/code&gt;可以获得程序文件所具有的能力，&lt;code class=&quot;highlighter-rouge&quot;&gt;getpcaps&lt;/code&gt;可以获得进程所具有的能力。&lt;/p&gt;
 
-&lt;p&gt;5) 使用非root用户运行：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;5)&lt;/strong&gt; 使用非root用户运行：&lt;/p&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo -u nginx /usr/local/nginx/sbin/nginx -c /opt/nginx/nginx-1.11.4/conf/nginx.conf 
 
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;6) 校验启动用户&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;6)&lt;/strong&gt; 校验启动用户&lt;/p&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ps -aux |grep nginx
 &lt;/code&gt;&lt;/pre&gt;
@@ -166,7 +164,9 @@ chgrp -R nginx conf/ logs/ sbin/
 
 &lt;h2 id=&quot;section-4&quot;&gt;三、禁用非必要的方法&lt;/h2&gt;
 
-&lt;p&gt;针对&lt;code class=&quot;highlighter-rouge&quot;&gt;GET&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;POST&lt;/code&gt;以及&lt;code class=&quot;highlighter-rouge&quot;&gt;HEAD&lt;/code&gt;之外的请求，如&lt;code class=&quot;highlighter-rouge&quot;&gt;PATCH&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;TRACE&lt;/code&gt;等，直接返回了&lt;code class=&quot;highlighter-rouge&quot;&gt;444&lt;/code&gt;状态码（&lt;code class=&quot;highlighter-rouge&quot;&gt;444&lt;/code&gt;是Nginx定义的响应状态码，会立即断开连接，没有响应正文）。具体配置是这样的,在&lt;code class=&quot;highlighter-rouge&quot;&gt;nginx.conf&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;Server&lt;/code&gt;中加入以下代码段：&lt;/p&gt;
+&lt;p&gt;针对&lt;code class=&quot;highlighter-rouge&quot;&gt;GET&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;POST&lt;/code&gt;以及&lt;code class=&quot;highlighter-rouge&quot;&gt;HEAD&lt;/code&gt;之外的请求，如&lt;code class=&quot;highlighter-rouge&quot;&gt;PATCH&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;TRACE&lt;/code&gt;等，直接返回了&lt;code class=&quot;highlighter-rouge&quot;&gt;444&lt;/code&gt;状态码（&lt;code class=&quot;highlighter-rouge&quot;&gt;444&lt;/code&gt;是Nginx定义的响应状态码，会立即断开连接，没有响应正文）。&lt;/p&gt;
+
+&lt;p&gt;具体配置是这样的,在&lt;code class=&quot;highlighter-rouge&quot;&gt;nginx.conf&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;Server&lt;/code&gt;中加入以下代码段：&lt;/p&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$request_method&lt;/span&gt; !~ ^&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;GET|HEAD|POST&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;return    &lt;/span&gt;444;

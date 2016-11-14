@@ -215,13 +215,11 @@ static u_char ngx_http_error_tail[] <span class="o">=</span>
 
 <h2 id="nginx">二、给Nginx以普通用户运行的权限</h2>
 
-<h3 id="nginx-1">2.1 给Nginx配置普通用户及用户组</h3>
-
 <p>nginx服务默认启动用户是nobody</p>
 
 <p><img src="http://i.imgur.com/lhzo8nw.png" alt="" /></p>
 
-<p>1) 建立nginx用户</p>
+<p><strong>1)</strong> 建立nginx用户</p>
 
 <div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c">#用户禁止登录，且无家目录</span>
 useradd nginx -s /sbin/nologin -M
@@ -234,7 +232,7 @@ useradd nginx -s /sbin/nologin -M
 </code></pre>
 </div>
 
-<p>2) 修改nginx.conf</p>
+<p><strong>2)</strong> 修改nginx.conf</p>
 
 <div class="language-shell highlighter-rouge"><pre class="highlight"><code>user  nobody;
 <span class="c"># 将上句修改为</span>
@@ -244,14 +242,14 @@ user  nginx;
 
 <p><img src="http://i.imgur.com/8KL0RsH.png" alt="" /></p>
 
-<p>3) 给关键目录普通用户及组权限</p>
+<p><strong>3)</strong> 给关键目录普通用户及组权限</p>
 
 <div class="language-shell highlighter-rouge"><pre class="highlight"><code>chown -R nginx conf/ logs/ sbin/
 chgrp -R nginx conf/ logs/ sbin/
 </code></pre>
 </div>
 
-<p>4) 普通用户不能通过bind函数绑定小于1024的端口,而root用户可以做到,<code class="highlighter-rouge">CAP_NET_BIND_SERVICE</code>的作用就是让普通用户也可以绑端口到1024以下的端口。让普通用户启动nginx绑定在80端口：</p>
+<p><strong>4)</strong> 普通用户不能通过bind函数绑定小于1024的端口,而root用户可以做到,<code class="highlighter-rouge">CAP_NET_BIND_SERVICE</code>的作用就是让普通用户也可以绑端口到1024以下的端口。让普通用户启动nginx绑定在80端口：</p>
 
 <div class="language-shell highlighter-rouge"><pre class="highlight"><code>setcap <span class="nv">CAP_NET_BIND_SERVICE</span><span class="o">=</span>+ep /usr/local/nginx/sbin/nginx
 </code></pre>
@@ -259,14 +257,14 @@ chgrp -R nginx conf/ logs/ sbin/
 
 <p><code class="highlighter-rouge">setcap</code>来源于<code class="highlighter-rouge">Capabilities</code>（能力），它打破了UNIX/LINUX操作系统中超级用户/普通用户的概念,由普通用户也可以做只有超级用户可以完成的工作。<code class="highlighter-rouge">setcap</code>可以设置程序文件的能力。另还有<code class="highlighter-rouge">getcap</code>可以获得程序文件所具有的能力，<code class="highlighter-rouge">getpcaps</code>可以获得进程所具有的能力。</p>
 
-<p>5) 使用非root用户运行：</p>
+<p><strong>5)</strong> 使用非root用户运行：</p>
 
 <div class="language-shell highlighter-rouge"><pre class="highlight"><code>sudo -u nginx /usr/local/nginx/sbin/nginx -c /opt/nginx/nginx-1.11.4/conf/nginx.conf 
 
 </code></pre>
 </div>
 
-<p>6) 校验启动用户</p>
+<p><strong>6)</strong> 校验启动用户</p>
 
 <div class="language-shell highlighter-rouge"><pre class="highlight"><code>ps -aux |grep nginx
 </code></pre>
@@ -276,7 +274,9 @@ chgrp -R nginx conf/ logs/ sbin/
 
 <h2 id="section-4">三、禁用非必要的方法</h2>
 
-<p>针对<code class="highlighter-rouge">GET</code>、<code class="highlighter-rouge">POST</code>以及<code class="highlighter-rouge">HEAD</code>之外的请求，如<code class="highlighter-rouge">PATCH</code>、<code class="highlighter-rouge">TRACE</code>等，直接返回了<code class="highlighter-rouge">444</code>状态码（<code class="highlighter-rouge">444</code>是Nginx定义的响应状态码，会立即断开连接，没有响应正文）。具体配置是这样的,在<code class="highlighter-rouge">nginx.conf</code>的<code class="highlighter-rouge">Server</code>中加入以下代码段：</p>
+<p>针对<code class="highlighter-rouge">GET</code>、<code class="highlighter-rouge">POST</code>以及<code class="highlighter-rouge">HEAD</code>之外的请求，如<code class="highlighter-rouge">PATCH</code>、<code class="highlighter-rouge">TRACE</code>等，直接返回了<code class="highlighter-rouge">444</code>状态码（<code class="highlighter-rouge">444</code>是Nginx定义的响应状态码，会立即断开连接，没有响应正文）。</p>
+
+<p>具体配置是这样的,在<code class="highlighter-rouge">nginx.conf</code>的<code class="highlighter-rouge">Server</code>中加入以下代码段：</p>
 
 <div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="k">if</span> <span class="o">(</span><span class="nv">$request_method</span> !~ ^<span class="o">(</span>GET|HEAD|POST<span class="o">)</span><span class="nv">$ </span><span class="o">)</span> <span class="o">{</span>
     <span class="k">return    </span>444;

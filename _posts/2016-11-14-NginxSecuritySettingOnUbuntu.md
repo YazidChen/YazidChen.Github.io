@@ -113,13 +113,11 @@ root@yazid-chen:/opt/nginx/nginx-1.11.4# /usr/local/nginx/sbin/nginx
 
 ## 二、给Nginx以普通用户运行的权限 ##
 
-### 2.1 给Nginx配置普通用户及用户组 ###
-
 nginx服务默认启动用户是nobody
 
 ![](http://i.imgur.com/lhzo8nw.png)
 
-1) 建立nginx用户
+**1)** 建立nginx用户
 
 ```shell
 #用户禁止登录，且无家目录
@@ -132,7 +130,7 @@ useradd nginx -s /sbin/nologin -M
 id nginx
 ```
 
-2) 修改nginx.conf
+**2)** 修改nginx.conf
 
 ```shell
 user  nobody;
@@ -142,14 +140,14 @@ user  nginx;
 
 ![](http://i.imgur.com/8KL0RsH.png)
 
-3) 给关键目录普通用户及组权限
+**3)** 给关键目录普通用户及组权限
 
 ```shell
 chown -R nginx conf/ logs/ sbin/
 chgrp -R nginx conf/ logs/ sbin/
 ```
 
-4) 普通用户不能通过bind函数绑定小于1024的端口,而root用户可以做到,`CAP_NET_BIND_SERVICE`的作用就是让普通用户也可以绑端口到1024以下的端口。让普通用户启动nginx绑定在80端口：
+**4)** 普通用户不能通过bind函数绑定小于1024的端口,而root用户可以做到,`CAP_NET_BIND_SERVICE`的作用就是让普通用户也可以绑端口到1024以下的端口。让普通用户启动nginx绑定在80端口：
 
 ```shell
 setcap CAP_NET_BIND_SERVICE=+ep /usr/local/nginx/sbin/nginx
@@ -157,14 +155,14 @@ setcap CAP_NET_BIND_SERVICE=+ep /usr/local/nginx/sbin/nginx
 
 `setcap`来源于`Capabilities`（能力），它打破了UNIX/LINUX操作系统中超级用户/普通用户的概念,由普通用户也可以做只有超级用户可以完成的工作。`setcap`可以设置程序文件的能力。另还有`getcap`可以获得程序文件所具有的能力，`getpcaps`可以获得进程所具有的能力。
 
-5) 使用非root用户运行：
+**5)** 使用非root用户运行：
 
 ```shell
 sudo -u nginx /usr/local/nginx/sbin/nginx -c /opt/nginx/nginx-1.11.4/conf/nginx.conf 
 
 ```
 
-6) 校验启动用户
+**6)** 校验启动用户
 
 ```shell
 ps -aux |grep nginx
@@ -172,10 +170,11 @@ ps -aux |grep nginx
 
 ![](http://i.imgur.com/5lthdxb.png)
 
-
 ## 三、禁用非必要的方法 ##
 
-针对`GET`、`POST`以及`HEAD`之外的请求，如`PATCH`、`TRACE`等，直接返回了`444`状态码（`444`是Nginx定义的响应状态码，会立即断开连接，没有响应正文）。具体配置是这样的,在`nginx.conf`的`Server`中加入以下代码段：
+针对`GET`、`POST`以及`HEAD`之外的请求，如`PATCH`、`TRACE`等，直接返回了`444`状态码（`444`是Nginx定义的响应状态码，会立即断开连接，没有响应正文）。
+
+具体配置是这样的,在`nginx.conf`的`Server`中加入以下代码段：
 
 ```shell
 if ($request_method !~ ^(GET|HEAD|POST)$ ) {
