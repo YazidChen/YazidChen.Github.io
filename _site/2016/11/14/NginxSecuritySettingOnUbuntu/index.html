@@ -414,7 +414,28 @@ limit_conn_status 503;
 </code></pre>
 </div>
 
-<h2 id="section-8">参考</h2>
+<h3 id="section-8">5.3 白名单设置</h3>
+
+<p><code class="highlighter-rouge">http_limit_conn</code>和<code class="highlighter-rouge">http_limit_req</code>模块限制了单ip单位时间内的并发和请求数，但是如果Nginx前面有负载均衡或者反向代理，nginx获取的都是来自负载均衡的连接或请求，这时不应该限制负载均衡的连接和请求，就需要<code class="highlighter-rouge">geo</code>和<code class="highlighter-rouge">map</code>模块设置白名单：</p>
+
+<div class="language-shell highlighter-rouge"><pre class="highlight"><code>geo <span class="nv">$whiteiplist</span>  <span class="o">{</span>
+        default 1;
+        10.11.18.120 0;
+    <span class="o">}</span>
+map <span class="nv">$whiteiplist</span>  <span class="nv">$limit</span> <span class="o">{</span>
+        1 <span class="nv">$binary_remote_addr</span>;
+        0 <span class="s2">""</span>;
+    <span class="o">}</span>
+limit_req_zone <span class="nv">$limit</span> <span class="nv">zone</span><span class="o">=</span>one:10m <span class="nv">rate</span><span class="o">=</span>10r/s;
+limit_conn_zone <span class="nv">$limit</span> <span class="nv">zone</span><span class="o">=</span>addr:10m;
+</code></pre>
+</div>
+
+<p><code class="highlighter-rouge">geo</code>模块定义了一个默认值是1的变量<code class="highlighter-rouge">whiteiplist</code>,并加入白名单IP，其变量<code class="highlighter-rouge">whiteiplist</code>的值为0。</p>
+
+<p><code class="highlighter-rouge">whiteiplist</code>的值对应着<code class="highlighter-rouge">map</code>模块。1则受限，0则不受限。</p>
+
+<h2 id="section-9">参考</h2>
 
 <p><a href="http://www.bkjia.com/Linux/1124560.html">Nginx安全优化之隐藏版本号</a></p>
 

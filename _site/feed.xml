@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-11-14T02:42:39+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>Linux环境Nginx安全配置</title><link href="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Nginx安全配置" /><published>2016-11-14T00:00:00+00:00</published><updated>2016-11-14T00:00:00+00:00</updated><id>yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu</id><content type="html" xml:base="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/">&lt;h1 id=&quot;nginx-security-for-ubuntu1604&quot;&gt;Nginx Security For Ubuntu16.04&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-11-14T05:51:25+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>Linux环境Nginx安全配置</title><link href="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Nginx安全配置" /><published>2016-11-14T00:00:00+00:00</published><updated>2016-11-14T00:00:00+00:00</updated><id>yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu</id><content type="html" xml:base="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/">&lt;h1 id=&quot;nginx-security-for-ubuntu1604&quot;&gt;Nginx Security For Ubuntu16.04&lt;/h1&gt;
 
 &lt;h2 id=&quot;section&quot;&gt;一、隐藏版本号&lt;/h2&gt;
 
@@ -304,7 +304,28 @@ limit_conn_status 503;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;h2 id=&quot;section-8&quot;&gt;参考&lt;/h2&gt;
+&lt;h3 id=&quot;section-8&quot;&gt;5.3 白名单设置&lt;/h3&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;http_limit_conn&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;http_limit_req&lt;/code&gt;模块限制了单ip单位时间内的并发和请求数，但是如果Nginx前面有负载均衡或者反向代理，nginx获取的都是来自负载均衡的连接或请求，这时不应该限制负载均衡的连接和请求，就需要&lt;code class=&quot;highlighter-rouge&quot;&gt;geo&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;map&lt;/code&gt;模块设置白名单：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;geo &lt;span class=&quot;nv&quot;&gt;$whiteiplist&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        default 1;
+        10.11.18.120 0;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+map &lt;span class=&quot;nv&quot;&gt;$whiteiplist&lt;/span&gt;  &lt;span class=&quot;nv&quot;&gt;$limit&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        1 &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt;;
+        0 &lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+limit_req_zone &lt;span class=&quot;nv&quot;&gt;$limit&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;one:10m &lt;span class=&quot;nv&quot;&gt;rate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10r/s;
+limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$limit&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;addr:10m;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;geo&lt;/code&gt;模块定义了一个默认值是1的变量&lt;code class=&quot;highlighter-rouge&quot;&gt;whiteiplist&lt;/code&gt;,并加入白名单IP，其变量&lt;code class=&quot;highlighter-rouge&quot;&gt;whiteiplist&lt;/code&gt;的值为0。&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;whiteiplist&lt;/code&gt;的值对应着&lt;code class=&quot;highlighter-rouge&quot;&gt;map&lt;/code&gt;模块。1则受限，0则不受限。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-9&quot;&gt;参考&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://www.bkjia.com/Linux/1124560.html&quot;&gt;Nginx安全优化之隐藏版本号&lt;/a&gt;&lt;/p&gt;
 

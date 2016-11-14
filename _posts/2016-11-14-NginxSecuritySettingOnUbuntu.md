@@ -309,6 +309,28 @@ limit_conn_status code;
 limit_conn_status 503;
 ```
 
+### 5.3 白名单设置 ###
+
+`http_limit_conn`和`http_limit_req`模块限制了单ip单位时间内的并发和请求数，但是如果Nginx前面有负载均衡或者反向代理，nginx获取的都是来自负载均衡的连接或请求，这时不应该限制负载均衡的连接和请求，就需要`geo`和`map`模块设置白名单：
+
+```shell
+geo $whiteiplist  {
+        default 1;
+        10.11.18.120 0;
+    }
+map $whiteiplist  $limit {
+        1 $binary_remote_addr;
+        0 "";
+    }
+limit_req_zone $limit zone=one:10m rate=10r/s;
+limit_conn_zone $limit zone=addr:10m;
+```
+
+`geo`模块定义了一个默认值是1的变量`whiteiplist`,并加入白名单IP，其变量`whiteiplist`的值为0。
+
+`whiteiplist`的值对应着`map`模块。1则受限，0则不受限。
+
+
 ## 参考 ##
 
 [Nginx安全优化之隐藏版本号](http://www.bkjia.com/Linux/1124560.html)
