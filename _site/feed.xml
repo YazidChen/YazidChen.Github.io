@@ -1,4 +1,316 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-10-13T11:14:15+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>定时切分Nginx日志</title><link href="yazidchen.github.io/2016/10/12/CutNginxLog/" rel="alternate" type="text/html" title="定时切分Nginx日志" /><published>2016-10-12T00:00:00+00:00</published><updated>2016-10-12T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/12/CutNginxLog</id><content type="html" xml:base="yazidchen.github.io/2016/10/12/CutNginxLog/">&lt;h1 id=&quot;section&quot;&gt;一、编写日志自动切割脚本&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-11-14T02:35:28+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>Linux环境Nginx安全配置</title><link href="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Nginx安全配置" /><published>2016-11-14T00:00:00+00:00</published><updated>2016-11-14T00:00:00+00:00</updated><id>yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu</id><content type="html" xml:base="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/">&lt;h1 id=&quot;nginx-security-for-ubuntu1604&quot;&gt;Nginx Security For Ubuntu16.04&lt;/h1&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;一、隐藏版本号&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;1.1 原始状态&lt;/h3&gt;
+
+&lt;p&gt;原始情况下，访问错误的链接会有暴露版本信息的危险。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/WOYn9rJ.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;用curl命令查出原始的版本信息：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl -I ddos.jinzhucaifu.com
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/vBvNuK2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;ngxhttpheaderfiltermodulec&quot;&gt;1.2 修改ngx_http_header_filter_module.c文件&lt;/h3&gt;
+
+&lt;p&gt;进入nginx源码目录，找到&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_header_filter_module.c&lt;/code&gt;文件进行编辑,找到以下行：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;static char ngx_http_server_string[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Server: nginx&quot;&lt;/span&gt; CRLF;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;将nginx修改：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;static char ngx_http_server_string[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Server: Yazid&quot;&lt;/span&gt; CRLF;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;ngxhttpspecialresponsec&quot;&gt;1.3 修改ngx_http_special_response.c文件&lt;/h3&gt;
+
+&lt;p&gt;进入nginx源码目录，找到&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_special_response.c&lt;/code&gt;文件进行编辑,找到以下代码段：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;static u_char ngx_http_error_full_tail[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
+&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;hr&amp;gt;&amp;lt;center&amp;gt;&quot;&lt;/span&gt; NGINX_VER &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/center&amp;gt;&quot;&lt;/span&gt; CRLF
+&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/body&amp;gt;&quot;&lt;/span&gt; CRLF
+&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/html&amp;gt;&quot;&lt;/span&gt; CRLF
+;
+
+static u_char ngx_http_error_tail[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
+&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;hr&amp;gt;&amp;lt;center&amp;gt;nginx&amp;lt;/center&amp;gt;&quot;&lt;/span&gt; CRLF
+&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/body&amp;gt;&quot;&lt;/span&gt; CRLF
+&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/html&amp;gt;&quot;&lt;/span&gt; CRLF
+;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;将NGINX_VER去除，将nginx修改：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;static u_char ngx_http_error_full_tail[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
+&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;hr&amp;gt;&amp;lt;center&amp;gt;&quot;&quot;&amp;lt;/center&amp;gt;&quot;&lt;/span&gt; CRLF
+&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/body&amp;gt;&quot;&lt;/span&gt; CRLF
+&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/html&amp;gt;&quot;&lt;/span&gt; CRLF
+;
+
+static u_char ngx_http_error_tail[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
+&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;hr&amp;gt;&amp;lt;center&amp;gt;Yazid&amp;lt;/center&amp;gt;&quot;&lt;/span&gt; CRLF
+&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/body&amp;gt;&quot;&lt;/span&gt; CRLF
+&lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/html&amp;gt;&quot;&lt;/span&gt; CRLF
+;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;nginxh&quot;&gt;1.4 修改nginx.h文件&lt;/h3&gt;
+
+&lt;p&gt;进入nginx源码目录，找到&lt;code class=&quot;highlighter-rouge&quot;&gt;nginx.h&lt;/code&gt;文件进行编辑,找到以下代码段：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#define nginx_version      1011004&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#define NGINX_VERSION      &quot;1.11.4&quot;&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#define NGINX_VER          &quot;nginx/&quot; NGINX_VERSION&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#define NGINX_VAR          &quot;NGINX&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;将所有敏感信息修改：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#define nginx_version      0&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#define NGINX_VERSION      &quot;0&quot;&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#define NGINX_VER          &quot;Yazid/&quot; NGINX_VERSION&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#define NGINX_VAR          &quot;Yazid&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;1.5 重新编译&lt;/h3&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#编译&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;root@yazid-chen:/opt/nginx/nginx-1.11.4# &lt;/span&gt;make
+&lt;span class=&quot;c&quot;&gt;#安装&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;root@yazid-chen:/opt/nginx/nginx-1.11.4# &lt;/span&gt;make install
+&lt;span class=&quot;c&quot;&gt;#启动&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;root@yazid-chen:/opt/nginx/nginx-1.11.4# &lt;/span&gt;/usr/local/nginx/sbin/nginx
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;1.6 隐藏后状态&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/VpB6yIF.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/EDN2dFS.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;nginx&quot;&gt;二、给Nginx以普通用户运行的权限&lt;/h2&gt;
+
+&lt;h3 id=&quot;nginx-1&quot;&gt;2.1 给Nginx配置普通用户及用户组&lt;/h3&gt;
+
+&lt;p&gt;nginx服务默认启动用户是nobody&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/lhzo8nw.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;1) 建立nginx用户&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#用户禁止登录，且无家目录&lt;/span&gt;
+useradd nginx -s /sbin/nologin -M
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;使用id查看用户：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;id nginx
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;2) 修改nginx.conf&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;user  nobody;
+&lt;span class=&quot;c&quot;&gt;# 将上句修改为&lt;/span&gt;
+user  nginx;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/8KL0RsH.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;3) 给关键目录普通用户及组权限&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;chown -R nginx conf/ logs/ sbin/
+chgrp -R nginx conf/ logs/ sbin/
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;4) 普通用户不能通过bind函数绑定小于1024的端口,而root用户可以做到,&lt;code class=&quot;highlighter-rouge&quot;&gt;CAP_NET_BIND_SERVICE&lt;/code&gt;的作用就是让普通用户也可以绑端口到1024以下的端口。让普通用户启动nginx绑定在80端口：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;setcap &lt;span class=&quot;nv&quot;&gt;CAP_NET_BIND_SERVICE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;+ep /usr/local/nginx/sbin/nginx
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;setcap&lt;/code&gt;来源于&lt;code class=&quot;highlighter-rouge&quot;&gt;Capabilities&lt;/code&gt;（能力），它打破了UNIX/LINUX操作系统中超级用户/普通用户的概念,由普通用户也可以做只有超级用户可以完成的工作。&lt;code class=&quot;highlighter-rouge&quot;&gt;setcap&lt;/code&gt;可以设置程序文件的能力。另还有&lt;code class=&quot;highlighter-rouge&quot;&gt;getcap&lt;/code&gt;可以获得程序文件所具有的能力，&lt;code class=&quot;highlighter-rouge&quot;&gt;getpcaps&lt;/code&gt;可以获得进程所具有的能力。&lt;/p&gt;
+
+&lt;p&gt;5) 使用非root用户运行：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo -u nginx /usr/local/nginx/sbin/nginx -c /opt/nginx/nginx-1.11.4/conf/nginx.conf 
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;6) 校验启动用户&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ps -aux |grep nginx
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/5lthdxb.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;section-4&quot;&gt;三、禁用非必要的方法&lt;/h2&gt;
+
+&lt;p&gt;针对&lt;code class=&quot;highlighter-rouge&quot;&gt;GET&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;POST&lt;/code&gt;以及&lt;code class=&quot;highlighter-rouge&quot;&gt;HEAD&lt;/code&gt;之外的请求，如&lt;code class=&quot;highlighter-rouge&quot;&gt;PATCH&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;TRACE&lt;/code&gt;等，直接返回了&lt;code class=&quot;highlighter-rouge&quot;&gt;444&lt;/code&gt;状态码（&lt;code class=&quot;highlighter-rouge&quot;&gt;444&lt;/code&gt;是Nginx定义的响应状态码，会立即断开连接，没有响应正文）。具体配置是这样的,在&lt;code class=&quot;highlighter-rouge&quot;&gt;nginx.conf&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;Server&lt;/code&gt;中加入以下代码段：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$request_method&lt;/span&gt; !~ ^&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;GET|HEAD|POST&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return    &lt;/span&gt;444;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;可用chrome测试，在nginx的日志&lt;code class=&quot;highlighter-rouge&quot;&gt;access.log&lt;/code&gt;中看到效果。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-5&quot;&gt;四、图片防盗链（未测试）&lt;/h2&gt;
+
+&lt;p&gt;配置&lt;code class=&quot;highlighter-rouge&quot;&gt;nginx.conf&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;location ~ .&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;gif|jpg|jpeg|png|bmp|swf&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; 
+valid_referers none blocked &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;.epinv.com epinv.com &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;.qq.com &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;.baidu.com; 
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$invalid_referer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; 
+  rewrite ^/ http://www.epinv.com/epinv.png; 
+  &lt;span class=&quot;c&quot;&gt;#return 404; &lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; 
+expires      30d; 
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
+valid_referers none | blocked | server_names | string ...;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;指定合法的来源&lt;code class=&quot;highlighter-rouge&quot;&gt;referer&lt;/code&gt;，他决定了内置变量&lt;code class=&quot;highlighter-rouge&quot;&gt;$invalid_referer&lt;/code&gt;的值，如果&lt;code class=&quot;highlighter-rouge&quot;&gt;referer&lt;/code&gt;头部包含在这个合法网址里面，这个变量被设置为0，否则设置为1。不区分大小写的。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;参数说明：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;none&lt;/code&gt;: 				“Referer” 来源头部为空的情况。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;blocked&lt;/code&gt;: 			“Referer”来源头部不为空，但是里面的值被代理或者防火墙删除了，这些值都不以http://或者https://开头。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;server_names&lt;/code&gt;: 		“Referer”来源头部包含当前的server_names（当前域名）。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;arbitrary string&lt;/code&gt;: 	任意字符串,定义服务器名或者可选的URI前缀.主机名可以使用*开头或者结尾，在检测来源头部这个过程中，来源域名中的主机端口将会被忽略掉。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;regular expression&lt;/code&gt;: 正则表达式，&lt;code class=&quot;highlighter-rouge&quot;&gt;~&lt;/code&gt;表示排除https://或http://开头的字符串。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;特别说明：&lt;/strong&gt;防盗链跳转的地址，不能再是设置防盗链的虚拟主机地址，要用第三个虚拟主机，要不就成死循环了！&lt;/p&gt;
+
+&lt;h2 id=&quot;section-6&quot;&gt;五、限制连接请求数（未测试）&lt;/h2&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_limit_conn_module&lt;/code&gt; 可以限制单个IP的连接数，&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_limit_req_module&lt;/code&gt; 可以限制单个IP每秒请求数，通过限制连接数和请求数能相对有效的防御CC攻击。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-7&quot;&gt;5.1 限制每秒请求数&lt;/h3&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_limit_req_module&lt;/code&gt;模块通过漏桶原理来限制单位时间内的请求数，一旦单位时间内请求数超过限制，就会返回503错误。配置需要在两个地方设置：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;nginx.conf的http段内定义触发条件，可以有多个条件。&lt;/li&gt;
+  &lt;li&gt;在location内定义达到触发条件时nginx所要执行的动作。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    limit_req_zone &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;one:10m &lt;span class=&quot;nv&quot;&gt;rate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10r/s;//触发条件，所有访问ip限制每秒10个请求
+    ...
+    server &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        ...
+        location /search/ &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            limit_req &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;one &lt;span class=&quot;nv&quot;&gt;burst&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;5;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;参数说明：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$binary_remote_addr&lt;/code&gt;：  	二进制远程地址&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;zone=one:10m&lt;/code&gt;：    		定义zone名字叫one，并为这个zone分配10M内存，用来存储会话（二进制远程地址），1m内存可以保存16000会话&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;rate=10r/s&lt;/code&gt;：     		限制频率为每秒10个请求&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;burst=5&lt;/code&gt;：         		允许超过频率限制的请求数不多于5个，假设1、2、3、4秒请求为每秒9个，那么第5秒内请求15个是允许的；反之，如果第一秒内请求15个，会将5个请求放到第二秒，第二秒内超过10的请求直接503，类似多秒内平均速率限制。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;nodelay&lt;/code&gt;：         		超过的请求不被延迟处理，设置后15个请求在1秒内处理。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;ip&quot;&gt;5.2 限制IP连接数&lt;/h3&gt;
+
+&lt;p&gt;设置共享内存区,最大允许连接数对应一个给定的键值。当超过这个极限时,服务器将返回503错误(服务暂时不可用)在回复一个请求:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;addr:10m;
+    ...
+    server &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        ...
+        location /download/ &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            limit_conn addr 1;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;以上每个IP只允许1个连接。&lt;/p&gt;
+
+&lt;p&gt;下面的配置将会限制客户端IP连接到nginx服务器的数量，以及与此同时nginx服务器分发到虚拟服务器的总数：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;perip:10m;
+limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$server_name&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;perserver:10m;
+...
+server &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    ...
+    limit_conn perip 10;
+    limit_conn perserver 100;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;设置共享内存区：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#指令&lt;/span&gt;
+limit_conn_zone key &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;name:size;
+&lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
+limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;addr:10m;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;当设置了服务器连接数限制的情况下的日志等级配置，默认error：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#指令&lt;/span&gt;
+limit_conn_log_level info | notice | warn | error;
+
+&lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
+limit_conn_log_level error;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;设置拒绝请求时返回的状态码：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#指令&lt;/span&gt;
+limit_conn_status code;
+&lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
+limit_conn_status 503;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;section-8&quot;&gt;参考&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.bkjia.com/Linux/1124560.html&quot;&gt;Nginx安全优化之隐藏版本号&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://imququ.com/post/my-nginx-conf-for-security.html#simple_thread&quot;&gt;本博客 Nginx 配置之安全篇&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://nginx.org/en/docs/&quot;&gt;nginx documentation&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary>Nginx Security For Ubuntu16.04</summary></entry><entry><title>定时切分Nginx日志</title><link href="yazidchen.github.io/2016/10/12/CutNginxLog/" rel="alternate" type="text/html" title="定时切分Nginx日志" /><published>2016-10-12T00:00:00+00:00</published><updated>2016-10-12T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/12/CutNginxLog</id><content type="html" xml:base="yazidchen.github.io/2016/10/12/CutNginxLog/">&lt;h1 id=&quot;section&quot;&gt;一、编写日志自动切割脚本&lt;/h1&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim /usr/local/nginx/sbin/cut_nginx_log.sh
 &lt;/code&gt;&lt;/pre&gt;
