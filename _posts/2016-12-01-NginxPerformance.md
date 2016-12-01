@@ -120,9 +120,9 @@ cat /proc/cpuinfo| grep "processor"| wc -l
 
 **2)** 配置绑定处理器：
 
-`worker_processer 4；`配置处理器数目项最好设置为**小于等于CPU内核数**。
+`worker_processer 4;`配置处理器数目，最好设置为**小于等于CPU内核数**。
 
-`worker_cpu_affinity 00000001 00000010 00000100 00001000;`绑定处理器项将`worker`进程均分在不同的内核上。
+`worker_cpu_affinity 00000001 00000010 00000100 00001000;`绑定处理器，将`worker`进程均分在不同的内核上。
 
 ![](http://i.imgur.com/QmDO3Sy.png)
 

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-12-01T06:46:28+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>Linux环境Nginx性能优化</title><link href="yazidchen.github.io/2016/12/01/NginxPerformance/" rel="alternate" type="text/html" title="Linux环境Nginx性能优化" /><published>2016-12-01T00:00:00+00:00</published><updated>2016-12-01T00:00:00+00:00</updated><id>yazidchen.github.io/2016/12/01/NginxPerformance</id><content type="html" xml:base="yazidchen.github.io/2016/12/01/NginxPerformance/">&lt;h1 id=&quot;nginx-performance-optimize&quot;&gt;Nginx performance optimize&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-12-01T06:46:29+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>Linux环境Nginx性能优化</title><link href="yazidchen.github.io/2016/12/01/NginxPerformance/" rel="alternate" type="text/html" title="Linux环境Nginx性能优化" /><published>2016-12-01T00:00:00+00:00</published><updated>2016-12-01T00:00:00+00:00</updated><id>yazidchen.github.io/2016/12/01/NginxPerformance</id><content type="html" xml:base="yazidchen.github.io/2016/12/01/NginxPerformance/">&lt;h1 id=&quot;nginx-performance-optimize&quot;&gt;Nginx performance optimize&lt;/h1&gt;
 
 &lt;h2 id=&quot;section&quot;&gt;一、主配置文件&lt;/h2&gt;
 
@@ -111,9 +111,9 @@ cat /proc/cpuinfo| grep &lt;span class=&quot;s2&quot;&gt;&quot;processor&quot;&l
 
 &lt;p&gt;&lt;strong&gt;2)&lt;/strong&gt; 配置绑定处理器：&lt;/p&gt;
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;worker_processer 4；&lt;/code&gt;配置处理器数目项最好设置为&lt;strong&gt;小于等于CPU内核数&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;worker_processer 4;&lt;/code&gt;配置处理器数目，最好设置为&lt;strong&gt;小于等于CPU内核数&lt;/strong&gt;。&lt;/p&gt;
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;worker_cpu_affinity 00000001 00000010 00000100 00001000;&lt;/code&gt;绑定处理器项将&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;进程均分在不同的内核上。&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;worker_cpu_affinity 00000001 00000010 00000100 00001000;&lt;/code&gt;绑定处理器，将&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;进程均分在不同的内核上。&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/QmDO3Sy.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 

@@ -221,9 +221,9 @@ cat /proc/cpuinfo| grep <span class="s2">"processor"</span>| wc -l
 
 <p><strong>2)</strong> 配置绑定处理器：</p>
 
-<p><code class="highlighter-rouge">worker_processer 4；</code>配置处理器数目项最好设置为<strong>小于等于CPU内核数</strong>。</p>
+<p><code class="highlighter-rouge">worker_processer 4;</code>配置处理器数目，最好设置为<strong>小于等于CPU内核数</strong>。</p>
 
-<p><code class="highlighter-rouge">worker_cpu_affinity 00000001 00000010 00000100 00001000;</code>绑定处理器项将<code class="highlighter-rouge">worker</code>进程均分在不同的内核上。</p>
+<p><code class="highlighter-rouge">worker_cpu_affinity 00000001 00000010 00000100 00001000;</code>绑定处理器，将<code class="highlighter-rouge">worker</code>进程均分在不同的内核上。</p>
 
 <p><img src="http://i.imgur.com/QmDO3Sy.png" alt="" /></p>
 
