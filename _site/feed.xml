@@ -1,6 +1,344 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-11-14T05:51:25+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>Linux环境Nginx安全配置</title><link href="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Nginx安全配置" /><published>2016-11-14T00:00:00+00:00</published><updated>2016-11-14T00:00:00+00:00</updated><id>yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu</id><content type="html" xml:base="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/">&lt;h1 id=&quot;nginx-security-for-ubuntu1604&quot;&gt;Nginx Security For Ubuntu16.04&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-12-01T06:46:28+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>Linux环境Nginx性能优化</title><link href="yazidchen.github.io/2016/12/01/NginxPerformance/" rel="alternate" type="text/html" title="Linux环境Nginx性能优化" /><published>2016-12-01T00:00:00+00:00</published><updated>2016-12-01T00:00:00+00:00</updated><id>yazidchen.github.io/2016/12/01/NginxPerformance</id><content type="html" xml:base="yazidchen.github.io/2016/12/01/NginxPerformance/">&lt;h1 id=&quot;nginx-performance-optimize&quot;&gt;Nginx performance optimize&lt;/h1&gt;
+
+&lt;h2 id=&quot;section&quot;&gt;一、主配置文件&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-1&quot;&gt;主配置文件结构&lt;/h3&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 主配置段，也即全局配置段；&lt;/span&gt;
+···
+
+&lt;span class=&quot;c&quot;&gt;# 事件驱动相关的配置；&lt;/span&gt;
+  event &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+           ...
+         &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+   
+  &lt;span class=&quot;c&quot;&gt;# http/https 协议相关的配置段； &lt;/span&gt;
+  http &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+          ...
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+   
+  &lt;span class=&quot;c&quot;&gt;# 邮件配置段；&lt;/span&gt;
+   mail &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+          ...
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+   
+  &lt;span class=&quot;c&quot;&gt;# tcp/udp等相关协议的配置段&lt;/span&gt;
+   stream &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+      ...
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h4 id=&quot;section-2&quot;&gt;主配置段相关配置&lt;/h4&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##定义执行权限的用户及组，如果省略组，则组名为用户所在组。&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#语法：&lt;/span&gt;
+user user &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;group];
+&lt;span class=&quot;c&quot;&gt;#默认：&lt;/span&gt;
+user nobody;
+
+&lt;span class=&quot;c&quot;&gt;##指定存储nginx主进程编号pid的文件路径&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#语法：&lt;/span&gt;
+pid path;
+&lt;span class=&quot;c&quot;&gt;#默认：&lt;/span&gt;
+pid logs/nginx.pid;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;section-3&quot;&gt;二、性能优化&lt;/h2&gt;
+
+&lt;h3 id=&quot;cpu&quot;&gt;2.1 关于CPU的配置项&lt;/h3&gt;
+
+&lt;h4 id=&quot;section-4&quot;&gt;2.1.1 配置运行处理器&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;配置详解：&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##worker进程的数量，通常应该为当前主机的CPU的物理核心数。&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#语法：&lt;/span&gt;
+worker_processer number;
+&lt;span class=&quot;c&quot;&gt;#默认：&lt;/span&gt;
+worker_processer  1;
+
+&lt;span class=&quot;c&quot;&gt;##worker进程绑定到固定的处理器（processer）上&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# cpumask(CPU掩码)，八位二进制，每一位代表一个处理器（processer），共8个，1代表固定使用，0代表不使用。&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# 00000001 : 0号processer&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# 00000010 : 1号processer&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# 00000100 : 2号processer&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#语法：&lt;/span&gt;
+worker_cpu_affinity cpumask1 cpumask2 ...;
+&lt;span class=&quot;c&quot;&gt;#默认：&lt;/span&gt;
+worker_cpu_affinity auto;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;搞懂上述配置，必须先弄清楚&lt;strong&gt;中央处理器（CPU）&lt;/strong&gt;、&lt;strong&gt;内核&lt;/strong&gt;、&lt;strong&gt;处理器（processer）&lt;/strong&gt;三者的关系。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;CPU&lt;/strong&gt;包含一个或多个&lt;strong&gt;内核&lt;/strong&gt;，一般一个&lt;strong&gt;内核&lt;/strong&gt;包含一个&lt;strong&gt;processer&lt;/strong&gt;，而支持一个&lt;strong&gt;内核&lt;/strong&gt;有两个&lt;strong&gt;processer&lt;/strong&gt;的技术，称为&lt;strong&gt;超线程技术&lt;/strong&gt;。此技术可以把&lt;strong&gt;CPU&lt;/strong&gt;中一个&lt;strong&gt;核心&lt;/strong&gt;模拟成两个用，以实现运算能力的大幅度提升。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;1)&lt;/strong&gt; Linux查看CPU信息：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##总核(cpu cores)数 = 中央处理器（CPU）个数 X 每颗CPU的核数 &lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;##总处理器（processor）数 =总核(cpu cores)数 X 超线程数&lt;/span&gt;
+
+&lt;span class=&quot;c&quot;&gt;#查看CPU总体信息&lt;/span&gt;
+cat /proc/cpuinfo
+
+&lt;span class=&quot;c&quot;&gt;# 查看CPU个数&lt;/span&gt;
+cat /proc/cpuinfo| grep &lt;span class=&quot;s2&quot;&gt;&quot;physical id&quot;&lt;/span&gt;| sort| uniq| wc -l
+
+&lt;span class=&quot;c&quot;&gt;# 查看每个CPU中的核数&lt;/span&gt;
+cat /proc/cpuinfo| grep &lt;span class=&quot;s2&quot;&gt;&quot;cpu cores&quot;&lt;/span&gt;| uniq
+
+&lt;span class=&quot;c&quot;&gt;# 查看总处理器（processor）个数&lt;/span&gt;
+cat /proc/cpuinfo| grep &lt;span class=&quot;s2&quot;&gt;&quot;processor&quot;&lt;/span&gt;| wc -l
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;通过上述指令，查询到本机仅有1个CPU。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/Uet4kiq.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;该CPU具有4个内核。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/ql0WpC5.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;每核虚拟出2个超线程，作为处理器，共8个处理器。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/aOpCeLn.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;0号和4号处理器同在0号内核上，1号和5号处理器同在1号内核上，以此类推。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2)&lt;/strong&gt; 配置绑定处理器：&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;worker_processer 4；&lt;/code&gt;配置处理器数目项最好设置为&lt;strong&gt;小于等于CPU内核数&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;worker_cpu_affinity 00000001 00000010 00000100 00001000;&lt;/code&gt;绑定处理器项将&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;进程均分在不同的内核上。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/QmDO3Sy.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;3)&lt;/strong&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;./nginx -t&lt;/code&gt; 校验配置项正确性：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/XVnd5TH.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;./nginx -s reload&lt;/code&gt;重启nginx后，可用以下方法校验：&lt;/p&gt;
+
+&lt;p&gt;查看&lt;code class=&quot;highlighter-rouge&quot;&gt;worker_processes 4;&lt;/code&gt;是否生效：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ps -aux | grep nginx
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/xqHVZPS.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;查看&lt;code class=&quot;highlighter-rouge&quot;&gt;worker_cpu_affinity auto;&lt;/code&gt;是否生效：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#查看nginx进程在哪个CPU内核上运行&lt;/span&gt;
+ps -axo pid,user,comm,psr |grep nginx
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/25fLoOI.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可以看到，所有的&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;进程都均匀的分布在不同的内核上，而&lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt;进程与&lt;code class=&quot;highlighter-rouge&quot;&gt;pid&lt;/code&gt;为2517的&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;进程都绑定在0号内核上。其他内核上剩余的处理器共3个，便用作计算机其他进程的处理。&lt;/p&gt;
+
+&lt;p&gt;这里有个疑问，0号内核上的&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;进程和&lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt;进程同在一个内核会不会给该内核造成极大的负载？&lt;/p&gt;
+
+&lt;p&gt;我们先来了解一下&lt;code class=&quot;highlighter-rouge&quot;&gt;nginx&lt;/code&gt;中&lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;之间的关系。&lt;/p&gt;
+
+&lt;p&gt;正常执行中的&lt;code class=&quot;highlighter-rouge&quot;&gt;nginx&lt;/code&gt;会有多个进程，最基本的有&lt;code class=&quot;highlighter-rouge&quot;&gt;master process&lt;/code&gt;（主进程）和&lt;code class=&quot;highlighter-rouge&quot;&gt;worker process&lt;/code&gt;（工作进程）。&lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt;充当监控进程，而由主进程&lt;code class=&quot;highlighter-rouge&quot;&gt;fork()&lt;/code&gt;出来的&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;则充当工作进程。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/22Euu68.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt;进程充当整个进程组与用户的交互接口，同时对进程进行监护。它不需要处理网络事件，不负责业务的执行，只会通过管理&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;进程来实现重启服务、平滑升级、更换日志文件、配置文件实时生效等功能。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/Ouirijn.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;进程的主要任务是完成具体的任务逻辑。其主要关注点是与客户端或后端真实服务器（此时nginx作为中间代理）之间的数据可读/可写等I/O交互事件。&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt;进程采用的是信号去通知&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;进程去做某些工作，这些工作包括&lt;code class=&quot;highlighter-rouge&quot;&gt;sig_atomic_t ngx_terminate&lt;/code&gt;（强制关闭进程）、&lt;code class=&quot;highlighter-rouge&quot;&gt;sig_atomic_t ngx_quit&lt;/code&gt;（优雅地关闭进程）、&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_uint_t ngx_exiting&lt;/code&gt;（退出进程标志位）、&lt;code class=&quot;highlighter-rouge&quot;&gt;sig_atomic_t ngx_reopen&lt;/code&gt;（重新打开所有文件）。&lt;/p&gt;
+
+&lt;p&gt;如此看来，&lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt;消耗的资源并不多。&lt;/p&gt;
+
+&lt;h4 id=&quot;section-5&quot;&gt;2.1.2 配置进程优先级&lt;/h4&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##设定worker进程的nice值，nice值决定进程的优先级，在CPU运行队列较长时，可以被有限调度到CPU上运行。nice值默认为0，区间[-20,20]&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
+worker_priority number;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这里有个疑问：nice值是什么？&lt;/p&gt;
+
+&lt;p&gt;首先先看一下进程的类型：&lt;/p&gt;
+
+&lt;p&gt;根据消耗型来分，有&lt;strong&gt;I/O消耗型进程&lt;/strong&gt;、&lt;strong&gt;CPU消耗型进程&lt;/strong&gt;以及两者兼消耗型进程。
+&lt;strong&gt;I/O消耗型进程&lt;/strong&gt;会把大部分时间消耗在I/O请求和等待I/O上，真正使用CPU的时间很少；而&lt;strong&gt;CPU消耗型进程&lt;/strong&gt;会把大部分时间用在使用CPU进行计算等操作。&lt;/p&gt;
+
+&lt;p&gt;Linux系统为了给&lt;strong&gt;CPU消耗型进程&lt;/strong&gt;多一些处理器时间，而给&lt;strong&gt;I/O消耗型进程&lt;/strong&gt;少一些处理器时间，于是linux采取的不是简单的&lt;strong&gt;时间片调度算法&lt;/strong&gt;，而是改进的优先级调度算法，&lt;strong&gt;完全公平调度算法CFS&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;我们来执行一个简单的命令：&lt;code class=&quot;highlighter-rouge&quot;&gt;ps -l&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/f6erFS3.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;其中有两个参数：&lt;strong&gt;PRI&lt;/strong&gt;和&lt;strong&gt;NI&lt;/strong&gt;：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;PRI&lt;/strong&gt;即进程的CPU調度优先级，就是进程被CPU执行的先后顺序的数值。它的值是由内核进行动态调整，用户无法调整它的值。此值越小，进程的优先级越高。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;NI&lt;/strong&gt;即nice值，它是一个偏移量。它会影响优先级&lt;strong&gt;PRI(new)=PRI(old)+nice&lt;/strong&gt;，范围是-20到+19。root和普通用户所能更改的范围不同，root随意这要在-20-19这个范围内，普通用户0-19。相当于只能增高无法降低。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Linux系统是抢占式的，系统当前运行一个进程，但这个时候一个具有更高优先级的进程突然得到某种资源进入了就绪状态，然后他就来到cpu面前一脚踢开正在运行的进程，与CPU共度美好时光。&lt;/p&gt;
+
+&lt;p&gt;至此，我们将&lt;code class=&quot;highlighter-rouge&quot;&gt;worker_priority&lt;/code&gt;的值设为-5，以提高优先级。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;1）&lt;/strong&gt; 查询修改前状态：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ps axo pid,user,comm,psr,nice | grep nginx
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/VErMiA9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可看出&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;进程的&lt;code class=&quot;highlighter-rouge&quot;&gt;nice&lt;/code&gt;值都为0。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2）&lt;/strong&gt; 配置以提高优先级至-5：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;worker_priority -5;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;./nginx -s reload&lt;/code&gt; 重启nginx。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;3）&lt;/strong&gt; 查询修改后的状态：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/MueCDqM.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可以看到，&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;进程的&lt;code class=&quot;highlighter-rouge&quot;&gt;nice&lt;/code&gt;值已经修改成了-5。&lt;/p&gt;
+
+&lt;h3 id=&quot;gzip&quot;&gt;2.2 gzip压缩传输数据&lt;/h3&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;是若干种文件压缩程序的简称，代表&lt;code class=&quot;highlighter-rouge&quot;&gt;GNU zip&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;nginx中&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;压缩功能由&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_gzip_module&lt;/code&gt;模块支持。&lt;/p&gt;
+
+&lt;p&gt;nginx中&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;的主要作用就是用来减轻服务器的带宽问题，经过&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;压缩后的页面大小可以变为原来的30%甚至更小，这样用户浏览页面时的速度会快很多。&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;的压缩页面需要浏览器和服务器双方都支持，实际上就是服务器端压缩，传到浏览器后浏览器解压缩并解析。目前的大多数浏览器都支持解析&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;压缩过的页面。&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##gzip压缩功能开关&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#语法 &lt;/span&gt;
+gzip on | off;
+&lt;span class=&quot;c&quot;&gt;#默认 &lt;/span&gt;
+gzip off;
+
+&lt;span class=&quot;c&quot;&gt;##设置response响应的缓冲区大小。32 4k代表以4k为单位将响应数据以4k的32倍(128k)的大小申请内存。如果没有设置，缓冲区的大小默认为整个响应页面的大小。&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#语法 &lt;/span&gt;
+gzip_buffers number size;
+&lt;span class=&quot;c&quot;&gt;#默认 &lt;/span&gt;
+gzip_buffers 32 4k | 16 8k;
+
+&lt;span class=&quot;c&quot;&gt;##设置gzip的压缩级别，可接受的范围是从1到9，数字越大压缩率越高，但更消耗CPU，一般设置6即可。&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
+gzip_comp_level level;
+&lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
+gzip_comp_level 1;
+
+&lt;span class=&quot;c&quot;&gt;##设置允许压缩的页面最小字节数，页面字节数从header头中的Content-Length中进行获取。因为过小的文件内容压缩之后效果不明显，甚至会比不压缩时更大，所以一般建议长度不小于1000或者1K。&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
+gzip_min_length length;
+&lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
+gzip_min_length 20;
+
+&lt;span class=&quot;c&quot;&gt;##指定哪些类型的响应才启用gzip压缩，多个用空格分隔。通配符”*”可以匹配任意类型，不管是否指定”text/html”类型，该类型的响应总是启用压缩。一般js、css等文本文件都启用压缩，如application/x-javascript、text/css、application/xml 等。具体的文件类型对应的mimi-type可以参考conf/mime.types文件。例如 jpg / png 这类文件一般不开启，因为图片格式已经是高度压缩过的，再压一遍没什么效果不说还浪费 CPU&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
+gzip_types mime-type ...;
+&lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
+gzip_types text/html;
+
+&lt;span class=&quot;c&quot;&gt;##设置gzip压缩所需要的请求的最小HTTP版本，低于该版本不使用gzip压缩。一般不用修改，默认即可。&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
+gzip_http_version 1.0 | 1.1;
+&lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
+gzip_http_version 1.1;
+
+&lt;span class=&quot;c&quot;&gt;##如果请求的”User-Agent”头信息能被指定的正则表达式匹配，则对响应禁用gzip压缩功能。主要是为了兼容不支持gzip压缩的浏览器。&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
+gzip_disable regex ...;
+&lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
+—
+
+&lt;span class=&quot;c&quot;&gt;##如果指令gzip,gzip_static或者gunzip被激活的话，启用Vary: Accept-Encoding响应头字段。&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
+gzip_vary on | off;
+&lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
+gzip_vary off;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;我们对nginx做如下配置：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/pZ25sfm.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;保存重启后有：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/eUzpULs.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;而未开启gzip压缩的同一页面，其响应大小及时间如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/qQuBvDu.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;我们再来看一下响应头信息：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/n1qAMnb.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可以看到，响应头中已经存在&lt;code class=&quot;highlighter-rouge&quot;&gt;Content-Encoding:gzip&lt;/code&gt;，并且有返回我们设置的Vary值&lt;code class=&quot;highlighter-rouge&quot;&gt;Vary:Accept-Encoding&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;在响应头中我们还看到&lt;code class=&quot;highlighter-rouge&quot;&gt;Transfer-Encoding:chunked&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;1)&lt;/strong&gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;Transfer-Encoding&lt;/code&gt;字面意思是&lt;strong&gt;传输编码&lt;/strong&gt;，而&lt;code class=&quot;highlighter-rouge&quot;&gt;Content-Encoding&lt;/code&gt;字面意思是&lt;strong&gt;内容编码&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Content-Encoding&lt;/code&gt;通常用于对实体内容进行压缩编码，目的是优化传输，例如&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;压缩，能大幅减小体积。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Transfer-Encoding&lt;/code&gt;则是用来改变报文格式的，它不但不会减少实体内容传输大小，甚至还会使传输变大。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;HTTP协议中有一个重要概念：&lt;code class=&quot;highlighter-rouge&quot;&gt;Persistent Connection&lt;/code&gt;（持久连接，即&lt;strong&gt;长连接&lt;/strong&gt;）。&lt;strong&gt;长连接&lt;/strong&gt;的存在，主要是可以避开缓慢的三次握手，还可以避免遇上TCP慢启动的拥塞适应阶段。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;长连接&lt;/strong&gt;通过&lt;code class=&quot;highlighter-rouge&quot;&gt;Connection: keep-alive&lt;/code&gt;这个头部来实现，服务端和客户端都可以使用它告诉对方在发送完数据之后不需要断开TCP连接，以备后用。HTTP/1.1则规定所有连接都必须是持久的，除非显式地在头部加上 &lt;code class=&quot;highlighter-rouge&quot;&gt;Connection: close&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;对于非持久连接，浏览器可以通过连接是否关闭来界定请求或响应实体的边界；对于持久连接，通过&lt;code class=&quot;highlighter-rouge&quot;&gt;Content-Length&lt;/code&gt;的长度信息，判断出响应实体已结束。那如果&lt;code class=&quot;highlighter-rouge&quot;&gt;Content-Length&lt;/code&gt;和实体实际长度不一致时，则由&lt;code class=&quot;highlighter-rouge&quot;&gt;Transfer-Encoding&lt;/code&gt;来解决。&lt;/p&gt;
+
+&lt;p&gt;在头部加入&lt;code class=&quot;highlighter-rouge&quot;&gt;Transfer-Encoding: chunked&lt;/code&gt;之后，就代表这个报文采用了&lt;strong&gt;分块编码&lt;/strong&gt;。这时，报文中的实体需要改为用一系列分块来传输。每个分块包含十六进制的长度值和数据，长度值独占一行，长度不包括它结尾的&lt;code class=&quot;highlighter-rouge&quot;&gt;CRLF（\r\n）&lt;/code&gt;，也不包括分块数据结尾的&lt;code class=&quot;highlighter-rouge&quot;&gt;CRLF&lt;/code&gt;。最后一个分块长度值必须为0，对应的分块数据没有内容，表示实体结束。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2)&lt;/strong&gt; Nginx中如果启用了&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;压缩，则必然采用&lt;code class=&quot;highlighter-rouge&quot;&gt;Transfer-Encoding:chunked&lt;/code&gt;的方式输出，原因如下：&lt;/p&gt;
+
+&lt;p&gt;在Nginx内部，&lt;code class=&quot;highlighter-rouge&quot;&gt;r-&amp;gt;headers_out.content_length_n&lt;/code&gt;用于表述请求返回内容的长度，只有在&lt;code class=&quot;highlighter-rouge&quot;&gt;r-&amp;gt;headers_out.content_length_n &amp;gt;=0&lt;/code&gt;的时候，才有意义。如果没有在脚本中强制&lt;code class=&quot;highlighter-rouge&quot;&gt;header&lt;/code&gt;输出&lt;code class=&quot;highlighter-rouge&quot;&gt;content-length&lt;/code&gt;，则默认在Nginx中&lt;code class=&quot;highlighter-rouge&quot;&gt;r-&amp;gt;headers_out.content_length_n = -1&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;在Nginx中，&lt;code class=&quot;highlighter-rouge&quot;&gt;header&lt;/code&gt;输出和&lt;code class=&quot;highlighter-rouge&quot;&gt;body&lt;/code&gt;的输出是完全两个不同的阶段，&lt;code class=&quot;highlighter-rouge&quot;&gt;http header&lt;/code&gt;输出是由&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_send_header()&lt;/code&gt;执行，由各个功能模块调用。&lt;code class=&quot;highlighter-rouge&quot;&gt;body&lt;/code&gt;的输出由&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_writer()&lt;/code&gt;调用&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_output_filter()&lt;/code&gt;产生。&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;header&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;body&lt;/code&gt;都有一个&lt;code class=&quot;highlighter-rouge&quot;&gt;filter&lt;/code&gt;队列需要执行，分别是&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_top_header_filter&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_top_body_filter&lt;/code&gt;，在http的功能模块中把处理函数插入到这两个队列。&lt;/p&gt;
+
+&lt;p&gt;真正的输出动作由&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_write_filter()&lt;/code&gt;产生。所以&lt;code class=&quot;highlighter-rouge&quot;&gt;filter&lt;/code&gt;队列的顺序很重要，&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_write_filter&lt;/code&gt;应该处于队列最后。也就是先输出&lt;code class=&quot;highlighter-rouge&quot;&gt;header&lt;/code&gt;，再输出&lt;code class=&quot;highlighter-rouge&quot;&gt;body&lt;/code&gt;。&lt;/p&gt;
+
+&lt;p&gt;由此可见，&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;要对内容模块进行压缩处理，而在&lt;code class=&quot;highlighter-rouge&quot;&gt;header filter&lt;/code&gt;的时候，&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;模块不可能计算出压缩后的内容长度。所以Nginx会清空&lt;code class=&quot;highlighter-rouge&quot;&gt;header&lt;/code&gt;中的&lt;code class=&quot;highlighter-rouge&quot;&gt;content-length&lt;/code&gt;。便采用&lt;code class=&quot;highlighter-rouge&quot;&gt;Transfer-Encoding:chunked&lt;/code&gt;的方式输出。&lt;/p&gt;
+
+&lt;p&gt;既然&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;是内容编码，则压缩是在传输之前进行的，所以传输的分块是按照压缩后的数据分块的。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-6&quot;&gt;参考&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://blog.liwenxin.com/2010/11/25/nginx-code-reading-4.html&quot;&gt;nginx源码解析(4)-深入http模块&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://phpor.net/blog/post/2037&quot;&gt;Response与Transfer-Encoding:chunked、Content-Length、Content-Encoding:gzip&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://imququ.com/post/transfer-encoding-header-in-http.html&quot;&gt;HTTP 协议中的 Transfer-Encoding&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary>Nginx performance optimize</summary></entry><entry><title>Linux环境Nginx安全配置</title><link href="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Nginx安全配置" /><published>2016-11-14T00:00:00+00:00</published><updated>2016-11-14T00:00:00+00:00</updated><id>yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu</id><content type="html" xml:base="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/">&lt;h1 id=&quot;nginx-security-for-ubuntu1604&quot;&gt;Nginx Security For Ubuntu16.04&lt;/h1&gt;
 
 &lt;h2 id=&quot;section&quot;&gt;一、隐藏版本号&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.freebuf.com/news/9026.html&quot;&gt;nginx爆整数溢出漏洞&lt;/a&gt;
+不怕一万，就怕万一。&lt;/p&gt;
 
 &lt;h3 id=&quot;section-1&quot;&gt;1.1 原始状态&lt;/h3&gt;
 

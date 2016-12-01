@@ -9,6 +9,9 @@ keywords: Nginx, Linux, 安全, Security, Nginx安全
 
 ## 一、隐藏版本号 ##
 
+[nginx爆整数溢出漏洞](http://www.freebuf.com/news/9026.html)
+不怕一万，就怕万一。
+
 ### 1.1 原始状态 ###
 
 原始情况下，访问错误的链接会有暴露版本信息的危险。
