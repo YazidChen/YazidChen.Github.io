@@ -1,4 +1,97 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2016-12-01T06:46:29+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>Linux环境Nginx性能优化</title><link href="yazidchen.github.io/2016/12/01/NginxPerformance/" rel="alternate" type="text/html" title="Linux环境Nginx性能优化" /><published>2016-12-01T00:00:00+00:00</published><updated>2016-12-01T00:00:00+00:00</updated><id>yazidchen.github.io/2016/12/01/NginxPerformance</id><content type="html" xml:base="yazidchen.github.io/2016/12/01/NginxPerformance/">&lt;h1 id=&quot;nginx-performance-optimize&quot;&gt;Nginx performance optimize&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2017-01-08T14:40:56+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>我的2016、我的2017</title><link href="yazidchen.github.io/2017/01/08/My2016AndMy2017/" rel="alternate" type="text/html" title="我的2016、我的2017" /><published>2017-01-08T00:00:00+00:00</published><updated>2017-01-08T00:00:00+00:00</updated><id>yazidchen.github.io/2017/01/08/My2016AndMy2017</id><content type="html" xml:base="yazidchen.github.io/2017/01/08/My2016AndMy2017/">&lt;h1 id=&quot;section&quot;&gt;我的2016&lt;/h1&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;学习&lt;/h2&gt;
+
+&lt;p&gt;年初很杂乱，啥都想去学，啥都没学好。没有确定下自己的方向。大学用了两年半的时间自学的Android出来发现都是皮毛。又回到了JAVA重新开始。
+年中开始确立了自己的方向，安全及微服务。开始从服务器方面入手学习。另外，JAVA也不能落下，必须达到精通的水准。&lt;/p&gt;
+
+&lt;p&gt;16年买了一大堆书，自己总是没有静下心好好去读。年内读了不到两本的技术书。已读完的是《软件工程与计算·卷一》，《JAVA核心技术·卷一》这本书还没读完。所以17年需要补上了，给自己定计划，要把几本书读深读透。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-2&quot;&gt;工作&lt;/h2&gt;
+
+&lt;p&gt;我喜欢现在的工作模式，工作氛围。晨会、过需求、任务分配等等。从中也学到了如何去带领团队，以及如何去被带领。但是自己工作不专注，思维容易发散。再加上自己拖延症作怪，实际工作时间往往大于有效工作时间，而且还多得多。另外就是不细心，有时候自己去寻找BUG出现的原因，得到结果后真的是觉得自己超乎想象的白痴。不专注，拖延症，还有不细心，必须在17年改正。&lt;/p&gt;
+
+&lt;p&gt;16年，我学会到如何去全方位的分析一个问题，而不是单纯的从一两个角度去考虑。再者，还有需求及功能分析，自己拆分一个功能的各个细节点，这也是我最喜欢也慢慢习惯的一种编码方式，即将一个功能完全分解，拆成各个小零件（包括公有、私有），小零件之间在缔造连接枢纽，最终整合。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-3&quot;&gt;处事&lt;/h2&gt;
+
+&lt;p&gt;沟通大障碍，不熟的人真是一句话都聊不上。熟的人又自己话少必须要别人带动。不过一年过去了这毛病还算有所改善，外向了很多。
+不说则已，一说太直，整个一直肠子。注意场合呀！17年必改。&lt;/p&gt;
+
+&lt;h1 id=&quot;section-4&quot;&gt;我的2017&lt;/h1&gt;
+
+&lt;h2 id=&quot;section-5&quot;&gt;读书计划&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1月~2月 -&amp;gt; 《JAVA核心技术·卷一》剩余两章、《软技能·代码之外的生存指南》&lt;/li&gt;
+  &lt;li&gt;3月~6月 -&amp;gt; 《JAVA核心技术·卷二》&lt;/li&gt;
+  &lt;li&gt;7月~9月 -&amp;gt; 《软件架构设计》&lt;/li&gt;
+  &lt;li&gt;10月~12月 -&amp;gt; 《重构·改善既有代码的设计》&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;section-6&quot;&gt;学习计划&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-7&quot;&gt;一、安全加固&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;hacker知识。&lt;/li&gt;
+  &lt;li&gt;将nginx、tomcat安全加固完善。（1月~3月）&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;section-8&quot;&gt;二、性能提升&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;配置监控系统。（4月~5月）&lt;/li&gt;
+  &lt;li&gt;配置nginx、tomcat性能提升。（6月~9月）&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;section-9&quot;&gt;三、架构学习&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;安全架构。（广泛，需拆分）&lt;/li&gt;
+  &lt;li&gt;微服务架构。（广泛，需拆分）&lt;/li&gt;
+  &lt;li&gt;DevOps。&lt;/li&gt;
+&lt;/ol&gt;</content><author><name>YazidChen</name></author><summary>我的2016</summary></entry><entry><title>公钥、私钥、数字签名</title><link href="yazidchen.github.io/2016/12/25/PublicKeyPrivateKeyDigitalSignature/" rel="alternate" type="text/html" title="公钥、私钥、数字签名" /><published>2016-12-25T00:00:00+00:00</published><updated>2016-12-25T00:00:00+00:00</updated><id>yazidchen.github.io/2016/12/25/PublicKeyPrivateKeyDigitalSignature</id><content type="html" xml:base="yazidchen.github.io/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">&lt;h1 id=&quot;section&quot;&gt;公钥、私钥、数字签名&lt;/h1&gt;
+
+&lt;h2 id=&quot;section-1&quot;&gt;公钥私钥&lt;/h2&gt;
+
+&lt;h3 id=&quot;section-2&quot;&gt;公钥加密&lt;/h3&gt;
+
+&lt;p&gt;假设有两个字母，&lt;strong&gt;S&lt;/strong&gt;和&lt;strong&gt;G&lt;/strong&gt;。我喜欢字母&lt;strong&gt;S&lt;/strong&gt;，我将字母&lt;strong&gt;S&lt;/strong&gt;当成私钥自己保留，此时别人并不知道我的私钥就是字母&lt;strong&gt;S&lt;/strong&gt;。而字母&lt;strong&gt;G&lt;/strong&gt;，我把它当成公钥，告诉了小明。此时小明知道我的公钥是字母&lt;strong&gt;G&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;某天，小明要给我写一封重要的信，他就给这封信用我的公钥字母&lt;strong&gt;G&lt;/strong&gt;加密，然后发给我。我看到信后，用公字母&lt;strong&gt;S&lt;/strong&gt;进行解密，便看到了信的真实内容。&lt;/p&gt;
+
+&lt;p&gt;如果这封信路上被劫了，截获的人没有我的私钥，所以他解不开信件。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/NMbtgGg.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这便是，&lt;strong&gt;公钥加密，私钥解密&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-3&quot;&gt;私钥数字签名&lt;/h3&gt;
+
+&lt;p&gt;假如我用私钥&lt;strong&gt;S&lt;/strong&gt;加密，但是我的公钥&lt;strong&gt;G&lt;/strong&gt;是暴露在外的，结果所有人都可以用公钥&lt;strong&gt;G&lt;/strong&gt;解密，结果加密的内容，所有人都知道了。&lt;/p&gt;
+
+&lt;p&gt;那用私钥加密到底有什么作用？&lt;/p&gt;
+
+&lt;p&gt;假如我写了一封信给小明，小明看到信后怎么知道信就是我写的？他表示怀疑。那么我就用我的私钥&lt;strong&gt;S&lt;/strong&gt;给一段内容&lt;strong&gt;1&lt;/strong&gt;加密。然后附在信件里，发给小明，然后告诉小明信件里附了一段加密的内容，真实内容是&lt;strong&gt;1&lt;/strong&gt;。小明收到信后，看到了加密的内容，他用我给的公钥&lt;strong&gt;G&lt;/strong&gt;解密，发现果然是内容&lt;strong&gt;1&lt;/strong&gt;，于是这封信必然是我写的。&lt;/p&gt;
+
+&lt;p&gt;当然，实际的会复杂一些，比如用Hash函数对信件本身做处理,得到 Digest，再加密成 Signature 。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/fEKeIIp.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这便是，&lt;strong&gt;私钥数字签名，公钥验证&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h3 id=&quot;section-4&quot;&gt;数字证书&lt;/h3&gt;
+
+&lt;p&gt;有天隔壁老王偷偷潜入小明家，将我给小明的公钥&lt;strong&gt;G&lt;/strong&gt;换成了他的公钥&lt;strong&gt;W&lt;/strong&gt;，此后，老王变可以冒充我，用他自己的私钥做成数字签名，写信给小明。&lt;/p&gt;
+
+&lt;p&gt;后来，小明觉得不对劲，便要求我去找&lt;strong&gt;证书中心（Certificate Authority，简称CA）&lt;/strong&gt;，为公钥&lt;strong&gt;G&lt;/strong&gt;做认证。证书中心用自己的私钥，对我的公钥和一些相关的信息一起加密，生成&lt;strong&gt;数字证书（Digital Certificate）&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;我拿到&lt;strong&gt;数字证书&lt;/strong&gt;后，就可以放心了，以后写信个小明，只要在&lt;strong&gt;数字签名&lt;/strong&gt;的同时，再加上&lt;strong&gt;数字证书&lt;/strong&gt;就行了。&lt;/p&gt;
+
+&lt;p&gt;小明收到我的信后，用CA的公钥解开数字证书，就可以拿到我的真实公钥，之后小明就能验签了。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/29Dejr4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary>公钥、私钥、数字签名</summary></entry><entry><title>Linux环境Nginx性能优化</title><link href="yazidchen.github.io/2016/12/01/NginxPerformance/" rel="alternate" type="text/html" title="Linux环境Nginx性能优化" /><published>2016-12-01T00:00:00+00:00</published><updated>2016-12-01T00:00:00+00:00</updated><id>yazidchen.github.io/2016/12/01/NginxPerformance</id><content type="html" xml:base="yazidchen.github.io/2016/12/01/NginxPerformance/">&lt;h1 id=&quot;nginx-performance-optimize&quot;&gt;Nginx performance optimize&lt;/h1&gt;
 
 &lt;h2 id=&quot;section&quot;&gt;一、主配置文件&lt;/h2&gt;
 

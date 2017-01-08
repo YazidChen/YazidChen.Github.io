@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <title>Categories &mdash; YazidChen Blog</title>
+    <title>公钥、私钥、数字签名 &mdash; YazidChen Blog</title>
     <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
     <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
     <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
@@ -21,26 +21,28 @@
     
 
     
-    <link rel="canonical" href="yazidchen.github.io/categories/">
+    <link rel="canonical" href="yazidchen.github.io/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">
     <link rel="alternate" type="application/atom+xml" title="YazidChen Blog" href="/feed.xml">
     <link rel="shortcut icon" href="/favicon.ico">
     
-    <meta property="og:title" content="Categories">
+    <meta property="og:title" content="公钥、私钥、数字签名">
       
-    <meta name="keywords" content="分类">
-    <meta name="og:keywords" content="分类">
+    <meta name="keywords" content="公钥, 私钥, 数字签名, public key, private key, digital signature">
+    <meta name="og:keywords" content="公钥, 私钥, 数字签名, public key, private key, digital signature">
       
-    <meta name="description" content="哈哈，你找到了我的文章基因库">
-    <meta name="og:description" content="哈哈，你找到了我的文章基因库">
+    <meta name="description" content="公钥、私钥、数字签名">
+    <meta name="og:description" content="公钥、私钥、数字签名">
       
     
     
         
     
-    <meta property="og:url" content="yazidchen.github.io/categories/">
+    <meta property="og:url" content="yazidchen.github.io/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">
     <meta property="og:site_name" content="YazidChen Blog">
     <meta property="og:type" content="article">
     <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2016-12-25">
     
     <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
     <script src="/assets/js/jquery-ui.js"></script>
@@ -77,97 +79,84 @@
     </header>
     <!-- / header -->
 
-    <section class="collection-head small geopattern" data-pattern-id="Categories">
-    <div class="container">
-        <div class="columns">
-            <div class="column three-fourths">
-                <div class="collection-title">
-                    <h1 class="collection-header">Categories</h1>
-                </div>
-            </div>
+    <section class="collection-head small geopattern" data-pattern-id="公钥、私钥、数字签名">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">公钥、私钥、数字签名</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2016/12/25
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#Security" title="Security">Security</a>
+          </span>
+          
         </div>
+      </div>
     </div>
+  </div>
+</div>
 </section>
 <!-- / .banner -->
 <section class="container content">
-    <div class="columns">
-        <div class="column three-fourths" >
-            <article class="article-content markdown-body">
-                <section class="container posts-content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="section">公钥、私钥、数字签名</h1>
+
+<h2 id="section-1">公钥私钥</h2>
+
+<h3 id="section-2">公钥加密</h3>
+
+<p>假设有两个字母，<strong>S</strong>和<strong>G</strong>。我喜欢字母<strong>S</strong>，我将字母<strong>S</strong>当成私钥自己保留，此时别人并不知道我的私钥就是字母<strong>S</strong>。而字母<strong>G</strong>，我把它当成公钥，告诉了小明。此时小明知道我的公钥是字母<strong>G</strong>。</p>
+
+<p>某天，小明要给我写一封重要的信，他就给这封信用我的公钥字母<strong>G</strong>加密，然后发给我。我看到信后，用公字母<strong>S</strong>进行解密，便看到了信的真实内容。</p>
+
+<p>如果这封信路上被劫了，截获的人没有我的私钥，所以他解不开信件。</p>
+
+<p><img src="http://i.imgur.com/NMbtgGg.png" alt="" /></p>
+
+<p>这便是，<strong>公钥加密，私钥解密</strong>。</p>
+
+<h3 id="section-3">私钥数字签名</h3>
+
+<p>假如我用私钥<strong>S</strong>加密，但是我的公钥<strong>G</strong>是暴露在外的，结果所有人都可以用公钥<strong>G</strong>解密，结果加密的内容，所有人都知道了。</p>
+
+<p>那用私钥加密到底有什么作用？</p>
+
+<p>假如我写了一封信给小明，小明看到信后怎么知道信就是我写的？他表示怀疑。那么我就用我的私钥<strong>S</strong>给一段内容<strong>1</strong>加密。然后附在信件里，发给小明，然后告诉小明信件里附了一段加密的内容，真实内容是<strong>1</strong>。小明收到信后，看到了加密的内容，他用我给的公钥<strong>G</strong>解密，发现果然是内容<strong>1</strong>，于是这封信必然是我写的。</p>
+
+<p>当然，实际的会复杂一些，比如用Hash函数对信件本身做处理,得到 Digest，再加密成 Signature 。</p>
+
+<p><img src="http://i.imgur.com/fEKeIIp.png" alt="" /></p>
+
+<p>这便是，<strong>私钥数字签名，公钥验证</strong>。</p>
+
+<h3 id="section-4">数字证书</h3>
+
+<p>有天隔壁老王偷偷潜入小明家，将我给小明的公钥<strong>G</strong>换成了他的公钥<strong>W</strong>，此后，老王变可以冒充我，用他自己的私钥做成数字签名，写信给小明。</p>
+
+<p>后来，小明觉得不对劲，便要求我去找<strong>证书中心（Certificate Authority，简称CA）</strong>，为公钥<strong>G</strong>做认证。证书中心用自己的私钥，对我的公钥和一些相关的信息一起加密，生成<strong>数字证书（Digital Certificate）</strong>。</p>
+
+<p>我拿到<strong>数字证书</strong>后，就可以放心了，以后写信个小明，只要在<strong>数字签名</strong>的同时，再加上<strong>数字证书</strong>就行了。</p>
+
+<p>小明收到我的信后，用CA的公钥解开数字证书，就可以拿到我的真实公钥，之后小明就能验签了。</p>
+
+<p><img src="http://i.imgur.com/29Dejr4.png" alt="" /></p>
 
 
-<h3>Nginx</h3>
-<ol class="posts-list" id="Nginx">
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2016-12-01</span>
-<a class="posts-list-name" href="/2016/12/01/NginxPerformance/">Linux环境Nginx性能优化</a>
-</li>
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2016-11-14</span>
-<a class="posts-list-name" href="/2016/11/14/NginxSecuritySettingOnUbuntu/">Linux环境Nginx安全配置</a>
-</li>
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2016-10-12</span>
-<a class="posts-list-name" href="/2016/10/12/CutNginxLog/">定时切分Nginx日志</a>
-</li>
-
-</ol>
-
-<h3>Other</h3>
-<ol class="posts-list" id="Other">
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2016-08-19</span>
-<a class="posts-list-name" href="/2016/08/19/CreateBlogsForJekyllOnGithub/">Win环境Jekyll+Markdown+Github Pages搭建个人Blogs</a>
-</li>
-
-</ol>
-
-<h3>Security</h3>
-<ol class="posts-list" id="Security">
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2016-12-25</span>
-<a class="posts-list-name" href="/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">公钥、私钥、数字签名</a>
-</li>
-
-</ol>
-
-<h3>Summary&amp;Plan</h3>
-<ol class="posts-list" id="Summary&amp;Plan">
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2017-01-08</span>
-<a class="posts-list-name" href="/2017/01/08/My2016AndMy2017/">我的2016、我的2017</a>
-</li>
-
-</ol>
-
-<h3>Tomcat</h3>
-<ol class="posts-list" id="Tomcat">
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2016-10-09</span>
-<a class="posts-list-name" href="/2016/10/09/CutTomcatLogByLog4j/">以Log4j切分Tomcat日志</a>
-</li>
-
-<li class="posts-list-item">
-<span class="posts-list-meta">2016-09-13</span>
-<a class="posts-list-name" href="/2016/09/13/TomcatSecuritySettingOnUbuntu/">Linux环境Tomcat安全配置</a>
-</li>
-
-</ol>
-
-</section>
-<!-- /section.content -->
-
-            </article>
-        </div>
-        <div class="column one-fourth">
-            
+    <br><br>
+    <span class="content end">本文由<a href="mailto:https://yazidchen.github.io/?subject=feedback">YazidChen</a>整理编辑，引用转载请注明出处。</span>
+    </article>
+  </div>
+  <div class="column one-fourth">
+    
 <h3>Search</h3>
 <div id="site_search">
     <input type="text" id="search_box" placeholder="Search">
@@ -181,51 +170,8 @@
 <script src="/assets/js/search.js"></script>
 
 
-            
-<h3>Blog Categories</h3>
-<div id="blog-categories">
-  <ul class="list-group">
-    
-    
-    <li class="list-group-item">
-    <a href="#Nginx">Nginx</a>
-    <span class="badge">3</span>
-    </li>
-    
-    <li class="list-group-item">
-    <a href="#Other">Other</a>
-    <span class="badge">1</span>
-    </li>
-    
-    <li class="list-group-item">
-    <a href="#Security">Security</a>
-    <span class="badge">1</span>
-    </li>
-    
-    <li class="list-group-item">
-    <a href="#Summary&Plan">Summary&Plan</a>
-    <span class="badge">1</span>
-    </li>
-    
-    <li class="list-group-item">
-    <a href="#Tomcat">Tomcat</a>
-    <span class="badge">2</span>
-    </li>
-    
-  </ul>
+  </div>
 </div>
-
-<script type="text/javascript">
-
-  $(document).ready(function(){
-    $("#blog-categories li").css('text-transform','capitalize')
-  });
-
-</script>
-
-
-        </div>
-    </div>
 </section>
 <!-- /section.content -->
 
