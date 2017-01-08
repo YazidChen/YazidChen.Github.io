@@ -1,9 +1,10 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2017-01-08T14:40:56+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>我的2016、我的2017</title><link href="yazidchen.github.io/2017/01/08/My2016AndMy2017/" rel="alternate" type="text/html" title="我的2016、我的2017" /><published>2017-01-08T00:00:00+00:00</published><updated>2017-01-08T00:00:00+00:00</updated><id>yazidchen.github.io/2017/01/08/My2016AndMy2017</id><content type="html" xml:base="yazidchen.github.io/2017/01/08/My2016AndMy2017/">&lt;h1 id=&quot;section&quot;&gt;我的2016&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2017-01-08T14:41:23+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>我的2016、我的2017</title><link href="yazidchen.github.io/2017/01/08/My2016AndMy2017/" rel="alternate" type="text/html" title="我的2016、我的2017" /><published>2017-01-08T00:00:00+00:00</published><updated>2017-01-08T00:00:00+00:00</updated><id>yazidchen.github.io/2017/01/08/My2016AndMy2017</id><content type="html" xml:base="yazidchen.github.io/2017/01/08/My2016AndMy2017/">&lt;h1 id=&quot;section&quot;&gt;我的2016&lt;/h1&gt;
 
 &lt;h2 id=&quot;section-1&quot;&gt;学习&lt;/h2&gt;
 
-&lt;p&gt;年初很杂乱，啥都想去学，啥都没学好。没有确定下自己的方向。大学用了两年半的时间自学的Android出来发现都是皮毛。又回到了JAVA重新开始。
-年中开始确立了自己的方向，安全及微服务。开始从服务器方面入手学习。另外，JAVA也不能落下，必须达到精通的水准。&lt;/p&gt;
+&lt;p&gt;年初很杂乱，啥都想去学，啥都没学好。没有确定下自己的方向。大学用了两年半的时间自学的Android出来发现都是皮毛。又回到了JAVA重新开始。&lt;/p&gt;
+
+&lt;p&gt;年中开始确立了自己的方向，安全及微服务。开始从服务器方面入手学习。另外，JAVA也不能落下，必须达到精通的水准。&lt;/p&gt;
 
 &lt;p&gt;16年买了一大堆书，自己总是没有静下心好好去读。年内读了不到两本的技术书。已读完的是《软件工程与计算·卷一》，《JAVA核心技术·卷一》这本书还没读完。所以17年需要补上了，给自己定计划，要把几本书读深读透。&lt;/p&gt;
 
@@ -11,12 +12,13 @@
 
 &lt;p&gt;我喜欢现在的工作模式，工作氛围。晨会、过需求、任务分配等等。从中也学到了如何去带领团队，以及如何去被带领。但是自己工作不专注，思维容易发散。再加上自己拖延症作怪，实际工作时间往往大于有效工作时间，而且还多得多。另外就是不细心，有时候自己去寻找BUG出现的原因，得到结果后真的是觉得自己超乎想象的白痴。不专注，拖延症，还有不细心，必须在17年改正。&lt;/p&gt;
 
-&lt;p&gt;16年，我学会到如何去全方位的分析一个问题，而不是单纯的从一两个角度去考虑。再者，还有需求及功能分析，自己拆分一个功能的各个细节点，这也是我最喜欢也慢慢习惯的一种编码方式，即将一个功能完全分解，拆成各个小零件（包括公有、私有），小零件之间在缔造连接枢纽，最终整合。&lt;/p&gt;
+&lt;p&gt;16年，我学会如何去全方位的分析一个问题，而不是单纯的从一两个角度去考虑。再者，会需求及功能分析，自己拆分一个功能的各个细节点，这也是我最喜欢也慢慢习惯的一种编码方式，即将一个功能完全分解，拆成各个小零件（包括公有、私有），小零件之间在缔造连接枢纽，最终整合。&lt;/p&gt;
 
 &lt;h2 id=&quot;section-3&quot;&gt;处事&lt;/h2&gt;
 
-&lt;p&gt;沟通大障碍，不熟的人真是一句话都聊不上。熟的人又自己话少必须要别人带动。不过一年过去了这毛病还算有所改善，外向了很多。
-不说则已，一说太直，整个一直肠子。注意场合呀！17年必改。&lt;/p&gt;
+&lt;p&gt;沟通大障碍，不熟的人真是一句话都聊不上。熟的人又自己话少必须要别人带动。不过一年过去了这毛病还算有所改善，外向了很多。&lt;/p&gt;
+
+&lt;p&gt;不说则已，一说太直，整个一直肠子。注意场合呀！17年必改。&lt;/p&gt;
 
 &lt;h1 id=&quot;section-4&quot;&gt;我的2017&lt;/h1&gt;
 
