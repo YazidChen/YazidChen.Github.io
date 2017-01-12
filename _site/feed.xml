@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2017-01-12T03:25:20+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>我的2016、我的2017</title><link href="yazidchen.github.io/2017/01/08/My2016AndMy2017/" rel="alternate" type="text/html" title="我的2016、我的2017" /><published>2017-01-08T00:00:00+00:00</published><updated>2017-01-08T00:00:00+00:00</updated><id>yazidchen.github.io/2017/01/08/My2016AndMy2017</id><content type="html" xml:base="yazidchen.github.io/2017/01/08/My2016AndMy2017/">&lt;h1 id=&quot;section&quot;&gt;我的2016&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2017-01-12T03:28:52+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>我的2016、我的2017</title><link href="yazidchen.github.io/2017/01/08/My2016AndMy2017/" rel="alternate" type="text/html" title="我的2016、我的2017" /><published>2017-01-08T00:00:00+00:00</published><updated>2017-01-08T00:00:00+00:00</updated><id>yazidchen.github.io/2017/01/08/My2016AndMy2017</id><content type="html" xml:base="yazidchen.github.io/2017/01/08/My2016AndMy2017/">&lt;h1 id=&quot;section&quot;&gt;我的2016&lt;/h1&gt;
 
 &lt;h2 id=&quot;section-1&quot;&gt;学习&lt;/h2&gt;
 
@@ -75,7 +75,8 @@
 
 &lt;h3 id=&quot;section-13&quot;&gt;三、系统提升计划&lt;/h3&gt;
 
-&lt;p&gt;以下完成条件为上生产并稳定通过。&lt;/p&gt;
+&lt;p&gt;以下完成条件为上生产并稳定通过:&lt;/p&gt;
+
 &lt;ol&gt;
   &lt;li&gt;安全加固(nginx,tomcat)(依据需求进度，大概4月~7月)&lt;/li&gt;
   &lt;li&gt;监控系统(依据需求进度，大概8月~9月)&lt;/li&gt;
