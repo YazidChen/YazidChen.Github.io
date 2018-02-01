@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" prefix="og: http://ogp.me/ns#" class="han-init">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>WebSocket应用 &mdash; YazidChen Blog</title>
+    <link rel="stylesheet" href="/assets/vendor/primer-css/css/primer.css">
+    <link rel="stylesheet" href="/assets/vendor/primer-markdown/dist/user-content.min.css">
+    <link rel="stylesheet" href="/assets/vendor/octicons/octicons/octicons.css">
+    <link rel="stylesheet" href="/assets/css/components/collection.css">
+    <link rel="stylesheet" href="/assets/css/components/repo-card.css">
+    <link rel="stylesheet" href="/assets/css/sections/repo-list.css">
+    <link rel="stylesheet" href="/assets/css/sections/mini-repo-list.css">
+    <link rel="stylesheet" href="/assets/css/components/boxed-group.css">
+    <link rel="stylesheet" href="/assets/css/globals/common.css">
+    <link rel="stylesheet" href="/assets/vendor/share.js/dist/css/share.min.css">
+    <link rel="stylesheet" href="/assets/css/globals/responsive.css">
+    <link rel="stylesheet" href="/assets/css/posts/index.css">
+    <!-- Latest compiled and minified CSS -->
+    
+
+    
+    <link rel="canonical" href="http://localhost:4000/2018/02/01/ImportWebSocket/">
+    <link rel="alternate" type="application/atom+xml" title="YazidChen Blog" href="/feed.xml">
+    <link rel="shortcut icon" href="/favicon.ico">
+    
+    <meta property="og:title" content="WebSocket应用">
+      
+    <meta name="keywords" content="WebSocket, SockJS, STOMP">
+    <meta name="og:keywords" content="WebSocket, SockJS, STOMP">
+      
+    <meta name="description" content="一、为何引入WebSocket">
+    <meta name="og:description" content="一、为何引入WebSocket">
+      
+    
+    
+        
+    
+    <meta property="og:url" content="http://localhost:4000/2018/02/01/ImportWebSocket/">
+    <meta property="og:site_name" content="YazidChen Blog">
+    <meta property="og:type" content="article">
+    <meta property="og:locale" content="zh_CN" />
+    
+    <meta property="article:published_time" content="2018-02-01">
+    
+    <script src="/assets/vendor/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+    function toggleMenu() {
+        var nav = document.getElementsByClassName("site-header-nav")[0];
+        if (nav.style.display == "inline-flex") {
+          nav.style.display = "none";
+        } else {
+          nav.style.display = "inline-flex";
+        }
+    }
+    </script>
+</head>
+<body class="" data-mz="">
+    <header class="site-header">
+        <div class="container">
+            <h1><a href="/" title="YazidChen Blog"><span class="octicon octicon-mark-github"></span> YazidChen Blog</a></h1>
+            <button class="collapsed mobile-visible" type="button" onclick="toggleMenu();">
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <nav class="site-header-nav" role="navigation">
+                
+                <a href="/" class=" site-header-nav-item" target="" title="Home">Home</a>
+                
+                <a href="/categories/" class=" site-header-nav-item" target="" title="Categories">Categories</a>
+                
+                <a href="/about/" class=" site-header-nav-item" target="" title="About">About</a>
+                
+            </nav>
+        </div>
+    </header>
+    <!-- / header -->
+
+    <section class="collection-head small geopattern" data-pattern-id="WebSocket应用">
+<div class="container">
+  <div class="columns">
+    <div class="column three-fourths">
+      <div class="collection-title">
+        <h1 class="collection-header">WebSocket应用</h1>
+        <div class="collection-info">
+          
+          <span class="meta-info">
+            <span class="octicon octicon-calendar"></span> 2018/02/01
+          </span>
+          
+          
+          <span class="meta-info">
+            <span class="octicon octicon-file-directory"></span>
+            <a href="/categories/#WebSocket" title="WebSocket">WebSocket</a>
+          </span>
+          
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+<!-- / .banner -->
+<section class="container content">
+<div class="columns">
+  <div class="column three-fourths" >
+    <article class="article-content markdown-body">
+    <h1 id="一为何引入websocket">一、为何引入WebSocket</h1>
+
+<h2 id="11-遇到问题">1.1 遇到问题</h2>
+<p>当前有一客服管理系统，有以下业务需求：</p>
+
+<h4 id="1呼出业务">1、呼出业务</h4>
+
+<p><img src="https://i.imgur.com/KQgXefy.png" alt="" /></p>
+
+<p>客服管理系统向第三方云呼系统发出呼叫请求，云呼系统异步返回呼出回调，后台服务接收到回调后，需要通知WEB端提示用户呼出的结果，此时有后台服务主动通知WEB的需求。</p>
+
+<h4 id="2呼入业务">2、呼入业务</h4>
+
+<p><img src="https://i.imgur.com/kDPC13M.png" alt="" /></p>
+
+<p>当有电话呼入时，云呼系统发起呼入通知给客服管理系统，客服管理系统后台服务接收到呼入通知后，需要及时让WEB发起界面提醒，此时也有后台服务主动通知WEB的需求。</p>
+
+<h2 id="12-解决方案">1.2 解决方案</h2>
+
+<ol>
+  <li>WEB通过HTTP轮询后台服务（不满足及时性，消耗资源大）;</li>
+  <li>HTTP长轮询(基本满足及时性，消耗资源较大）</li>
+  <li>WebSocket(满足及时性，消耗资源小，提供双向通信)。</li>
+</ol>
+
+<p>初步判断，WebSocket可以作为解决方案。下面开始深入研究WebSocket。</p>
+
+<h1 id="二websocket是什么">二、WebSocket是什么</h1>
+
+<p><strong>WebSocket协议</strong>由HTML5定义，能更好的<strong>节省</strong>服务器资源和带宽，并且能够更实时地进行<strong>双向</strong>通讯。它是一种持久化的协议。
+我们拿WebSocket与HTTP进行对比。</p>
+
+<p><img src="https://i.imgur.com/LLATtBY.png" alt="" /></p>
+
+<p>首先是HTTP轮询，浏览器通过ajax每隔几秒就向服务器发起一次请求，询问服务器是否有新的消息。每次发起的请求，即Request，它都包含header头部，多次轮询相当于多次发送了header头部信息，这便会造成带宽资源的浪费。每次返回的Response亦是如此。</p>
+
+<p>其次是HTTP长轮询，与前者相比，长轮询采用的是阻塞模式，即客户端发起请求，会一直等待服务端有消息后才返回，而后再次发起请求。如果无消息，就会一直等，直至超时。</p>
+
+<p>以上两种方式，都是客户端主动向服务端发起请求，等待服务端处理。而服务端不能主动联系客户端。</p>
+
+<p>下面开始WebSocket协议内容：
+首先，客户端会向服务端发起一次Handshake握手的请求，服务端收到请求并确认无误后，返回确认通知。这两步操作还是通过HTTP协议进行通信的。确认通知返回成功后，通信协议由HTTP协议升级为WebSocket协议。之后，服务端就能主动推送消息给客户端，当然，客户端也能主动推消息给服务端。真真正正实现了双向通讯。如果要关闭通信链接，客户端可以给服务端发送断开链接的请求，当然，服务端也可以主动断开链接。这样，整个通信链接的生命周期也就结束了。
+由此看来，WebSocket只需要一次HTTP请求进行建立链接，之后所有的通信都不需要有复杂的header头部信息，也无需多次鉴权了，从而省下了很多资源。</p>
+
+<p><img src="https://i.imgur.com/jjDjhHU.png" alt="" /></p>
+
+<p>继续深入学习WebSocket，我们发现他同HTTP协议一样，也是属于OSI模型的应用层，也是建立在TCP协议之上的。WebSocket协议的<strong>统一资源标识符</strong>是<code class="highlighter-rouge">ws</code>，如果加密，则是<code class="highlighter-rouge">wss</code>,这和HTTP如出一辙，都是由TSL进行加密的。</p>
+
+<p><img src="https://i.imgur.com/lhwKS1T.png" alt="" /></p>
+
+<p>服务器的网址，即为URL：<code class="highlighter-rouge">ws://example.com:80/test</code></p>
+
+<h1 id="三springmvc如何引入websocket">三、SpringMVC如何引入WebSocket</h1>
+
+<p>这里有三种API，分别是<code class="highlighter-rouge">WebSocket API</code>，<code class="highlighter-rouge">SockJS</code>以及<code class="highlighter-rouge">STOMP</code>。<code class="highlighter-rouge">WebSocket API</code>是发送和接收消息的底层API，<code class="highlighter-rouge">SockJS</code>在<code class="highlighter-rouge">WebSocket API</code>之上，而<code class="highlighter-rouge">STOMP</code>是基于<code class="highlighter-rouge">SockJS</code>的高级API。</p>
+
+<h2 id="31-websocket-api">3.1 WebSocket API</h2>
+
+<h3 id="311-服务端配置">3.1.1 服务端配置</h3>
+
+<p>1、创建Handler</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">org.springframework.stereotype.Service</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.TextMessage</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.WebSocketSession</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.handler.AbstractWebSocketHandler</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.io.IOException</span>
+
+<span class="cm">/**
+ * @author YazidChen
+ * @date 2017/12/21 0021 11:10
+ **/</span>
+<span class="nd">@Service</span><span class="c1">//此处注解扫描</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WsHandler</span> <span class="kd">extends</span> <span class="n">AbstractWebSocketHandler</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">handleTextMessage</span><span class="o">(</span><span class="n">WebSocketSession</span> <span class="n">session</span><span class="o">,</span> <span class="n">TextMessage</span> <span class="n">message</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"into handleText"</span><span class="o">);</span>
+        <span class="n">session</span><span class="o">.</span><span class="na">sendMessage</span><span class="o">(</span><span class="k">new</span> <span class="n">TextMessage</span><span class="o">(</span><span class="s">"来自服务器的消息！"</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>2、创建握手拦截器：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">com.jz.service.jzcf_ums.api.form.UserSession</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.ums.sso.utils.ShiroUtils</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.http.server.ServerHttpRequest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.http.server.ServerHttpResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Service</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.WebSocketHandler</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.server.HandshakeInterceptor</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+
+<span class="cm">/**
+ * @author YazidChen
+ * @date 2017/12/21 0021 11:21
+ **/</span>
+<span class="nd">@Service</span><span class="c1">//此处注解扫描</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WsHandshakeInterceptor</span> <span class="kd">implements</span> <span class="n">HandshakeInterceptor</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">beforeHandshake</span><span class="o">(</span><span class="n">ServerHttpRequest</span> <span class="n">serverHttpRequest</span><span class="o">,</span> <span class="n">ServerHttpResponse</span> <span class="n">serverHttpResponse</span><span class="o">,</span> <span class="n">WebSocketHandler</span> <span class="n">webSocketHandler</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">map</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+	<span class="c1">//在引入Shiro的情况下，此处可获取用户Session</span>
+        <span class="n">UserSession</span> <span class="n">userSession</span> <span class="o">=</span> <span class="n">ShiroUtils</span><span class="o">.</span><span class="na">getUserSession</span><span class="o">();</span>
+        <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"userSession"</span><span class="o">,</span> <span class="n">userSession</span><span class="o">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">afterHandshake</span><span class="o">(</span><span class="n">ServerHttpRequest</span> <span class="n">serverHttpRequest</span><span class="o">,</span> <span class="n">ServerHttpResponse</span> <span class="n">serverHttpResponse</span><span class="o">,</span> <span class="n">WebSocketHandler</span> <span class="n">webSocketHandler</span><span class="o">,</span> <span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<p>3、将WsHandler绑定到特定的URL上</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">com.jzcf.csms.core.websocket.handler.WsHandler</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.csms.core.websocket.interceptor.WsHandshakeInterceptor</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Configuration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.config.annotation.EnableWebSocket</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.config.annotation.WebSocketConfigurer</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry</span><span class="o">;</span>
+
+<span class="cm">/**
+ * @author YazidChen
+ * @date 2018/01/31 0031 10:26
+ **/</span>
+<span class="nd">@Configuration</span>
+<span class="nd">@EnableWebSocket</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WsConfig</span> <span class="kd">implements</span> <span class="n">WebSocketConfigurer</span> <span class="o">{</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">WsHandler</span> <span class="n">wsHandler</span><span class="o">;</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">WsHandshakeInterceptor</span> <span class="n">wsHandshakeInterceptor</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">registerWebSocketHandlers</span><span class="o">(</span><span class="n">WebSocketHandlerRegistry</span> <span class="n">registry</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">registry</span><span class="o">.</span><span class="na">addHandler</span><span class="o">(</span><span class="n">wsHandler</span><span class="o">,</span> <span class="s">"/chat"</span><span class="o">).</span><span class="na">setAllowedOrigins</span><span class="o">(</span><span class="s">"https://csms-dev.jzcaifu.com"</span><span class="o">).</span><span class="na">addInterceptors</span><span class="o">(</span><span class="n">wsHandshakeInterceptor</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">addHandler()</code>将<code class="highlighter-rouge">WsHandler</code>绑定在了<code class="highlighter-rouge">/chat</code>路径上；</li>
+  <li><code class="highlighter-rouge">setAllowedOrigins()</code>允许来源为<code class="highlighter-rouge">https://csms-dev.jzcaifu.com</code>的请求，设置为<code class="highlighter-rouge">*</code>允许所有来源；</li>
+  <li><code class="highlighter-rouge">addInterceptors()</code>添加拦截器。</li>
+</ul>
+
+<h3 id="332-客户端配置">3.3.2 客户端配置</h3>
+
+<p>客户端发起WebSocket链接请求：</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">let</span> <span class="nx">ws</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">WebSocket</span><span class="p">(</span><span class="s2">"wss://csms-dev.jzcaifu.com/chat"</span><span class="p">);</span><span class="c1">//发起连接</span>
+            <span class="nx">ws</span><span class="p">.</span><span class="nx">onopen</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"WebSocket open now!"</span><span class="p">)</span>
+                <span class="nx">ws</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s2">"message test!"</span><span class="p">);</span><span class="c1">//客户端向服务器发送消息</span>
+            <span class="p">};</span>
+
+            <span class="nx">ws</span><span class="p">.</span><span class="nx">onmessage</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"WebSocket message now!"</span><span class="p">);</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+            <span class="p">};</span>
+
+            <span class="nx">ws</span><span class="p">.</span><span class="nx">onclose</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"WebSocket close now!"</span><span class="p">);</span>
+            <span class="p">};</span>
+</code></pre></div></div>
+
+<h3 id="333-运行结果">3.3.3 运行结果</h3>
+
+<p><img src="https://i.imgur.com/mTgAbTb.png" alt="" /></p>
+
+<p><img src="https://i.imgur.com/KwNihlQ.png" alt="" /></p>
+
+<ul>
+  <li><code class="highlighter-rouge">Connection</code>为Upgrade，表示客户端希望连接升级；</li>
+  <li><code class="highlighter-rouge">Upgrade</code>为Websocket，表示希望升级到Websocket协议；</li>
+  <li><code class="highlighter-rouge">Sec-WebSocket-Key</code>是随机的字符串，服务器端会用这些数据来构造出一个SHA-1的信息摘要。把<code class="highlighter-rouge">Sec-WebSocket-Key</code>加上一个特殊字符串，然后计算<code class="highlighter-rouge">SHA-1</code>摘要，之后进行<code class="highlighter-rouge">BASE-64</code>编码，将结果作为<code class="highlighter-rouge">Sec-WebSocket-Accept</code>头的值，返回给客户端。如此操作，可以尽量避免普通<code class="highlighter-rouge">HTTP</code>请求被误认为<code class="highlighter-rouge">Websocket</code>协议；</li>
+  <li><code class="highlighter-rouge">Sec-WebSocket-Version</code>表示支持的Websocket版本；</li>
+  <li>Websocket通过<code class="highlighter-rouge">HTTP/1.1</code>协议的<code class="highlighter-rouge">101</code>状态码进行握手，此时握手成功。</li>
+</ul>
+
+<h2 id="32-sockjs">3.2 SockJS</h2>
+
+<p>在<code class="highlighter-rouge">WebSocket API</code>的基础上，稍加修改，就变为<code class="highlighter-rouge">SockJS</code>形式。</p>
+
+<h3 id="321-服务端配置">3.2.1 服务端配置</h3>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">com.jzcf.csms.core.websocket.handler.WsHandler</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.csms.core.websocket.interceptor.WsHandshakeInterceptor</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.context.annotation.Configuration</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.config.annotation.EnableWebSocket</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.config.annotation.WebSocketConfigurer</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry</span><span class="o">;</span>
+
+<span class="cm">/**
+ * @author YazidChen
+ * @date 2018/01/31 0031 10:26
+ **/</span>
+<span class="nd">@Configuration</span>
+<span class="nd">@EnableWebSocket</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WsConfig</span> <span class="kd">implements</span> <span class="n">WebSocketConfigurer</span> <span class="o">{</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">WsHandler</span> <span class="n">wsHandler</span><span class="o">;</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">WsHandshakeInterceptor</span> <span class="n">wsHandshakeInterceptor</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">registerWebSocketHandlers</span><span class="o">(</span><span class="n">WebSocketHandlerRegistry</span> <span class="n">registry</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">registry</span><span class="o">.</span><span class="na">addHandler</span><span class="o">(</span><span class="n">wsHandler</span><span class="o">,</span> <span class="s">"/chat"</span><span class="o">).</span><span class="na">setAllowedOrigins</span><span class="o">(</span><span class="s">"https://csms-dev.jzcaifu.com"</span><span class="o">).</span><span class="na">addInterceptors</span><span class="o">(</span><span class="n">wsHandshakeInterceptor</span><span class="o">).</span><span class="na">withSockJS</span><span class="o">();</span><span class="c1">//此处使用SockJS</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>方法<code class="highlighter-rouge">withSockJS()</code>用SockJS改造了原始的API</p>
+
+<h3 id="322-客户端配置">3.2.2 客户端配置</h3>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">&lt;!--</span><span class="err">引入</span><span class="nx">sockjs</span><span class="o">--&gt;</span>
+<span class="o">&lt;</span><span class="nx">script</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text/javascript"</span> <span class="nx">src</span><span class="o">=</span><span class="s2">"/statics/libs/sockjs.min.js"</span><span class="o">&gt;&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span><span class="c">&lt;!--</span><span class="err">此处为</span><span class="nx">https</span><span class="err">协议</span><span class="o">--&gt;</span>
+            <span class="kd">let</span> <span class="nx">sock</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SockJS</span><span class="p">(</span><span class="s2">"https://csms-dev.jzcaifu.com/chat"</span><span class="p">);</span>
+            <span class="nx">sock</span><span class="p">.</span><span class="nx">onopen</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"WebSocket open now!"</span><span class="p">)</span>
+                <span class="nx">sock</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s2">"message test!"</span><span class="p">);</span><span class="c1">//客户端向服务器发送消息</span>
+            <span class="p">};</span>
+
+            <span class="nx">sock</span><span class="p">.</span><span class="nx">onmessage</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"WebSocket message now!"</span><span class="p">);</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">e</span><span class="p">);</span>
+            <span class="p">};</span>
+
+            <span class="nx">sock</span><span class="p">.</span><span class="nx">onclose</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"WebSocket close now!"</span><span class="p">);</span>
+            <span class="p">};</span>
+</code></pre></div></div>
+
+<p><strong>SockJS</strong>将<code class="highlighter-rouge">http</code>或<code class="highlighter-rouge">https</code>协议处理成为<code class="highlighter-rouge">ws</code>或<code class="highlighter-rouge">wss</code>协议。</p>
+
+<h3 id="323-运行结果">3.2.3 运行结果</h3>
+
+<p><img src="https://i.imgur.com/d91tSia.png" alt="" /></p>
+
+<p><img src="https://i.imgur.com/9bOXUOI.png" alt="" /></p>
+
+<h2 id="33-stomp">3.3 STOMP</h2>
+
+<p>此处为XML配置形式示例。</p>
+
+<h3 id="331-服务端配置">3.3.1 服务端配置</h3>
+
+<p>1、创建拦截器：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">com.jz.service.jzcf_ums.api.form.UserSession</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.ums.sso.utils.ShiroUtils</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.http.server.ServerHttpRequest</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.http.server.ServerHttpResponse</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.WebSocketHandler</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.server.HandshakeInterceptor</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+
+<span class="cm">/**
+ * @author YazidChen
+ * @date 2017/12/21 0021 11:21
+ **/</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WsHandshakeInterceptor</span> <span class="kd">implements</span> <span class="n">HandshakeInterceptor</span> <span class="o">{</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">beforeHandshake</span><span class="o">(</span><span class="n">ServerHttpRequest</span> <span class="n">serverHttpRequest</span><span class="o">,</span> <span class="n">ServerHttpResponse</span> <span class="n">serverHttpResponse</span><span class="o">,</span> <span class="n">WebSocketHandler</span> <span class="n">webSocketHandler</span><span class="o">,</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">map</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+        <span class="n">UserSession</span> <span class="n">userSession</span> <span class="o">=</span> <span class="n">ShiroUtils</span><span class="o">.</span><span class="na">getUserSession</span><span class="o">();</span>
+        <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"userSession"</span><span class="o">,</span> <span class="n">userSession</span><span class="o">);</span>
+        <span class="k">return</span> <span class="kc">true</span><span class="o">;</span>
+    <span class="o">}</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">afterHandshake</span><span class="o">(</span><span class="n">ServerHttpRequest</span> <span class="n">serverHttpRequest</span><span class="o">,</span> <span class="n">ServerHttpResponse</span> <span class="n">serverHttpResponse</span><span class="o">,</span> <span class="n">WebSocketHandler</span> <span class="n">webSocketHandler</span><span class="o">,</span> <span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<p>2、XML配置：</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="c">&lt;!--利用fastjson改变消息体传输方式--&gt;</span>
+    <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">"fastjsonSockJsMessageCodec"</span> <span class="na">class=</span><span class="s">"com.alibaba.fastjson.support.spring.FastjsonSockJsMessageCodec"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;/bean&gt;</span>
+
+    <span class="c">&lt;!--开启websocket--&gt;</span>
+    <span class="nt">&lt;websocket:message-broker</span> <span class="na">application-destination-prefix=</span><span class="s">"/ws"</span> <span class="na">user-destination-prefix=</span><span class="s">"/user"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;websocket:stomp-endpoint</span> <span class="na">path=</span><span class="s">"/portfolio"</span> <span class="na">allowed-origins=</span><span class="s">"*"</span><span class="nt">&gt;</span>
+            <span class="nt">&lt;websocket:handshake-interceptors&gt;</span>
+                <span class="nt">&lt;bean</span> <span class="na">id=</span><span class="s">"wsHandshakeInterceptor"</span>
+                      <span class="na">class=</span><span class="s">"com.jzcf.csms.core.websocket.interceptor.WsHandshakeInterceptor"</span><span class="nt">/&gt;</span>
+            <span class="nt">&lt;/websocket:handshake-interceptors&gt;</span>
+            <span class="nt">&lt;websocket:sockjs</span> <span class="na">message-codec=</span><span class="s">"fastjsonSockJsMessageCodec"</span><span class="nt">/&gt;</span>
+        <span class="nt">&lt;/websocket:stomp-endpoint&gt;</span>
+        <span class="nt">&lt;websocket:simple-broker</span> <span class="na">prefix=</span><span class="s">"/topic, /queue"</span><span class="nt">/&gt;</span>
+    <span class="nt">&lt;/websocket:message-broker&gt;</span>
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">stomp-endpoint</code>中，<code class="highlighter-rouge">path</code>为<code class="highlighter-rouge">/portfolio</code>是客户端需要连接到WebSocket握手的端点的HTTP URL；</li>
+  <li><code class="highlighter-rouge">stomp-endpoint</code>中，<code class="highlighter-rouge">allowed-origins</code>为<code class="highlighter-rouge">*</code>允许所有来源；</li>
+  <li><code class="highlighter-rouge">message-broker</code>中，<code class="highlighter-rouge">application-destination-prefix</code>的<code class="highlighter-rouge">/ws</code>将STOMP消息路由到类中的@MessageMapping注解的方法；</li>
+  <li><code class="highlighter-rouge">message-broker</code>中，<code class="highlighter-rouge">user-destination-prefix="/user"</code>表示开启用户目的地，服务器可以发送针对特定用户的消息，并且Spring的STOMP可以识别”/user/”以此为前缀的目标；</li>
+  <li><code class="highlighter-rouge">simple-broker</code>中，<code class="highlighter-rouge">prefix="/topic, /queue"</code>表示代理目的地前缀，即订阅时的前缀。</li>
+</ul>
+
+<p>3、对于用户目的地，编写一个用户管理中心：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">com.jzcf.csms.core.callcenter.form.WsMessage</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.messaging.simp.SimpMessagingTemplate</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Service</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">java.util.HashMap</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+
+<span class="cm">/**
+ * @author YazidChen
+ * @date 2018/01/23 0023 12:45
+ **/</span>
+<span class="nd">@Service</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WsUsers</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">Long</span><span class="o">,</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;&gt;</span> <span class="n">users</span><span class="o">;</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">SimpMessagingTemplate</span> <span class="n">template</span><span class="o">;</span>
+
+    <span class="kd">static</span> <span class="o">{</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 发送消息给订阅者
+     *
+     * @param subscribePath 订阅路径
+     * @param userId        客服ID
+     * @param wsMessage     消息体
+     * @author YazidChen
+     * @createDate 2018/01/23 0023 14:59
+     */</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">sendToUser</span><span class="o">(</span><span class="n">String</span> <span class="n">subscribePath</span><span class="o">,</span> <span class="n">Long</span> <span class="n">userId</span><span class="o">,</span> <span class="n">WsMessage</span> <span class="n">wsMessage</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">userId</span><span class="o">);</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">list</span> <span class="o">==</span> <span class="kc">null</span> <span class="o">||</span> <span class="n">list</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+            <span class="k">return</span><span class="o">;</span>
+        <span class="o">}</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">template</span><span class="o">);</span>
+        <span class="n">list</span><span class="o">.</span><span class="na">forEach</span><span class="o">(</span><span class="n">username</span> <span class="o">-&gt;</span> <span class="n">template</span><span class="o">.</span><span class="na">convertAndSendToUser</span><span class="o">(</span><span class="n">username</span><span class="o">,</span> <span class="n">subscribePath</span><span class="o">,</span> <span class="n">wsMessage</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<p>3、编写测试Controller:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">com.jz.service.jzcf_ums.api.form.UserSession</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.csms.common.utils.R</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.csms.core.callcenter.form.WsMessage</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.csms.core.websocket.service.WsUsers</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.csms.shiro.controller.AbstractController</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.messaging.handler.annotation.MessageMapping</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.messaging.simp.SimpMessageHeaderAccessor</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.messaging.simp.SimpMessagingTemplate</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.messaging.simp.annotation.SendToUser</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Controller</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.GetMapping</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.RequestParam</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.bind.annotation.ResponseBody</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.HashMap</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+
+<span class="cm">/**
+ * @author YazidChen
+ * @date 2017/12/22 0022 14:28
+ **/</span>
+<span class="nd">@Controller</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WsController</span> <span class="kd">extends</span> <span class="n">AbstractController</span> <span class="o">{</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">SimpMessagingTemplate</span> <span class="n">template</span><span class="o">;</span>
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">WsUsers</span> <span class="n">wsUsers</span><span class="o">;</span>
+
+    <span class="nd">@MessageMapping</span><span class="o">(</span><span class="s">"trade"</span><span class="o">)</span>
+    <span class="nd">@SendToUser</span><span class="o">(</span><span class="s">"/queue/sub"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="n">R</span> <span class="nf">wsTest</span><span class="o">(</span><span class="n">SimpMessageHeaderAccessor</span> <span class="n">accessor</span><span class="o">,</span> <span class="nd">@RequestParam</span> <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">params</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">"接收到客户端消息！"</span><span class="o">);</span>
+        <span class="n">UserSession</span> <span class="n">userSession</span> <span class="o">=</span> <span class="o">(</span><span class="n">UserSession</span><span class="o">)</span> <span class="n">accessor</span><span class="o">.</span><span class="na">getSessionAttributes</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="s">"userSession"</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">R</span><span class="o">.</span><span class="na">ok</span><span class="o">().</span><span class="na">put</span><span class="o">(</span><span class="s">"mess"</span><span class="o">,</span> <span class="s">"服务端返回消息！"</span><span class="o">);</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 发送用户消息测试接口
+     *
+     * @param userId        用户ID
+     * @param subscribePath 订阅地址
+     * @return
+     * @author YazidChen
+     * @createDate 2018/01/31 0031 16:05
+     */</span>
+    <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"sendMsToUser"</span><span class="o">)</span>
+    <span class="nd">@ResponseBody</span>
+    <span class="kd">public</span> <span class="n">R</span> <span class="nf">sendMsToUser</span><span class="o">(</span><span class="kt">long</span> <span class="n">userId</span><span class="o">,</span> <span class="n">String</span> <span class="n">subscribePath</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+        <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"data"</span><span class="o">,</span> <span class="s">"The Data!"</span><span class="o">);</span>
+        <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"message"</span><span class="o">,</span> <span class="s">"The message!"</span><span class="o">);</span>
+
+        <span class="n">WsMessage</span> <span class="n">wsMessage</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WsMessage</span><span class="o">();</span>
+        <span class="n">wsMessage</span><span class="o">.</span><span class="na">setBusinessType</span><span class="o">(</span><span class="s">"TEST"</span><span class="o">);</span>
+        <span class="n">wsMessage</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">map</span><span class="o">);</span>
+
+        <span class="n">wsUsers</span><span class="o">.</span><span class="na">sendToUser</span><span class="o">(</span><span class="n">subscribePath</span><span class="o">,</span> <span class="n">userId</span><span class="o">,</span> <span class="n">wsMessage</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">R</span><span class="o">.</span><span class="na">ok</span><span class="o">();</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * 发送全局消息测试接口
+     *
+     * @param subscribePath 订阅地址
+     * @return
+     * @author YazidChen
+     * @createDate 2018/01/31 0031 16:05
+     */</span>
+    <span class="nd">@GetMapping</span><span class="o">(</span><span class="s">"sendMsAll"</span><span class="o">)</span>
+    <span class="nd">@ResponseBody</span>
+    <span class="kd">public</span> <span class="n">R</span> <span class="nf">sendMsAll</span><span class="o">(</span><span class="n">String</span> <span class="n">subscribePath</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;&gt;();</span>
+        <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"data"</span><span class="o">,</span> <span class="s">"The All Data!"</span><span class="o">);</span>
+        <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"message"</span><span class="o">,</span> <span class="s">"The All message!"</span><span class="o">);</span>
+
+        <span class="n">WsMessage</span> <span class="n">wsMessage</span> <span class="o">=</span> <span class="k">new</span> <span class="n">WsMessage</span><span class="o">();</span>
+        <span class="n">wsMessage</span><span class="o">.</span><span class="na">setBusinessType</span><span class="o">(</span><span class="s">"TEST All"</span><span class="o">);</span>
+        <span class="n">wsMessage</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">map</span><span class="o">);</span>
+
+        <span class="n">template</span><span class="o">.</span><span class="na">convertAndSend</span><span class="o">(</span><span class="n">subscribePath</span><span class="o">,</span> <span class="n">wsMessage</span><span class="o">);</span>
+        <span class="k">return</span> <span class="n">R</span><span class="o">.</span><span class="na">ok</span><span class="o">();</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<h3 id="332-客户端配置-1">3.3.2 客户端配置</h3>
+
+<p>需要引入stomp.js:</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">script</span> <span class="nx">type</span><span class="o">=</span><span class="s2">"text/javascript"</span> <span class="nx">src</span><span class="o">=</span><span class="s2">"/statics/libs/stomp.min.js"</span><span class="o">&gt;&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span>
+<span class="kd">let</span> <span class="nx">socket</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">SockJS</span><span class="p">(</span><span class="s1">'https://csms-dev.jzcaifu.com/portfolio'</span><span class="p">);</span>
+            <span class="kd">let</span> <span class="nx">stompClient</span> <span class="o">=</span> <span class="nx">Stomp</span><span class="p">.</span><span class="nx">over</span><span class="p">(</span><span class="nx">socket</span><span class="p">);</span>
+            <span class="cm">/*            stompClient.debug = function (str) {
+                            //不输出日志到控制台
+                        };*/</span>
+            <span class="nx">stompClient</span><span class="p">.</span><span class="nx">connect</span><span class="p">({},</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">frame</span><span class="p">)</span> <span class="p">{</span>
+                <span class="kd">let</span> <span class="nx">messageModel</span> <span class="o">=</span> <span class="p">{};</span>
+                <span class="nx">messageModel</span><span class="p">.</span><span class="nx">type</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+                <span class="nx">messageModel</span><span class="p">.</span><span class="nx">content</span> <span class="o">=</span> <span class="s2">"jhbjhjashuj"</span><span class="p">;</span>
+                <span class="c1">//向服务端发送消息</span>
+                <span class="nx">stompClient</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="s2">"/ws/trade"</span><span class="p">,</span> <span class="p">{},</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">messageModel</span><span class="p">));</span>
+                <span class="c1">//用户订阅</span>
+                <span class="nx">stompClient</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">'/user/queue/sub'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="kd">let</span> <span class="nx">wsMessage</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">message</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+                    <span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">wsMessage</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+                    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+                <span class="p">});</span>
+                <span class="c1">//全局订阅</span>
+                <span class="nx">stompClient</span><span class="p">.</span><span class="nx">subscribe</span><span class="p">(</span><span class="s1">'/topic/all'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="kd">let</span> <span class="nx">wsMessage</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">message</span><span class="p">.</span><span class="nx">body</span><span class="p">);</span>
+                    <span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="nx">wsMessage</span><span class="p">.</span><span class="nx">data</span><span class="p">;</span>
+                    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">data</span><span class="p">);</span>
+                <span class="p">});</span>
+            <span class="p">});</span>
+</code></pre></div></div>
+
+<h3 id="333-运行结果-1">3.3.3 运行结果</h3>
+
+<p>1、连接结果：</p>
+
+<p><img src="https://i.imgur.com/rJCqnx9.png" alt="" /></p>
+
+<p>2、发送全局消息：</p>
+
+<p><img src="https://i.imgur.com/SMssDZ0.png" alt="" /></p>
+
+<p>3、用户目的地消息发送：</p>
+
+<p><img src="https://i.imgur.com/2hxYU27.png" alt="" /></p>
+
+<h1 id="参考">参考</h1>
+
+<p>本文参考以下文章，在此对原作者表示感谢！</p>
+
+<p><a href="http://www.ruanyifeng.com/blog/2017/05/websocket.html">WebSocket 教程</a></p>
+
+<p><a href="https://zh.wikipedia.org/wiki/WebSocket">WebSocket维基百科</a></p>
+
+<p><a href="https://www.zhihu.com/question/20215561">WebSocket 是什么原理？为什么可以实现持久连接？</a></p>
+
+    <br><br>
+    <span class="content end">本文由<a href="mailto:https://yazidchen.github.io/?subject=feedback">YazidChen</a>整理编辑，引用转载请注明出处。</span>
+    </article>
+  </div>
+  <div class="column one-fourth">
+    
+<h3>Search</h3>
+<div id="site_search">
+    <input type="text" id="search_box" placeholder="Search">
+    <button class="btn btn-default" id="site_search_do"><span class="octicon octicon-search"></span></button>
+</div>
+
+<ul id="search_results"></ul>
+
+<link rel="stylesheet" type="text/css" href="/assets/css/modules/sidebar-search.css">
+<script src="/assets/js/lunr.min.js"></script>
+<script src="/assets/js/search.js"></script>
+
+
+  </div>
+</div>
+</section>
+<!-- /section.content -->
+
+    <footer class="container">
+        <div class="site-footer" role="contentinfo">
+            <div class="copyright left mobile-block">
+                    © 2018
+                    <span title="YazidChen">YazidChen</span>
+                    <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
+            </div>
+
+            <ul class="site-footer-links right mobile-hidden">
+                <li>
+                    <a href="javascript:window.scrollTo(0,0)" >TOP</a>
+                </li>
+            </ul>
+            <a href="https://github.com/YazidChen/yazidchen.github.io" target="_blank" aria-label="view source code">
+                <span class="mega-octicon octicon-mark-github" title="GitHub"></span>
+            </a>
+            <ul class="site-footer-links mobile-hidden">
+                
+                <li>
+                    <a href="/" title="Home" target="">Home</a>
+                </li>
+                
+                <li>
+                    <a href="/categories/" title="Categories" target="">Categories</a>
+                </li>
+                
+                <li>
+                    <a href="/about/" title="About" target="">About</a>
+                </li>
+                
+                <li><a href="/feed.xml"><span class="octicon octicon-rss" style="color:orange;"></span></a></li>
+            </ul>
+
+        </div>
+    </footer>
+    <!-- / footer -->
+    <script src="/assets/vendor/share.js/dist/js/share.min.js"></script>
+    <script src="/assets/js/geopattern.js"></script>
+    <script src="/assets/js/prism.js"></script>
+    <link rel="stylesheet" href="/assets/css/globals/prism.css">
+    <script>
+      jQuery(document).ready(function($) {
+        // geopattern
+        $('.geopattern').each(function(){
+          $(this).geopattern($(this).data('pattern-id'));
+        });
+       // hljs.initHighlightingOnLoad();
+      });
+    </script>
+    
+</body>
+</html>

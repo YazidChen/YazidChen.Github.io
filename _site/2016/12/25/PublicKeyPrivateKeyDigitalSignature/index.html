@@ -21,7 +21,7 @@
     
 
     
-    <link rel="canonical" href="yazidchen.github.io/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">
+    <link rel="canonical" href="http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">
     <link rel="alternate" type="application/atom+xml" title="YazidChen Blog" href="/feed.xml">
     <link rel="shortcut icon" href="/favicon.ico">
     
@@ -37,7 +37,7 @@
     
         
     
-    <meta property="og:url" content="yazidchen.github.io/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">
+    <meta property="og:url" content="http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">
     <meta property="og:site_name" content="YazidChen Blog">
     <meta property="og:type" content="article">
     <meta property="og:locale" content="zh_CN" />
@@ -108,11 +108,11 @@
 <div class="columns">
   <div class="column three-fourths" >
     <article class="article-content markdown-body">
-    <h1 id="section">公钥、私钥、数字签名</h1>
+    <h1 id="公钥私钥数字签名">公钥、私钥、数字签名</h1>
 
-<h2 id="section-1">公钥私钥</h2>
+<h2 id="公钥私钥">公钥私钥</h2>
 
-<h3 id="section-2">公钥加密</h3>
+<h3 id="公钥加密">公钥加密</h3>
 
 <p>假设有两个字母，<strong>S</strong>和<strong>G</strong>。我喜欢字母<strong>S</strong>，我将字母<strong>S</strong>当成私钥自己保留，此时别人并不知道我的私钥就是字母<strong>S</strong>。而字母<strong>G</strong>，我把它当成公钥，告诉了小明。此时小明知道我的公钥是字母<strong>G</strong>。</p>
 
@@ -124,7 +124,7 @@
 
 <p>这便是，<strong>公钥加密，私钥解密</strong>。</p>
 
-<h3 id="section-3">私钥数字签名</h3>
+<h3 id="私钥数字签名">私钥数字签名</h3>
 
 <p>假如我用私钥<strong>S</strong>加密，但是我的公钥<strong>G</strong>是暴露在外的，结果所有人都可以用公钥<strong>G</strong>解密，结果加密的内容，所有人都知道了。</p>
 
@@ -138,7 +138,7 @@
 
 <p>这便是，<strong>私钥数字签名，公钥验证</strong>。</p>
 
-<h3 id="section-4">数字证书</h3>
+<h3 id="数字证书">数字证书</h3>
 
 <p>有天隔壁老王偷偷潜入小明家，将我给小明的公钥<strong>G</strong>换成了他的公钥<strong>W</strong>，此后，老王变可以冒充我，用他自己的私钥做成数字签名，写信给小明。</p>
 
@@ -178,7 +178,7 @@
     <footer class="container">
         <div class="site-footer" role="contentinfo">
             <div class="copyright left mobile-block">
-                    © 2016
+                    © 2018
                     <span title="YazidChen">YazidChen</span>
                     <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
             </div>

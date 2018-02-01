@@ -1,6 +1,510 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="yazidchen.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="yazidchen.github.io/" rel="alternate" type="text/html" /><updated>2017-01-12T03:28:52+00:00</updated><id>yazidchen.github.io/</id><title>YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title>我的2016、我的2017</title><link href="yazidchen.github.io/2017/01/08/My2016AndMy2017/" rel="alternate" type="text/html" title="我的2016、我的2017" /><published>2017-01-08T00:00:00+00:00</published><updated>2017-01-08T00:00:00+00:00</updated><id>yazidchen.github.io/2017/01/08/My2016AndMy2017</id><content type="html" xml:base="yazidchen.github.io/2017/01/08/My2016AndMy2017/">&lt;h1 id=&quot;section&quot;&gt;我的2016&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-02-01T20:41:23+08:00</updated><id>http://localhost:4000/</id><title type="html">YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title type="html">WebSocket应用</title><link href="http://localhost:4000/2018/02/01/ImportWebSocket/" rel="alternate" type="text/html" title="WebSocket应用" /><published>2018-02-01T00:00:00+08:00</published><updated>2018-02-01T00:00:00+08:00</updated><id>http://localhost:4000/2018/02/01/ImportWebSocket</id><content type="html" xml:base="http://localhost:4000/2018/02/01/ImportWebSocket/">&lt;h1 id=&quot;一为何引入websocket&quot;&gt;一、为何引入WebSocket&lt;/h1&gt;
 
-&lt;h2 id=&quot;section-1&quot;&gt;学习&lt;/h2&gt;
+&lt;h2 id=&quot;11-遇到问题&quot;&gt;1.1 遇到问题&lt;/h2&gt;
+&lt;p&gt;当前有一客服管理系统，有以下业务需求：&lt;/p&gt;
+
+&lt;h4 id=&quot;1呼出业务&quot;&gt;1、呼出业务&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/KQgXefy.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;客服管理系统向第三方云呼系统发出呼叫请求，云呼系统异步返回呼出回调，后台服务接收到回调后，需要通知WEB端提示用户呼出的结果，此时有后台服务主动通知WEB的需求。&lt;/p&gt;
+
+&lt;h4 id=&quot;2呼入业务&quot;&gt;2、呼入业务&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/kDPC13M.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;当有电话呼入时，云呼系统发起呼入通知给客服管理系统，客服管理系统后台服务接收到呼入通知后，需要及时让WEB发起界面提醒，此时也有后台服务主动通知WEB的需求。&lt;/p&gt;
+
+&lt;h2 id=&quot;12-解决方案&quot;&gt;1.2 解决方案&lt;/h2&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;WEB通过HTTP轮询后台服务（不满足及时性，消耗资源大）;&lt;/li&gt;
+  &lt;li&gt;HTTP长轮询(基本满足及时性，消耗资源较大）&lt;/li&gt;
+  &lt;li&gt;WebSocket(满足及时性，消耗资源小，提供双向通信)。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;初步判断，WebSocket可以作为解决方案。下面开始深入研究WebSocket。&lt;/p&gt;
+
+&lt;h1 id=&quot;二websocket是什么&quot;&gt;二、WebSocket是什么&lt;/h1&gt;
+
+&lt;p&gt;&lt;strong&gt;WebSocket协议&lt;/strong&gt;由HTML5定义，能更好的&lt;strong&gt;节省&lt;/strong&gt;服务器资源和带宽，并且能够更实时地进行&lt;strong&gt;双向&lt;/strong&gt;通讯。它是一种持久化的协议。
+我们拿WebSocket与HTTP进行对比。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/LLATtBY.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;首先是HTTP轮询，浏览器通过ajax每隔几秒就向服务器发起一次请求，询问服务器是否有新的消息。每次发起的请求，即Request，它都包含header头部，多次轮询相当于多次发送了header头部信息，这便会造成带宽资源的浪费。每次返回的Response亦是如此。&lt;/p&gt;
+
+&lt;p&gt;其次是HTTP长轮询，与前者相比，长轮询采用的是阻塞模式，即客户端发起请求，会一直等待服务端有消息后才返回，而后再次发起请求。如果无消息，就会一直等，直至超时。&lt;/p&gt;
+
+&lt;p&gt;以上两种方式，都是客户端主动向服务端发起请求，等待服务端处理。而服务端不能主动联系客户端。&lt;/p&gt;
+
+&lt;p&gt;下面开始WebSocket协议内容：
+首先，客户端会向服务端发起一次Handshake握手的请求，服务端收到请求并确认无误后，返回确认通知。这两步操作还是通过HTTP协议进行通信的。确认通知返回成功后，通信协议由HTTP协议升级为WebSocket协议。之后，服务端就能主动推送消息给客户端，当然，客户端也能主动推消息给服务端。真真正正实现了双向通讯。如果要关闭通信链接，客户端可以给服务端发送断开链接的请求，当然，服务端也可以主动断开链接。这样，整个通信链接的生命周期也就结束了。
+由此看来，WebSocket只需要一次HTTP请求进行建立链接，之后所有的通信都不需要有复杂的header头部信息，也无需多次鉴权了，从而省下了很多资源。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/jjDjhHU.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;继续深入学习WebSocket，我们发现他同HTTP协议一样，也是属于OSI模型的应用层，也是建立在TCP协议之上的。WebSocket协议的&lt;strong&gt;统一资源标识符&lt;/strong&gt;是&lt;code class=&quot;highlighter-rouge&quot;&gt;ws&lt;/code&gt;，如果加密，则是&lt;code class=&quot;highlighter-rouge&quot;&gt;wss&lt;/code&gt;,这和HTTP如出一辙，都是由TSL进行加密的。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/lhwKS1T.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;服务器的网址，即为URL：&lt;code class=&quot;highlighter-rouge&quot;&gt;ws://example.com:80/test&lt;/code&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;三springmvc如何引入websocket&quot;&gt;三、SpringMVC如何引入WebSocket&lt;/h1&gt;
+
+&lt;p&gt;这里有三种API，分别是&lt;code class=&quot;highlighter-rouge&quot;&gt;WebSocket API&lt;/code&gt;，&lt;code class=&quot;highlighter-rouge&quot;&gt;SockJS&lt;/code&gt;以及&lt;code class=&quot;highlighter-rouge&quot;&gt;STOMP&lt;/code&gt;。&lt;code class=&quot;highlighter-rouge&quot;&gt;WebSocket API&lt;/code&gt;是发送和接收消息的底层API，&lt;code class=&quot;highlighter-rouge&quot;&gt;SockJS&lt;/code&gt;在&lt;code class=&quot;highlighter-rouge&quot;&gt;WebSocket API&lt;/code&gt;之上，而&lt;code class=&quot;highlighter-rouge&quot;&gt;STOMP&lt;/code&gt;是基于&lt;code class=&quot;highlighter-rouge&quot;&gt;SockJS&lt;/code&gt;的高级API。&lt;/p&gt;
+
+&lt;h2 id=&quot;31-websocket-api&quot;&gt;3.1 WebSocket API&lt;/h2&gt;
+
+&lt;h3 id=&quot;311-服务端配置&quot;&gt;3.1.1 服务端配置&lt;/h3&gt;
+
+&lt;p&gt;1、创建Handler&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.stereotype.Service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.TextMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.WebSocketSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.handler.AbstractWebSocketHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.io.IOException&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/**
+ * @author YazidChen
+ * @date 2017/12/21 0021 11:10
+ **/&lt;/span&gt;
+&lt;span class=&quot;nd&quot;&gt;@Service&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//此处注解扫描&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;WsHandler&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AbstractWebSocketHandler&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;handleTextMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WebSocketSession&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;session&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TextMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IOException&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;into handleText&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;session&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;sendMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TextMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;来自服务器的消息！&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;2、创建握手拦截器：&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jz.service.jzcf_ums.api.form.UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.ums.sso.utils.ShiroUtils&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.http.server.ServerHttpRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.http.server.ServerHttpResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.stereotype.Service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.WebSocketHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.server.HandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/**
+ * @author YazidChen
+ * @date 2017/12/21 0021 11:21
+ **/&lt;/span&gt;
+&lt;span class=&quot;nd&quot;&gt;@Service&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//此处注解扫描&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;WsHandshakeInterceptor&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HandshakeInterceptor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;boolean&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;beforeHandshake&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ServerHttpRequest&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;serverHttpRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ServerHttpResponse&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;serverHttpResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WebSocketHandler&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;webSocketHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Exception&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;c1&quot;&gt;//在引入Shiro的情况下，此处可获取用户Session&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;UserSession&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userSession&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ShiroUtils&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getUserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;userSession&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;afterHandshake&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ServerHttpRequest&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;serverHttpRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ServerHttpResponse&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;serverHttpResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WebSocketHandler&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;webSocketHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Exception&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;3、将WsHandler绑定到特定的URL上&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.websocket.handler.WsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.websocket.interceptor.WsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.beans.factory.annotation.Autowired&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.context.annotation.Configuration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.config.annotation.EnableWebSocket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.config.annotation.WebSocketConfigurer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/**
+ * @author YazidChen
+ * @date 2018/01/31 0031 10:26
+ **/&lt;/span&gt;
+&lt;span class=&quot;nd&quot;&gt;@Configuration&lt;/span&gt;
+&lt;span class=&quot;nd&quot;&gt;@EnableWebSocket&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;WsConfig&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WebSocketConfigurer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nd&quot;&gt;@Autowired&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WsHandler&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nd&quot;&gt;@Autowired&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WsHandshakeInterceptor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;registerWebSocketHandlers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WebSocketHandlerRegistry&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/chat&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setAllowedOrigins&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;https://csms-dev.jzcaifu.com&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addInterceptors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;addHandler()&lt;/code&gt;将&lt;code class=&quot;highlighter-rouge&quot;&gt;WsHandler&lt;/code&gt;绑定在了&lt;code class=&quot;highlighter-rouge&quot;&gt;/chat&lt;/code&gt;路径上；&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;setAllowedOrigins()&lt;/code&gt;允许来源为&lt;code class=&quot;highlighter-rouge&quot;&gt;https://csms-dev.jzcaifu.com&lt;/code&gt;的请求，设置为&lt;code class=&quot;highlighter-rouge&quot;&gt;*&lt;/code&gt;允许所有来源；&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;addInterceptors()&lt;/code&gt;添加拦截器。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;332-客户端配置&quot;&gt;3.3.2 客户端配置&lt;/h3&gt;
+
+&lt;p&gt;客户端发起WebSocket链接请求：&lt;/p&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ws&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;WebSocket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;wss://csms-dev.jzcaifu.com/chat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//发起连接&lt;/span&gt;
+            &lt;span class=&quot;nx&quot;&gt;ws&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;onopen&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;WebSocket open now!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;ws&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;message test!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//客户端向服务器发送消息&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+            &lt;span class=&quot;nx&quot;&gt;ws&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;onmessage&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;WebSocket message now!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+            &lt;span class=&quot;nx&quot;&gt;ws&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;onclose&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;WebSocket close now!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;333-运行结果&quot;&gt;3.3.3 运行结果&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/mTgAbTb.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/KwNihlQ.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Connection&lt;/code&gt;为Upgrade，表示客户端希望连接升级；&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Upgrade&lt;/code&gt;为Websocket，表示希望升级到Websocket协议；&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Sec-WebSocket-Key&lt;/code&gt;是随机的字符串，服务器端会用这些数据来构造出一个SHA-1的信息摘要。把&lt;code class=&quot;highlighter-rouge&quot;&gt;Sec-WebSocket-Key&lt;/code&gt;加上一个特殊字符串，然后计算&lt;code class=&quot;highlighter-rouge&quot;&gt;SHA-1&lt;/code&gt;摘要，之后进行&lt;code class=&quot;highlighter-rouge&quot;&gt;BASE-64&lt;/code&gt;编码，将结果作为&lt;code class=&quot;highlighter-rouge&quot;&gt;Sec-WebSocket-Accept&lt;/code&gt;头的值，返回给客户端。如此操作，可以尽量避免普通&lt;code class=&quot;highlighter-rouge&quot;&gt;HTTP&lt;/code&gt;请求被误认为&lt;code class=&quot;highlighter-rouge&quot;&gt;Websocket&lt;/code&gt;协议；&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Sec-WebSocket-Version&lt;/code&gt;表示支持的Websocket版本；&lt;/li&gt;
+  &lt;li&gt;Websocket通过&lt;code class=&quot;highlighter-rouge&quot;&gt;HTTP/1.1&lt;/code&gt;协议的&lt;code class=&quot;highlighter-rouge&quot;&gt;101&lt;/code&gt;状态码进行握手，此时握手成功。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;32-sockjs&quot;&gt;3.2 SockJS&lt;/h2&gt;
+
+&lt;p&gt;在&lt;code class=&quot;highlighter-rouge&quot;&gt;WebSocket API&lt;/code&gt;的基础上，稍加修改，就变为&lt;code class=&quot;highlighter-rouge&quot;&gt;SockJS&lt;/code&gt;形式。&lt;/p&gt;
+
+&lt;h3 id=&quot;321-服务端配置&quot;&gt;3.2.1 服务端配置&lt;/h3&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.websocket.handler.WsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.websocket.interceptor.WsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.beans.factory.annotation.Autowired&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.context.annotation.Configuration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.config.annotation.EnableWebSocket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.config.annotation.WebSocketConfigurer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/**
+ * @author YazidChen
+ * @date 2018/01/31 0031 10:26
+ **/&lt;/span&gt;
+&lt;span class=&quot;nd&quot;&gt;@Configuration&lt;/span&gt;
+&lt;span class=&quot;nd&quot;&gt;@EnableWebSocket&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;WsConfig&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WebSocketConfigurer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nd&quot;&gt;@Autowired&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WsHandler&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nd&quot;&gt;@Autowired&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WsHandshakeInterceptor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;registerWebSocketHandlers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WebSocketHandlerRegistry&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/chat&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setAllowedOrigins&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;https://csms-dev.jzcaifu.com&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addInterceptors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;withSockJS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//此处使用SockJS&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;方法&lt;code class=&quot;highlighter-rouge&quot;&gt;withSockJS()&lt;/code&gt;用SockJS改造了原始的API&lt;/p&gt;
+
+&lt;h3 id=&quot;322-客户端配置&quot;&gt;3.2.2 客户端配置&lt;/h3&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;&amp;lt;!--&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;引入&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sockjs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;--&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;script&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;text/javascript&quot;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/statics/libs/sockjs.min.js&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/script&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;&amp;lt;!--&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;此处为&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;https&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;协议&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;--&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sock&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;SockJS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;https://csms-dev.jzcaifu.com/chat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;nx&quot;&gt;sock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;onopen&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;WebSocket open now!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;sock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;message test!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//客户端向服务器发送消息&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+            &lt;span class=&quot;nx&quot;&gt;sock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;onmessage&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;WebSocket message now!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+
+            &lt;span class=&quot;nx&quot;&gt;sock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;onclose&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;WebSocket close now!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;SockJS&lt;/strong&gt;将&lt;code class=&quot;highlighter-rouge&quot;&gt;http&lt;/code&gt;或&lt;code class=&quot;highlighter-rouge&quot;&gt;https&lt;/code&gt;协议处理成为&lt;code class=&quot;highlighter-rouge&quot;&gt;ws&lt;/code&gt;或&lt;code class=&quot;highlighter-rouge&quot;&gt;wss&lt;/code&gt;协议。&lt;/p&gt;
+
+&lt;h3 id=&quot;323-运行结果&quot;&gt;3.2.3 运行结果&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/d91tSia.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/9bOXUOI.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;33-stomp&quot;&gt;3.3 STOMP&lt;/h2&gt;
+
+&lt;p&gt;此处为XML配置形式示例。&lt;/p&gt;
+
+&lt;h3 id=&quot;331-服务端配置&quot;&gt;3.3.1 服务端配置&lt;/h3&gt;
+
+&lt;p&gt;1、创建拦截器：&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jz.service.jzcf_ums.api.form.UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.ums.sso.utils.ShiroUtils&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.http.server.ServerHttpRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.http.server.ServerHttpResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.WebSocketHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.server.HandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/**
+ * @author YazidChen
+ * @date 2017/12/21 0021 11:21
+ **/&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;WsHandshakeInterceptor&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HandshakeInterceptor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+
+    &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;boolean&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;beforeHandshake&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ServerHttpRequest&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;serverHttpRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ServerHttpResponse&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;serverHttpResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WebSocketHandler&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;webSocketHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Exception&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;UserSession&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userSession&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ShiroUtils&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getUserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;userSession&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;afterHandshake&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ServerHttpRequest&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;serverHttpRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ServerHttpResponse&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;serverHttpResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WebSocketHandler&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;webSocketHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Exception&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;2、XML配置：&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;c&quot;&gt;&amp;lt;!--利用fastjson改变消息体传输方式--&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;bean&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fastjsonSockJsMessageCodec&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;com.alibaba.fastjson.support.spring.FastjsonSockJsMessageCodec&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/bean&amp;gt;&lt;/span&gt;
+
+    &lt;span class=&quot;c&quot;&gt;&amp;lt;!--开启websocket--&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;websocket:message-broker&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;application-destination-prefix=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/ws&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;user-destination-prefix=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/user&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;websocket:stomp-endpoint&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;path=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/portfolio&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;allowed-origins=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;websocket:handshake-interceptors&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;nt&quot;&gt;&amp;lt;bean&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;wsHandshakeInterceptor&quot;&lt;/span&gt;
+                      &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;com.jzcf.csms.core.websocket.interceptor.WsHandshakeInterceptor&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;/websocket:handshake-interceptors&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;nt&quot;&gt;&amp;lt;websocket:sockjs&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;message-codec=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fastjsonSockJsMessageCodec&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;/websocket:stomp-endpoint&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;websocket:simple-broker&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;prefix=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/topic, /queue&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/websocket:message-broker&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;stomp-endpoint&lt;/code&gt;中，&lt;code class=&quot;highlighter-rouge&quot;&gt;path&lt;/code&gt;为&lt;code class=&quot;highlighter-rouge&quot;&gt;/portfolio&lt;/code&gt;是客户端需要连接到WebSocket握手的端点的HTTP URL；&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;stomp-endpoint&lt;/code&gt;中，&lt;code class=&quot;highlighter-rouge&quot;&gt;allowed-origins&lt;/code&gt;为&lt;code class=&quot;highlighter-rouge&quot;&gt;*&lt;/code&gt;允许所有来源；&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;message-broker&lt;/code&gt;中，&lt;code class=&quot;highlighter-rouge&quot;&gt;application-destination-prefix&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;/ws&lt;/code&gt;将STOMP消息路由到类中的@MessageMapping注解的方法；&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;message-broker&lt;/code&gt;中，&lt;code class=&quot;highlighter-rouge&quot;&gt;user-destination-prefix=&quot;/user&quot;&lt;/code&gt;表示开启用户目的地，服务器可以发送针对特定用户的消息，并且Spring的STOMP可以识别”/user/”以此为前缀的目标；&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;simple-broker&lt;/code&gt;中，&lt;code class=&quot;highlighter-rouge&quot;&gt;prefix=&quot;/topic, /queue&quot;&lt;/code&gt;表示代理目的地前缀，即订阅时的前缀。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;3、对于用户目的地，编写一个用户管理中心：&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.callcenter.form.WsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.beans.factory.annotation.Autowired&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.messaging.simp.SimpMessagingTemplate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.stereotype.Service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.HashMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.List&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/**
+ * @author YazidChen
+ * @date 2018/01/23 0023 12:45
+ **/&lt;/span&gt;
+&lt;span class=&quot;nd&quot;&gt;@Service&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;WsUsers&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Long&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;List&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;users&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;nd&quot;&gt;@Autowired&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SimpMessagingTemplate&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;users&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HashMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;gt;();&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;cm&quot;&gt;/**
+     * 发送消息给订阅者
+     *
+     * @param subscribePath 订阅路径
+     * @param userId        客服ID
+     * @param wsMessage     消息体
+     * @author YazidChen
+     * @createDate 2018/01/23 0023 14:59
+     */&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;sendToUser&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;subscribePath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WsMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;List&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;list&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;users&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;userId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;list&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;isEmpty&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;list&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;username&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;convertAndSendToUser&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;username&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;subscribePath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;3、编写测试Controller:&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jz.service.jzcf_ums.api.form.UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.common.utils.R&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.callcenter.form.WsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.websocket.service.WsUsers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.shiro.controller.AbstractController&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.beans.factory.annotation.Autowired&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.messaging.handler.annotation.MessageMapping&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.messaging.simp.SimpMessageHeaderAccessor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.messaging.simp.SimpMessagingTemplate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.messaging.simp.annotation.SendToUser&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.stereotype.Controller&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.bind.annotation.GetMapping&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.bind.annotation.RequestParam&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.bind.annotation.ResponseBody&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.HashMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;java.util.Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+&lt;span class=&quot;cm&quot;&gt;/**
+ * @author YazidChen
+ * @date 2017/12/22 0022 14:28
+ **/&lt;/span&gt;
+&lt;span class=&quot;nd&quot;&gt;@Controller&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;WsController&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AbstractController&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nd&quot;&gt;@Autowired&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SimpMessagingTemplate&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nd&quot;&gt;@Autowired&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WsUsers&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsUsers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+
+    &lt;span class=&quot;nd&quot;&gt;@MessageMapping&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;trade&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;nd&quot;&gt;@SendToUser&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/queue/sub&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;R&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;wsTest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SimpMessageHeaderAccessor&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;accessor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nd&quot;&gt;@RequestParam&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;接收到客户端消息！&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;UserSession&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userSession&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;accessor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getSessionAttributes&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;userSession&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;R&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;ok&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;mess&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;服务端返回消息！&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;cm&quot;&gt;/**
+     * 发送用户消息测试接口
+     *
+     * @param userId        用户ID
+     * @param subscribePath 订阅地址
+     * @return
+     * @author YazidChen
+     * @createDate 2018/01/31 0031 16:05
+     */&lt;/span&gt;
+    &lt;span class=&quot;nd&quot;&gt;@GetMapping&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sendMsToUser&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;nd&quot;&gt;@ResponseBody&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;R&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;sendMsToUser&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;subscribePath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HashMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;data&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;The Data!&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;message&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;The message!&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+
+        &lt;span class=&quot;n&quot;&gt;WsMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setBusinessType&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;TEST&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+
+        &lt;span class=&quot;n&quot;&gt;wsUsers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;sendToUser&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subscribePath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;userId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;R&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;ok&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;cm&quot;&gt;/**
+     * 发送全局消息测试接口
+     *
+     * @param subscribePath 订阅地址
+     * @return
+     * @author YazidChen
+     * @createDate 2018/01/31 0031 16:05
+     */&lt;/span&gt;
+    &lt;span class=&quot;nd&quot;&gt;@GetMapping&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;sendMsAll&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;nd&quot;&gt;@ResponseBody&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;R&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;sendMsAll&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;subscribePath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HashMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;data&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;The All Data!&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;message&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;The All message!&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+
+        &lt;span class=&quot;n&quot;&gt;WsMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setBusinessType&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;TEST All&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+
+        &lt;span class=&quot;n&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;convertAndSend&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subscribePath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;R&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;ok&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;332-客户端配置-1&quot;&gt;3.3.2 客户端配置&lt;/h3&gt;
+
+&lt;p&gt;需要引入stomp.js:&lt;/p&gt;
+
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;script&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;text/javascript&quot;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/statics/libs/stomp.min.js&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/script&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&amp;gt;
+&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;socket&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;SockJS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'https://csms-dev.jzcaifu.com/portfolio'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;stompClient&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Stomp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;over&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;cm&quot;&gt;/*            stompClient.debug = function (str) {
+                            //不输出日志到控制台
+                        };*/&lt;/span&gt;
+            &lt;span class=&quot;nx&quot;&gt;stompClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;({},&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;frame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;messageModel&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{};&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;messageModel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;messageModel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;content&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;jhbjhjashuj&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+                &lt;span class=&quot;c1&quot;&gt;//向服务端发送消息&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;stompClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/ws/trade&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{},&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;JSON&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;stringify&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;messageModel&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+                &lt;span class=&quot;c1&quot;&gt;//用户订阅&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;stompClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;subscribe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'/user/queue/sub'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                    &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;wsMessage&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;JSON&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;body&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                    &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+                    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+                &lt;span class=&quot;c1&quot;&gt;//全局订阅&lt;/span&gt;
+                &lt;span class=&quot;nx&quot;&gt;stompClient&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;subscribe&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'/topic/all'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+                    &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;wsMessage&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;JSON&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;body&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                    &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+                    &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+                &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+            &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;333-运行结果-1&quot;&gt;3.3.3 运行结果&lt;/h3&gt;
+
+&lt;p&gt;1、连接结果：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/rJCqnx9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;2、发送全局消息：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/SMssDZ0.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;3、用户目的地消息发送：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/2hxYU27.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;参考&quot;&gt;参考&lt;/h1&gt;
+
+&lt;p&gt;本文参考以下文章，在此对原作者表示感谢！&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://www.ruanyifeng.com/blog/2017/05/websocket.html&quot;&gt;WebSocket 教程&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://zh.wikipedia.org/wiki/WebSocket&quot;&gt;WebSocket维基百科&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.zhihu.com/question/20215561&quot;&gt;WebSocket 是什么原理？为什么可以实现持久连接？&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">一、为何引入WebSocket</summary></entry><entry><title type="html">我的2016、我的2017</title><link href="http://localhost:4000/2017/01/08/My2016AndMy2017/" rel="alternate" type="text/html" title="我的2016、我的2017" /><published>2017-01-08T00:00:00+08:00</published><updated>2017-01-08T00:00:00+08:00</updated><id>http://localhost:4000/2017/01/08/My2016AndMy2017</id><content type="html" xml:base="http://localhost:4000/2017/01/08/My2016AndMy2017/">&lt;h1 id=&quot;我的2016&quot;&gt;我的2016&lt;/h1&gt;
+
+&lt;h2 id=&quot;学习&quot;&gt;学习&lt;/h2&gt;
 
 &lt;p&gt;年初很杂乱，啥都想去学，啥都没学好。没有确定下自己的方向。大学用了两年半的时间自学的Android出来发现都是皮毛。又回到了JAVA重新开始。&lt;/p&gt;
 
@@ -8,21 +512,21 @@
 
 &lt;p&gt;16年买了一大堆书，自己总是没有静下心好好去读。年内读了不到两本的技术书。已读完的是《软件工程与计算·卷一》，《JAVA核心技术·卷一》这本书还没读完。所以17年需要补上了，给自己定计划，要把几本书读深读透。&lt;/p&gt;
 
-&lt;h2 id=&quot;section-2&quot;&gt;工作&lt;/h2&gt;
+&lt;h2 id=&quot;工作&quot;&gt;工作&lt;/h2&gt;
 
 &lt;p&gt;我喜欢现在的工作模式，工作氛围。晨会、过需求、任务分配等等。从中也学到了如何去带领团队，以及如何去被带领。但是自己工作不专注，思维容易发散。再加上自己拖延症作怪，实际工作时间往往大于有效工作时间，而且还多得多。另外就是不细心，有时候自己去寻找BUG出现的原因，得到结果后真的是觉得自己超乎想象的白痴。不专注，拖延症，还有不细心，必须在17年改正。&lt;/p&gt;
 
 &lt;p&gt;16年，我学会如何去全方位的分析一个问题，而不是单纯的从一两个角度去考虑。再者，会需求及功能分析，自己拆分一个功能的各个细节点，这也是我最喜欢也慢慢习惯的一种编码方式，即将一个功能完全分解，拆成各个小零件（包括公有、私有），小零件之间在缔造连接枢纽，最终整合。&lt;/p&gt;
 
-&lt;h2 id=&quot;section-3&quot;&gt;处事&lt;/h2&gt;
+&lt;h2 id=&quot;处事&quot;&gt;处事&lt;/h2&gt;
 
 &lt;p&gt;沟通大障碍，不熟的人真是一句话都聊不上。熟的人又自己话少必须要别人带动。不过一年过去了这毛病还算有所改善，外向了很多。&lt;/p&gt;
 
 &lt;p&gt;不说则已，一说太直，整个一直肠子。注意场合呀！17年必改。&lt;/p&gt;
 
-&lt;h1 id=&quot;section-4&quot;&gt;我的2017&lt;/h1&gt;
+&lt;h1 id=&quot;我的2017&quot;&gt;我的2017&lt;/h1&gt;
 
-&lt;h2 id=&quot;section-5&quot;&gt;读书计划&lt;/h2&gt;
+&lt;h2 id=&quot;读书计划&quot;&gt;读书计划&lt;/h2&gt;
 
 &lt;ul&gt;
   &lt;li&gt;1月~2月 -&amp;gt; 《JAVA核心技术·卷一》剩余两章、《软技能·代码之外的生存指南》&lt;/li&gt;
@@ -31,23 +535,23 @@
   &lt;li&gt;10月~12月 -&amp;gt; 《重构·改善既有代码的设计》&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&quot;section-6&quot;&gt;学习计划&lt;/h2&gt;
+&lt;h2 id=&quot;学习计划&quot;&gt;学习计划&lt;/h2&gt;
 
-&lt;h3 id=&quot;section-7&quot;&gt;一、安全加固&lt;/h3&gt;
+&lt;h3 id=&quot;一安全加固&quot;&gt;一、安全加固&lt;/h3&gt;
 
 &lt;ol&gt;
   &lt;li&gt;hacker知识。（1月~3月）&lt;/li&gt;
   &lt;li&gt;将nginx、tomcat安全加固完善。（1月~3月）&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3 id=&quot;section-8&quot;&gt;二、性能提升&lt;/h3&gt;
+&lt;h3 id=&quot;二性能提升&quot;&gt;二、性能提升&lt;/h3&gt;
 
 &lt;ol&gt;
   &lt;li&gt;配置监控系统。（4月~5月）&lt;/li&gt;
   &lt;li&gt;配置nginx、tomcat性能提升。（6月~9月）&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3 id=&quot;section-9&quot;&gt;三、架构学习&lt;/h3&gt;
+&lt;h3 id=&quot;三架构学习&quot;&gt;三、架构学习&lt;/h3&gt;
 
 &lt;ol&gt;
   &lt;li&gt;安全架构。（广泛，需拆分）(拆分时间段1月~3月)&lt;/li&gt;
@@ -55,9 +559,9 @@
   &lt;li&gt;DevOps。（2月~5月）&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h2 id=&quot;section-10&quot;&gt;工作计划&lt;/h2&gt;
+&lt;h2 id=&quot;工作计划&quot;&gt;工作计划&lt;/h2&gt;
 
-&lt;h3 id=&quot;section-11&quot;&gt;一、习惯养成计划&lt;/h3&gt;
+&lt;h3 id=&quot;一习惯养成计划&quot;&gt;一、习惯养成计划&lt;/h3&gt;
 
 &lt;ol&gt;
   &lt;li&gt;工作为主，研究为辅。&lt;/li&gt;
@@ -65,7 +569,7 @@
   &lt;li&gt;每周末回顾本周开发的功能，存档。&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3 id=&quot;section-12&quot;&gt;二、代码提升计划&lt;/h3&gt;
+&lt;h3 id=&quot;二代码提升计划&quot;&gt;二、代码提升计划&lt;/h3&gt;
 
 &lt;ol&gt;
   &lt;li&gt;减少BUG出现率，平均每个功能3个。&lt;/li&gt;
@@ -73,7 +577,7 @@
   &lt;li&gt;接入JAVA8特性，准备对接JAVA9。&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3 id=&quot;section-13&quot;&gt;三、系统提升计划&lt;/h3&gt;
+&lt;h3 id=&quot;三系统提升计划&quot;&gt;三、系统提升计划&lt;/h3&gt;
 
 &lt;p&gt;以下完成条件为上生产并稳定通过:&lt;/p&gt;
 
@@ -81,11 +585,11 @@
   &lt;li&gt;安全加固(nginx,tomcat)(依据需求进度，大概4月~7月)&lt;/li&gt;
   &lt;li&gt;监控系统(依据需求进度，大概8月~9月)&lt;/li&gt;
   &lt;li&gt;性能提升（nginx,tomcat）(依据需求进度，大概10月~12月)&lt;/li&gt;
-&lt;/ol&gt;</content><author><name>YazidChen</name></author><summary>我的2016</summary></entry><entry><title>公钥、私钥、数字签名</title><link href="yazidchen.github.io/2016/12/25/PublicKeyPrivateKeyDigitalSignature/" rel="alternate" type="text/html" title="公钥、私钥、数字签名" /><published>2016-12-25T00:00:00+00:00</published><updated>2016-12-25T00:00:00+00:00</updated><id>yazidchen.github.io/2016/12/25/PublicKeyPrivateKeyDigitalSignature</id><content type="html" xml:base="yazidchen.github.io/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">&lt;h1 id=&quot;section&quot;&gt;公钥、私钥、数字签名&lt;/h1&gt;
+&lt;/ol&gt;</content><author><name>YazidChen</name></author><summary type="html">我的2016</summary></entry><entry><title type="html">公钥、私钥、数字签名</title><link href="http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature/" rel="alternate" type="text/html" title="公钥、私钥、数字签名" /><published>2016-12-25T00:00:00+08:00</published><updated>2016-12-25T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature</id><content type="html" xml:base="http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">&lt;h1 id=&quot;公钥私钥数字签名&quot;&gt;公钥、私钥、数字签名&lt;/h1&gt;
 
-&lt;h2 id=&quot;section-1&quot;&gt;公钥私钥&lt;/h2&gt;
+&lt;h2 id=&quot;公钥私钥&quot;&gt;公钥私钥&lt;/h2&gt;
 
-&lt;h3 id=&quot;section-2&quot;&gt;公钥加密&lt;/h3&gt;
+&lt;h3 id=&quot;公钥加密&quot;&gt;公钥加密&lt;/h3&gt;
 
 &lt;p&gt;假设有两个字母，&lt;strong&gt;S&lt;/strong&gt;和&lt;strong&gt;G&lt;/strong&gt;。我喜欢字母&lt;strong&gt;S&lt;/strong&gt;，我将字母&lt;strong&gt;S&lt;/strong&gt;当成私钥自己保留，此时别人并不知道我的私钥就是字母&lt;strong&gt;S&lt;/strong&gt;。而字母&lt;strong&gt;G&lt;/strong&gt;，我把它当成公钥，告诉了小明。此时小明知道我的公钥是字母&lt;strong&gt;G&lt;/strong&gt;。&lt;/p&gt;
 
@@ -97,7 +601,7 @@
 
 &lt;p&gt;这便是，&lt;strong&gt;公钥加密，私钥解密&lt;/strong&gt;。&lt;/p&gt;
 
-&lt;h3 id=&quot;section-3&quot;&gt;私钥数字签名&lt;/h3&gt;
+&lt;h3 id=&quot;私钥数字签名&quot;&gt;私钥数字签名&lt;/h3&gt;
 
 &lt;p&gt;假如我用私钥&lt;strong&gt;S&lt;/strong&gt;加密，但是我的公钥&lt;strong&gt;G&lt;/strong&gt;是暴露在外的，结果所有人都可以用公钥&lt;strong&gt;G&lt;/strong&gt;解密，结果加密的内容，所有人都知道了。&lt;/p&gt;
 
@@ -111,7 +615,7 @@
 
 &lt;p&gt;这便是，&lt;strong&gt;私钥数字签名，公钥验证&lt;/strong&gt;。&lt;/p&gt;
 
-&lt;h3 id=&quot;section-4&quot;&gt;数字证书&lt;/h3&gt;
+&lt;h3 id=&quot;数字证书&quot;&gt;数字证书&lt;/h3&gt;
 
 &lt;p&gt;有天隔壁老王偷偷潜入小明家，将我给小明的公钥&lt;strong&gt;G&lt;/strong&gt;换成了他的公钥&lt;strong&gt;W&lt;/strong&gt;，此后，老王变可以冒充我，用他自己的私钥做成数字签名，写信给小明。&lt;/p&gt;
 
@@ -121,13 +625,13 @@
 
 &lt;p&gt;小明收到我的信后，用CA的公钥解开数字证书，就可以拿到我的真实公钥，之后小明就能验签了。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/29Dejr4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary>公钥、私钥、数字签名</summary></entry><entry><title>Linux环境Nginx性能优化</title><link href="yazidchen.github.io/2016/12/01/NginxPerformance/" rel="alternate" type="text/html" title="Linux环境Nginx性能优化" /><published>2016-12-01T00:00:00+00:00</published><updated>2016-12-01T00:00:00+00:00</updated><id>yazidchen.github.io/2016/12/01/NginxPerformance</id><content type="html" xml:base="yazidchen.github.io/2016/12/01/NginxPerformance/">&lt;h1 id=&quot;nginx-performance-optimize&quot;&gt;Nginx performance optimize&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/29Dejr4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">公钥、私钥、数字签名</summary></entry><entry><title type="html">Linux环境Nginx性能优化</title><link href="http://localhost:4000/2016/12/01/NginxPerformance/" rel="alternate" type="text/html" title="Linux环境Nginx性能优化" /><published>2016-12-01T00:00:00+08:00</published><updated>2016-12-01T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/01/NginxPerformance</id><content type="html" xml:base="http://localhost:4000/2016/12/01/NginxPerformance/">&lt;h1 id=&quot;nginx-performance-optimize&quot;&gt;Nginx performance optimize&lt;/h1&gt;
 
-&lt;h2 id=&quot;section&quot;&gt;一、主配置文件&lt;/h2&gt;
+&lt;h2 id=&quot;一主配置文件&quot;&gt;一、主配置文件&lt;/h2&gt;
 
-&lt;h3 id=&quot;section-1&quot;&gt;主配置文件结构&lt;/h3&gt;
+&lt;h3 id=&quot;主配置文件结构&quot;&gt;主配置文件结构&lt;/h3&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 主配置段，也即全局配置段；&lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 主配置段，也即全局配置段；&lt;/span&gt;
 ···
 
 &lt;span class=&quot;c&quot;&gt;# 事件驱动相关的配置；&lt;/span&gt;
@@ -149,39 +653,37 @@
    stream &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
       ...
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h4 id=&quot;section-2&quot;&gt;主配置段相关配置&lt;/h4&gt;
+&lt;h4 id=&quot;主配置段相关配置&quot;&gt;主配置段相关配置&lt;/h4&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##定义执行权限的用户及组，如果省略组，则组名为用户所在组。&lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##定义执行权限的用户及组，如果省略组，则组名为用户所在组。&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#语法：&lt;/span&gt;
-user user &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;group];
+user user &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;group]&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认：&lt;/span&gt;
-user nobody;
+user nobody&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;##指定存储nginx主进程编号pid的文件路径&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#语法：&lt;/span&gt;
-pid path;
+pid path&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认：&lt;/span&gt;
-pid logs/nginx.pid;
+pid logs/nginx.pid&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h2 id=&quot;section-3&quot;&gt;二、性能优化&lt;/h2&gt;
+&lt;h2 id=&quot;二性能优化&quot;&gt;二、性能优化&lt;/h2&gt;
 
-&lt;h3 id=&quot;cpu&quot;&gt;2.1 关于CPU的配置项&lt;/h3&gt;
+&lt;h3 id=&quot;21-关于cpu的配置项&quot;&gt;2.1 关于CPU的配置项&lt;/h3&gt;
 
-&lt;h4 id=&quot;section-4&quot;&gt;2.1.1 配置运行处理器&lt;/h4&gt;
+&lt;h4 id=&quot;211-配置运行处理器&quot;&gt;2.1.1 配置运行处理器&lt;/h4&gt;
 
 &lt;p&gt;&lt;strong&gt;配置详解：&lt;/strong&gt;&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##worker进程的数量，通常应该为当前主机的CPU的物理核心数。&lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##worker进程的数量，通常应该为当前主机的CPU的物理核心数。&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#语法：&lt;/span&gt;
-worker_processer number;
+worker_processer number&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认：&lt;/span&gt;
-worker_processer  1;
+worker_processer  1&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;##worker进程绑定到固定的处理器（processer）上&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;# cpumask(CPU掩码)，八位二进制，每一位代表一个处理器（processer），共8个，1代表固定使用，0代表不使用。&lt;/span&gt;
@@ -189,11 +691,10 @@ worker_processer  1;
 &lt;span class=&quot;c&quot;&gt;# 00000010 : 1号processer&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;# 00000100 : 2号processer&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#语法：&lt;/span&gt;
-worker_cpu_affinity cpumask1 cpumask2 ...;
+worker_cpu_affinity cpumask1 cpumask2 ...&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认：&lt;/span&gt;
-worker_cpu_affinity auto;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+worker_cpu_affinity auto&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;搞懂上述配置，必须先弄清楚&lt;strong&gt;中央处理器（CPU）&lt;/strong&gt;、&lt;strong&gt;内核&lt;/strong&gt;、&lt;strong&gt;处理器（processer）&lt;/strong&gt;三者的关系。&lt;/p&gt;
 
@@ -201,22 +702,21 @@ worker_cpu_affinity auto;
 
 &lt;p&gt;&lt;strong&gt;1)&lt;/strong&gt; Linux查看CPU信息：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##总核(cpu cores)数 = 中央处理器（CPU）个数 X 每颗CPU的核数 &lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##总核(cpu cores)数 = 中央处理器（CPU）个数 X 每颗CPU的核数 &lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;##总处理器（processor）数 =总核(cpu cores)数 X 超线程数&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;#查看CPU总体信息&lt;/span&gt;
-cat /proc/cpuinfo
+&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; /proc/cpuinfo
 
 &lt;span class=&quot;c&quot;&gt;# 查看CPU个数&lt;/span&gt;
-cat /proc/cpuinfo| grep &lt;span class=&quot;s2&quot;&gt;&quot;physical id&quot;&lt;/span&gt;| sort| uniq| wc -l
+&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; /proc/cpuinfo| &lt;span class=&quot;nb&quot;&gt;grep&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;physical id&quot;&lt;/span&gt;| &lt;span class=&quot;nb&quot;&gt;sort&lt;/span&gt;| &lt;span class=&quot;nb&quot;&gt;uniq&lt;/span&gt;| &lt;span class=&quot;nb&quot;&gt;wc&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;# 查看每个CPU中的核数&lt;/span&gt;
-cat /proc/cpuinfo| grep &lt;span class=&quot;s2&quot;&gt;&quot;cpu cores&quot;&lt;/span&gt;| uniq
+&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; /proc/cpuinfo| &lt;span class=&quot;nb&quot;&gt;grep&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;cpu cores&quot;&lt;/span&gt;| &lt;span class=&quot;nb&quot;&gt;uniq&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;# 查看总处理器（processor）个数&lt;/span&gt;
-cat /proc/cpuinfo| grep &lt;span class=&quot;s2&quot;&gt;&quot;processor&quot;&lt;/span&gt;| wc -l
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; /proc/cpuinfo| &lt;span class=&quot;nb&quot;&gt;grep&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;processor&quot;&lt;/span&gt;| &lt;span class=&quot;nb&quot;&gt;wc&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;通过上述指令，查询到本机仅有1个CPU。&lt;/p&gt;
 
@@ -248,18 +748,16 @@ cat /proc/cpuinfo| grep &lt;span class=&quot;s2&quot;&gt;&quot;processor&quot;&l
 
 &lt;p&gt;查看&lt;code class=&quot;highlighter-rouge&quot;&gt;worker_processes 4;&lt;/code&gt;是否生效：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ps -aux | grep nginx
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ps &lt;span class=&quot;nt&quot;&gt;-aux&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;grep &lt;/span&gt;nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/xqHVZPS.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;查看&lt;code class=&quot;highlighter-rouge&quot;&gt;worker_cpu_affinity auto;&lt;/code&gt;是否生效：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#查看nginx进程在哪个CPU内核上运行&lt;/span&gt;
-ps -axo pid,user,comm,psr |grep nginx
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#查看nginx进程在哪个CPU内核上运行&lt;/span&gt;
+ps &lt;span class=&quot;nt&quot;&gt;-axo&lt;/span&gt; pid,user,comm,psr |grep nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/25fLoOI.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
@@ -283,14 +781,13 @@ ps -axo pid,user,comm,psr |grep nginx
 
 &lt;p&gt;如此看来，&lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt;消耗的资源并不多。&lt;/p&gt;
 
-&lt;h4 id=&quot;section-5&quot;&gt;2.1.2 配置进程优先级&lt;/h4&gt;
+&lt;h4 id=&quot;212-配置进程优先级&quot;&gt;2.1.2 配置进程优先级&lt;/h4&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##设定worker进程的nice值，nice值决定进程的优先级，在CPU运行队列较长时，可以被有限调度到CPU上运行。nice值默认为0，区间[-20,20]&lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##设定worker进程的nice值，nice值决定进程的优先级，在CPU运行队列较长时，可以被有限调度到CPU上运行。nice值默认为0，区间[-20,20]&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
-worker_priority number;
+worker_priority number&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;这里有个疑问：nice值是什么？&lt;/p&gt;
 
@@ -318,9 +815,8 @@ worker_priority number;
 
 &lt;p&gt;&lt;strong&gt;1）&lt;/strong&gt; 查询修改前状态：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ps axo pid,user,comm,psr,nice | grep nginx
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ps axo pid,user,comm,psr,nice | &lt;span class=&quot;nb&quot;&gt;grep &lt;/span&gt;nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/VErMiA9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
@@ -328,9 +824,8 @@ worker_priority number;
 
 &lt;p&gt;&lt;strong&gt;2）&lt;/strong&gt; 配置以提高优先级至-5：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;worker_priority -5;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;worker_priority &lt;span class=&quot;nt&quot;&gt;-5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;./nginx -s reload&lt;/code&gt; 重启nginx。&lt;/p&gt;
 
@@ -340,7 +835,7 @@ worker_priority number;
 
 &lt;p&gt;可以看到，&lt;code class=&quot;highlighter-rouge&quot;&gt;worker&lt;/code&gt;进程的&lt;code class=&quot;highlighter-rouge&quot;&gt;nice&lt;/code&gt;值已经修改成了-5。&lt;/p&gt;
 
-&lt;h3 id=&quot;gzip&quot;&gt;2.2 gzip压缩传输数据&lt;/h3&gt;
+&lt;h3 id=&quot;22-gzip压缩传输数据&quot;&gt;2.2 gzip压缩传输数据&lt;/h3&gt;
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;是若干种文件压缩程序的简称，代表&lt;code class=&quot;highlighter-rouge&quot;&gt;GNU zip&lt;/code&gt;。&lt;/p&gt;
 
@@ -350,56 +845,55 @@ worker_priority number;
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;的压缩页面需要浏览器和服务器双方都支持，实际上就是服务器端压缩，传到浏览器后浏览器解压缩并解析。目前的大多数浏览器都支持解析&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;压缩过的页面。&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##gzip压缩功能开关&lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;##gzip压缩功能开关&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#语法 &lt;/span&gt;
-gzip on | off;
+&lt;span class=&quot;nb&quot;&gt;gzip &lt;/span&gt;on | off&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认 &lt;/span&gt;
-gzip off;
+&lt;span class=&quot;nb&quot;&gt;gzip &lt;/span&gt;off&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;##设置response响应的缓冲区大小。32 4k代表以4k为单位将响应数据以4k的32倍(128k)的大小申请内存。如果没有设置，缓冲区的大小默认为整个响应页面的大小。&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#语法 &lt;/span&gt;
-gzip_buffers number size;
+gzip_buffers number size&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认 &lt;/span&gt;
-gzip_buffers 32 4k | 16 8k;
+gzip_buffers 32 4k | 16 8k&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;##设置gzip的压缩级别，可接受的范围是从1到9，数字越大压缩率越高，但更消耗CPU，一般设置6即可。&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
-gzip_comp_level level;
+gzip_comp_level level&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
-gzip_comp_level 1;
+gzip_comp_level 1&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;##设置允许压缩的页面最小字节数，页面字节数从header头中的Content-Length中进行获取。因为过小的文件内容压缩之后效果不明显，甚至会比不压缩时更大，所以一般建议长度不小于1000或者1K。&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
-gzip_min_length length;
+gzip_min_length length&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
-gzip_min_length 20;
+gzip_min_length 20&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;##指定哪些类型的响应才启用gzip压缩，多个用空格分隔。通配符”*”可以匹配任意类型，不管是否指定”text/html”类型，该类型的响应总是启用压缩。一般js、css等文本文件都启用压缩，如application/x-javascript、text/css、application/xml 等。具体的文件类型对应的mimi-type可以参考conf/mime.types文件。例如 jpg / png 这类文件一般不开启，因为图片格式已经是高度压缩过的，再压一遍没什么效果不说还浪费 CPU&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
-gzip_types mime-type ...;
+gzip_types mime-type ...&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
-gzip_types text/html;
+gzip_types text/html&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;##设置gzip压缩所需要的请求的最小HTTP版本，低于该版本不使用gzip压缩。一般不用修改，默认即可。&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
-gzip_http_version 1.0 | 1.1;
+gzip_http_version 1.0 | 1.1&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
-gzip_http_version 1.1;
+gzip_http_version 1.1&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;##如果请求的”User-Agent”头信息能被指定的正则表达式匹配，则对响应禁用gzip压缩功能。主要是为了兼容不支持gzip压缩的浏览器。&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
-gzip_disable regex ...;
+gzip_disable regex ...&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
 —
 
 &lt;span class=&quot;c&quot;&gt;##如果指令gzip,gzip_static或者gunzip被激活的话，启用Vary: Accept-Encoding响应头字段。&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
-gzip_vary on | off;
+gzip_vary on | off&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
-gzip_vary off;
+gzip_vary off&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;我们对nginx做如下配置：&lt;/p&gt;
 
@@ -450,20 +944,20 @@ gzip_vary off;
 
 &lt;p&gt;既然&lt;code class=&quot;highlighter-rouge&quot;&gt;gzip&lt;/code&gt;是内容编码，则压缩是在传输之前进行的，所以传输的分块是按照压缩后的数据分块的。&lt;/p&gt;
 
-&lt;h2 id=&quot;section-6&quot;&gt;参考&lt;/h2&gt;
+&lt;h2 id=&quot;参考&quot;&gt;参考&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://blog.liwenxin.com/2010/11/25/nginx-code-reading-4.html&quot;&gt;nginx源码解析(4)-深入http模块&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://phpor.net/blog/post/2037&quot;&gt;Response与Transfer-Encoding:chunked、Content-Length、Content-Encoding:gzip&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://imququ.com/post/transfer-encoding-header-in-http.html&quot;&gt;HTTP 协议中的 Transfer-Encoding&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary>Nginx performance optimize</summary></entry><entry><title>Linux环境Nginx安全配置</title><link href="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Nginx安全配置" /><published>2016-11-14T00:00:00+00:00</published><updated>2016-11-14T00:00:00+00:00</updated><id>yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu</id><content type="html" xml:base="yazidchen.github.io/2016/11/14/NginxSecuritySettingOnUbuntu/">&lt;h1 id=&quot;nginx-security-for-ubuntu1604&quot;&gt;Nginx Security For Ubuntu16.04&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://imququ.com/post/transfer-encoding-header-in-http.html&quot;&gt;HTTP 协议中的 Transfer-Encoding&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">Nginx performance optimize</summary></entry><entry><title type="html">Linux环境Nginx安全配置</title><link href="http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Nginx安全配置" /><published>2016-11-14T00:00:00+08:00</published><updated>2016-11-14T00:00:00+08:00</updated><id>http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu</id><content type="html" xml:base="http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu/">&lt;h1 id=&quot;nginx-security-for-ubuntu1604&quot;&gt;Nginx Security For Ubuntu16.04&lt;/h1&gt;
 
-&lt;h2 id=&quot;section&quot;&gt;一、隐藏版本号&lt;/h2&gt;
+&lt;h2 id=&quot;一隐藏版本号&quot;&gt;一、隐藏版本号&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://www.freebuf.com/news/9026.html&quot;&gt;nginx爆整数溢出漏洞&lt;/a&gt;
 不怕一万，就怕万一。&lt;/p&gt;
 
-&lt;h3 id=&quot;section-1&quot;&gt;1.1 原始状态&lt;/h3&gt;
+&lt;h3 id=&quot;11-原始状态&quot;&gt;1.1 原始状态&lt;/h3&gt;
 
 &lt;p&gt;原始情况下，访问错误的链接会有暴露版本信息的危险。&lt;/p&gt;
 
@@ -471,100 +965,92 @@ gzip_vary off;
 
 &lt;p&gt;用curl命令查出原始的版本信息：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl -I ddos.jinzhucaifu.com
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-I&lt;/span&gt; ddos.jinzhucaifu.com
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/vBvNuK2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;ngxhttpheaderfiltermodulec&quot;&gt;1.2 修改ngx_http_header_filter_module.c文件&lt;/h3&gt;
+&lt;h3 id=&quot;12-修改ngx_http_header_filter_modulec文件&quot;&gt;1.2 修改ngx_http_header_filter_module.c文件&lt;/h3&gt;
 
 &lt;p&gt;进入nginx源码目录，找到&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_header_filter_module.c&lt;/code&gt;文件进行编辑,找到以下行：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;static char ngx_http_server_string[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Server: nginx&quot;&lt;/span&gt; CRLF;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;static char ngx_http_server_string[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Server: nginx&quot;&lt;/span&gt; CRLF&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;将nginx修改：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;static char ngx_http_server_string[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Server: Yazid&quot;&lt;/span&gt; CRLF;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;static char ngx_http_server_string[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Server: Yazid&quot;&lt;/span&gt; CRLF&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;ngxhttpspecialresponsec&quot;&gt;1.3 修改ngx_http_special_response.c文件&lt;/h3&gt;
+&lt;h3 id=&quot;13-修改ngx_http_special_responsec文件&quot;&gt;1.3 修改ngx_http_special_response.c文件&lt;/h3&gt;
 
 &lt;p&gt;进入nginx源码目录，找到&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_special_response.c&lt;/code&gt;文件进行编辑,找到以下代码段：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;static u_char ngx_http_error_full_tail[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;static u_char ngx_http_error_full_tail[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
 &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;hr&amp;gt;&amp;lt;center&amp;gt;&quot;&lt;/span&gt; NGINX_VER &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/center&amp;gt;&quot;&lt;/span&gt; CRLF
 &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/body&amp;gt;&quot;&lt;/span&gt; CRLF
 &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/html&amp;gt;&quot;&lt;/span&gt; CRLF
-;
+&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 static u_char ngx_http_error_tail[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
 &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;hr&amp;gt;&amp;lt;center&amp;gt;nginx&amp;lt;/center&amp;gt;&quot;&lt;/span&gt; CRLF
 &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/body&amp;gt;&quot;&lt;/span&gt; CRLF
 &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/html&amp;gt;&quot;&lt;/span&gt; CRLF
-;
+&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;将NGINX_VER去除，将nginx修改：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;static u_char ngx_http_error_full_tail[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;static u_char ngx_http_error_full_tail[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
 &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;hr&amp;gt;&amp;lt;center&amp;gt;&quot;&quot;&amp;lt;/center&amp;gt;&quot;&lt;/span&gt; CRLF
 &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/body&amp;gt;&quot;&lt;/span&gt; CRLF
 &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/html&amp;gt;&quot;&lt;/span&gt; CRLF
-;
+&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 static u_char ngx_http_error_tail[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
 &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;hr&amp;gt;&amp;lt;center&amp;gt;Yazid&amp;lt;/center&amp;gt;&quot;&lt;/span&gt; CRLF
 &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/body&amp;gt;&quot;&lt;/span&gt; CRLF
 &lt;span class=&quot;s2&quot;&gt;&quot;&amp;lt;/html&amp;gt;&quot;&lt;/span&gt; CRLF
-;
+&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;nginxh&quot;&gt;1.4 修改nginx.h文件&lt;/h3&gt;
+&lt;h3 id=&quot;14-修改nginxh文件&quot;&gt;1.4 修改nginx.h文件&lt;/h3&gt;
 
 &lt;p&gt;进入nginx源码目录，找到&lt;code class=&quot;highlighter-rouge&quot;&gt;nginx.h&lt;/code&gt;文件进行编辑,找到以下代码段：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#define nginx_version      1011004&lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#define nginx_version      1011004&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#define NGINX_VERSION      &quot;1.11.4&quot;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#define NGINX_VER          &quot;nginx/&quot; NGINX_VERSION&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#define NGINX_VAR          &quot;NGINX&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;将所有敏感信息修改：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#define nginx_version      0&lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#define nginx_version      0&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#define NGINX_VERSION      &quot;0&quot;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#define NGINX_VER          &quot;Yazid/&quot; NGINX_VERSION&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#define NGINX_VAR          &quot;Yazid&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;section-2&quot;&gt;1.5 重新编译&lt;/h3&gt;
+&lt;h3 id=&quot;15-重新编译&quot;&gt;1.5 重新编译&lt;/h3&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#编译&lt;/span&gt;
-&lt;span class=&quot;gp&quot;&gt;root@yazid-chen:/opt/nginx/nginx-1.11.4# &lt;/span&gt;make
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#编译&lt;/span&gt;
+root@yazid-chen:/opt/nginx/nginx-1.11.4# make
 &lt;span class=&quot;c&quot;&gt;#安装&lt;/span&gt;
-&lt;span class=&quot;gp&quot;&gt;root@yazid-chen:/opt/nginx/nginx-1.11.4# &lt;/span&gt;make install
+root@yazid-chen:/opt/nginx/nginx-1.11.4# make &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#启动&lt;/span&gt;
-&lt;span class=&quot;gp&quot;&gt;root@yazid-chen:/opt/nginx/nginx-1.11.4# &lt;/span&gt;/usr/local/nginx/sbin/nginx
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+root@yazid-chen:/opt/nginx/nginx-1.11.4# /usr/local/nginx/sbin/nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;section-3&quot;&gt;1.6 隐藏后状态&lt;/h3&gt;
+&lt;h3 id=&quot;16-隐藏后状态&quot;&gt;1.6 隐藏后状态&lt;/h3&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/VpB6yIF.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/EDN2dFS.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;nginx&quot;&gt;二、给Nginx以普通用户运行的权限&lt;/h2&gt;
+&lt;h2 id=&quot;二给nginx以普通用户运行的权限&quot;&gt;二、给Nginx以普通用户运行的权限&lt;/h2&gt;
 
 &lt;p&gt;nginx服务默认启动用户是nobody&lt;/p&gt;
 
@@ -572,91 +1058,81 @@ static u_char ngx_http_error_tail[] &lt;span class=&quot;o&quot;&gt;=&lt;/span&g
 
 &lt;p&gt;&lt;strong&gt;1)&lt;/strong&gt; 建立nginx用户&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#用户禁止登录，且无家目录&lt;/span&gt;
-useradd nginx -s /sbin/nologin -M
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#用户禁止登录，且无家目录&lt;/span&gt;
+useradd nginx &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; /sbin/nologin &lt;span class=&quot;nt&quot;&gt;-M&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;使用id查看用户：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;id nginx
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;id &lt;/span&gt;nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;strong&gt;2)&lt;/strong&gt; 修改nginx.conf&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;user  nobody;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;user  nobody&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;# 将上句修改为&lt;/span&gt;
-user  nginx;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+user  nginx&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/8KL0RsH.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;3)&lt;/strong&gt; 给关键目录普通用户及组权限&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;chown -R nginx conf/ logs/ sbin/
-chgrp -R nginx conf/ logs/ sbin/
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;chown&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; nginx conf/ logs/ sbin/
+&lt;span class=&quot;nb&quot;&gt;chgrp&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; nginx conf/ logs/ sbin/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;strong&gt;4)&lt;/strong&gt; 普通用户不能通过bind函数绑定小于1024的端口,而root用户可以做到,&lt;code class=&quot;highlighter-rouge&quot;&gt;CAP_NET_BIND_SERVICE&lt;/code&gt;的作用就是让普通用户也可以绑端口到1024以下的端口。让普通用户启动nginx绑定在80端口：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;setcap &lt;span class=&quot;nv&quot;&gt;CAP_NET_BIND_SERVICE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;+ep /usr/local/nginx/sbin/nginx
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;setcap &lt;span class=&quot;nv&quot;&gt;CAP_NET_BIND_SERVICE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;+ep /usr/local/nginx/sbin/nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;setcap&lt;/code&gt;来源于&lt;code class=&quot;highlighter-rouge&quot;&gt;Capabilities&lt;/code&gt;（能力），它打破了UNIX/LINUX操作系统中超级用户/普通用户的概念,由普通用户也可以做只有超级用户可以完成的工作。&lt;code class=&quot;highlighter-rouge&quot;&gt;setcap&lt;/code&gt;可以设置程序文件的能力。另还有&lt;code class=&quot;highlighter-rouge&quot;&gt;getcap&lt;/code&gt;可以获得程序文件所具有的能力，&lt;code class=&quot;highlighter-rouge&quot;&gt;getpcaps&lt;/code&gt;可以获得进程所具有的能力。&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;5)&lt;/strong&gt; 使用非root用户运行：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo -u nginx /usr/local/nginx/sbin/nginx -c /opt/nginx/nginx-1.11.4/conf/nginx.conf 
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; nginx /usr/local/nginx/sbin/nginx &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; /opt/nginx/nginx-1.11.4/conf/nginx.conf 
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;strong&gt;6)&lt;/strong&gt; 校验启动用户&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ps -aux |grep nginx
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ps &lt;span class=&quot;nt&quot;&gt;-aux&lt;/span&gt; |grep nginx
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/5lthdxb.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;section-4&quot;&gt;三、禁用非必要的方法&lt;/h2&gt;
+&lt;h2 id=&quot;三禁用非必要的方法&quot;&gt;三、禁用非必要的方法&lt;/h2&gt;
 
 &lt;p&gt;针对&lt;code class=&quot;highlighter-rouge&quot;&gt;GET&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;POST&lt;/code&gt;以及&lt;code class=&quot;highlighter-rouge&quot;&gt;HEAD&lt;/code&gt;之外的请求，如&lt;code class=&quot;highlighter-rouge&quot;&gt;PATCH&lt;/code&gt;、&lt;code class=&quot;highlighter-rouge&quot;&gt;TRACE&lt;/code&gt;等，直接返回了&lt;code class=&quot;highlighter-rouge&quot;&gt;444&lt;/code&gt;状态码（&lt;code class=&quot;highlighter-rouge&quot;&gt;444&lt;/code&gt;是Nginx定义的响应状态码，会立即断开连接，没有响应正文）。&lt;/p&gt;
 
 &lt;p&gt;具体配置是这样的,在&lt;code class=&quot;highlighter-rouge&quot;&gt;nginx.conf&lt;/code&gt;的&lt;code class=&quot;highlighter-rouge&quot;&gt;Server&lt;/code&gt;中加入以下代码段：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$request_method&lt;/span&gt; !~ ^&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;GET|HEAD|POST&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return    &lt;/span&gt;444;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$request_method&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;~ ^&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;GET|HEAD|POST&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return    &lt;/span&gt;444&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;可用chrome测试，在nginx的日志&lt;code class=&quot;highlighter-rouge&quot;&gt;access.log&lt;/code&gt;中看到效果。&lt;/p&gt;
 
-&lt;h2 id=&quot;section-5&quot;&gt;四、图片防盗链（未测试）&lt;/h2&gt;
+&lt;h2 id=&quot;四图片防盗链未测试&quot;&gt;四、图片防盗链（未测试）&lt;/h2&gt;
 
 &lt;p&gt;配置&lt;code class=&quot;highlighter-rouge&quot;&gt;nginx.conf&lt;/code&gt;:&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;location ~ .&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;gif|jpg|jpeg|png|bmp|swf&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;location ~ .&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\.&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;gif|jpg|jpeg|png|bmp|swf&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; 
-valid_referers none blocked &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;.epinv.com epinv.com &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;.qq.com &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;.baidu.com; 
+valid_referers none blocked &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;.epinv.com epinv.com &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;.qq.com &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;.baidu.com&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
 &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$invalid_referer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; 
-  rewrite ^/ http://www.epinv.com/epinv.png; 
+  rewrite ^/ http://www.epinv.com/epinv.png&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
   &lt;span class=&quot;c&quot;&gt;#return 404; &lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; 
-expires      30d; 
+expires      30d&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
-valid_referers none | blocked | server_names | string ...;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#语法&lt;/span&gt;
+valid_referers none | blocked | server_names | string ...&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;指定合法的来源&lt;code class=&quot;highlighter-rouge&quot;&gt;referer&lt;/code&gt;，他决定了内置变量&lt;code class=&quot;highlighter-rouge&quot;&gt;$invalid_referer&lt;/code&gt;的值，如果&lt;code class=&quot;highlighter-rouge&quot;&gt;referer&lt;/code&gt;头部包含在这个合法网址里面，这个变量被设置为0，否则设置为1。不区分大小写的。&lt;/p&gt;
 
@@ -672,11 +1148,11 @@ valid_referers none | blocked | server_names | string ...;
 
 &lt;p&gt;&lt;strong&gt;特别说明：&lt;/strong&gt;防盗链跳转的地址，不能再是设置防盗链的虚拟主机地址，要用第三个虚拟主机，要不就成死循环了！&lt;/p&gt;
 
-&lt;h2 id=&quot;section-6&quot;&gt;五、限制连接请求数（未测试）&lt;/h2&gt;
+&lt;h2 id=&quot;五限制连接请求数未测试&quot;&gt;五、限制连接请求数（未测试）&lt;/h2&gt;
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_limit_conn_module&lt;/code&gt; 可以限制单个IP的连接数，&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_limit_req_module&lt;/code&gt; 可以限制单个IP每秒请求数，通过限制连接数和请求数能相对有效的防御CC攻击。&lt;/p&gt;
 
-&lt;h3 id=&quot;section-7&quot;&gt;5.1 限制每秒请求数&lt;/h3&gt;
+&lt;h3 id=&quot;51-限制每秒请求数&quot;&gt;5.1 限制每秒请求数&lt;/h3&gt;
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ngx_http_limit_req_module&lt;/code&gt;模块通过漏桶原理来限制单位时间内的请求数，一旦单位时间内请求数超过限制，就会返回503错误。配置需要在两个地方设置：&lt;/p&gt;
 
@@ -685,16 +1161,15 @@ valid_referers none | blocked | server_names | string ...;
   &lt;li&gt;在location内定义达到触发条件时nginx所要执行的动作。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    limit_req_zone &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;one:10m &lt;span class=&quot;nv&quot;&gt;rate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10r/s;//触发条件，所有访问ip限制每秒10个请求
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    limit_req_zone &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;one:10m &lt;span class=&quot;nv&quot;&gt;rate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10r/s&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;//触发条件，所有访问ip限制每秒10个请求
     ...
     server &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
         ...
         location /search/ &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-            limit_req &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;one &lt;span class=&quot;nv&quot;&gt;burst&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;5;
+            limit_req &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;one &lt;span class=&quot;nv&quot;&gt;burst&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;5&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
         &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;strong&gt;参数说明：&lt;/strong&gt;&lt;/p&gt;
 
@@ -706,105 +1181,98 @@ valid_referers none | blocked | server_names | string ...;
   &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;nodelay&lt;/code&gt;：         		超过的请求不被延迟处理，设置后15个请求在1秒内处理。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&quot;ip&quot;&gt;5.2 限制IP连接数&lt;/h3&gt;
+&lt;h3 id=&quot;52-限制ip连接数&quot;&gt;5.2 限制IP连接数&lt;/h3&gt;
 
 &lt;p&gt;设置共享内存区,最大允许连接数对应一个给定的键值。当超过这个极限时,服务器将返回503错误(服务暂时不可用)在回复一个请求:&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;addr:10m;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;addr:10m&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
     ...
     server &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
         ...
         location /download/ &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-            limit_conn addr 1;
+            limit_conn addr 1&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
         &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;以上每个IP只允许1个连接。&lt;/p&gt;
 
 &lt;p&gt;下面的配置将会限制客户端IP连接到nginx服务器的数量，以及与此同时nginx服务器分发到虚拟服务器的总数：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;perip:10m;
-limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$server_name&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;perserver:10m;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;perip:10m&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$server_name&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;perserver:10m&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 ...
 server &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
     ...
-    limit_conn perip 10;
-    limit_conn perserver 100;
+    limit_conn perip 10&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    limit_conn perserver 100&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;设置共享内存区：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#指令&lt;/span&gt;
-limit_conn_zone key &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;name:size;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#指令&lt;/span&gt;
+limit_conn_zone key &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;name:size&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
-limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;addr:10m;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;addr:10m&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;当设置了服务器连接数限制的情况下的日志等级配置，默认error：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#指令&lt;/span&gt;
-limit_conn_log_level info | notice | warn | error;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#指令&lt;/span&gt;
+limit_conn_log_level info | notice | warn | error&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
-limit_conn_log_level error;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+limit_conn_log_level error&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;设置拒绝请求时返回的状态码：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#指令&lt;/span&gt;
-limit_conn_status code;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#指令&lt;/span&gt;
+limit_conn_status code&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;#默认&lt;/span&gt;
-limit_conn_status 503;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+limit_conn_status 503&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;section-8&quot;&gt;5.3 白名单设置&lt;/h3&gt;
+&lt;h3 id=&quot;53-白名单设置&quot;&gt;5.3 白名单设置&lt;/h3&gt;
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;http_limit_conn&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;http_limit_req&lt;/code&gt;模块限制了单ip单位时间内的并发和请求数，但是如果Nginx前面有负载均衡或者反向代理，nginx获取的都是来自负载均衡的连接或请求，这时不应该限制负载均衡的连接和请求，就需要&lt;code class=&quot;highlighter-rouge&quot;&gt;geo&lt;/code&gt;和&lt;code class=&quot;highlighter-rouge&quot;&gt;map&lt;/code&gt;模块设置白名单：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;geo &lt;span class=&quot;nv&quot;&gt;$whiteiplist&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-        default 1;
-        10.11.18.120 0;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;geo &lt;span class=&quot;nv&quot;&gt;$whiteiplist&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        default 1&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        10.11.18.120 0&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 map &lt;span class=&quot;nv&quot;&gt;$whiteiplist&lt;/span&gt;  &lt;span class=&quot;nv&quot;&gt;$limit&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-        1 &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt;;
-        0 &lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;;
+        1 &lt;span class=&quot;nv&quot;&gt;$binary_remote_addr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+        0 &lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-limit_req_zone &lt;span class=&quot;nv&quot;&gt;$limit&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;one:10m &lt;span class=&quot;nv&quot;&gt;rate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10r/s;
-limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$limit&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;addr:10m;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+limit_req_zone &lt;span class=&quot;nv&quot;&gt;$limit&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;one:10m &lt;span class=&quot;nv&quot;&gt;rate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10r/s&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$limit&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;zone&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;addr:10m&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;geo&lt;/code&gt;模块定义了一个默认值是1的变量&lt;code class=&quot;highlighter-rouge&quot;&gt;whiteiplist&lt;/code&gt;,并加入白名单IP，其变量&lt;code class=&quot;highlighter-rouge&quot;&gt;whiteiplist&lt;/code&gt;的值为0。&lt;/p&gt;
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;whiteiplist&lt;/code&gt;的值对应着&lt;code class=&quot;highlighter-rouge&quot;&gt;map&lt;/code&gt;模块。1则受限，0则不受限。&lt;/p&gt;
 
-&lt;h2 id=&quot;section-9&quot;&gt;参考&lt;/h2&gt;
+&lt;h2 id=&quot;参考&quot;&gt;参考&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&quot;http://www.bkjia.com/Linux/1124560.html&quot;&gt;Nginx安全优化之隐藏版本号&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://imququ.com/post/my-nginx-conf-for-security.html#simple_thread&quot;&gt;本博客 Nginx 配置之安全篇&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://nginx.org/en/docs/&quot;&gt;nginx documentation&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary>Nginx Security For Ubuntu16.04</summary></entry><entry><title>定时切分Nginx日志</title><link href="yazidchen.github.io/2016/10/12/CutNginxLog/" rel="alternate" type="text/html" title="定时切分Nginx日志" /><published>2016-10-12T00:00:00+00:00</published><updated>2016-10-12T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/12/CutNginxLog</id><content type="html" xml:base="yazidchen.github.io/2016/10/12/CutNginxLog/">&lt;h1 id=&quot;section&quot;&gt;一、编写日志自动切割脚本&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;http://nginx.org/en/docs/&quot;&gt;nginx documentation&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">Nginx Security For Ubuntu16.04</summary></entry><entry><title type="html">定时切分Nginx日志</title><link href="http://localhost:4000/2016/10/12/CutNginxLog/" rel="alternate" type="text/html" title="定时切分Nginx日志" /><published>2016-10-12T00:00:00+08:00</published><updated>2016-10-12T00:00:00+08:00</updated><id>http://localhost:4000/2016/10/12/CutNginxLog</id><content type="html" xml:base="http://localhost:4000/2016/10/12/CutNginxLog/">&lt;h1 id=&quot;一编写日志自动切割脚本&quot;&gt;一、编写日志自动切割脚本&lt;/h1&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim /usr/local/nginx/sbin/cut_nginx_log.sh
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim /usr/local/nginx/sbin/cut_nginx_log.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;脚本编写：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#!/bin/bash&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;# author YazidChen&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;# 一般设定切割时间是0点，切除昨天的日志。&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;DATE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;date -d &lt;span class=&quot;s2&quot;&gt;&quot;yesterday&quot;&lt;/span&gt; +&lt;span class=&quot;s2&quot;&gt;&quot;%Y%m%d&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;DATE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;date&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-d&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;yesterday&quot;&lt;/span&gt; +&lt;span class=&quot;s2&quot;&gt;&quot;%Y%m%d&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/usr/local/nginx/logs/
 &lt;span class=&quot;nv&quot;&gt;ACCESS_LOG_NAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;access.log
 &lt;span class=&quot;nv&quot;&gt;ERROR_LOG_NAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;error.log
@@ -813,35 +1281,31 @@ limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$limit&lt;/span&gt; &lt;span cl
 &lt;span class=&quot;nv&quot;&gt;PID_PATH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/usr/local/nginx/logs/nginx.pid
 
 &lt;span class=&quot;c&quot;&gt;# 重命名原始日志文件&lt;/span&gt;
-mv &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ACCESS_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CUT_ACCESS_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;
-mv &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ERROR_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CUT_ERROR_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;mv&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ACCESS_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CUT_ACCESS_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;mv&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ERROR_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;LOG_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CUT_ERROR_LOG_NAME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;# 向nginx主进程发信号，重新打开日志文件，当原始文件不存在时，重新生成新的日志文件access.log及error.log&lt;/span&gt;
-&lt;span class=&quot;nb&quot;&gt;kill&lt;/span&gt; -USR1 &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;cat &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;PID_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;span class=&quot;nb&quot;&gt;kill&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-USR1&lt;/span&gt; &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;PID_PATH&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h1 id=&quot;section-1&quot;&gt;二、设置定时执行脚本&lt;/h1&gt;
+&lt;h1 id=&quot;二设置定时执行脚本&quot;&gt;二、设置定时执行脚本&lt;/h1&gt;
 
 &lt;p&gt;&lt;strong&gt;1、&lt;/strong&gt;给脚本执行权限：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;chmod +x cut_nginx_log.sh 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;chmod&lt;/span&gt; +x cut_nginx_log.sh 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;strong&gt;2、&lt;/strong&gt;使用crontab工具添加定时任务：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 编辑crontab文件&lt;/span&gt;
-crontab -e
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 编辑crontab文件&lt;/span&gt;
+crontab &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;strong&gt;3、&lt;/strong&gt;编写定时任务，保存退出：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 每天0点执行任务&lt;/span&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 每天0点执行任务&lt;/span&gt;
 0 0 &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; /bin/sh /usr/local/nginx/sbin/cut_nginx_log.sh
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;为方便测试将时间修改：&lt;/p&gt;
 
@@ -853,20 +1317,19 @@ crontab -e
 
 &lt;p&gt;测试中可能会使用到以下命令：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 列出crontab文件内容&lt;/span&gt;
-crontab -l
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 列出crontab文件内容&lt;/span&gt;
+crontab &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;# 删除crontab文件&lt;/span&gt;
-crontab -r
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+crontab &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h1 id=&quot;section-2&quot;&gt;参考&lt;/h1&gt;
+&lt;h1 id=&quot;参考&quot;&gt;参考&lt;/h1&gt;
 
 &lt;p&gt;本文参考以下文章，在此对原作者表示感谢！&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://pvbutler.blog.51cto.com/7662323/1653088&quot;&gt;Linux下定时切割nginx日志并删除指定天数前的日志记录&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary>一、编写日志自动切割脚本</summary></entry><entry><title>以Log4j切分Tomcat日志</title><link href="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/" rel="alternate" type="text/html" title="以Log4j切分Tomcat日志" /><published>2016-10-09T00:00:00+00:00</published><updated>2016-10-09T00:00:00+00:00</updated><id>yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j</id><content type="html" xml:base="yazidchen.github.io/2016/10/09/CutTomcatLogByLog4j/">&lt;h1 id=&quot;log4jproperties&quot;&gt;一、Log4j.properties解析&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;http://pvbutler.blog.51cto.com/7662323/1653088&quot;&gt;Linux下定时切割nginx日志并删除指定天数前的日志记录&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">一、编写日志自动切割脚本</summary></entry><entry><title type="html">以Log4j切分Tomcat日志</title><link href="http://localhost:4000/2016/10/09/CutTomcatLogByLog4j/" rel="alternate" type="text/html" title="以Log4j切分Tomcat日志" /><published>2016-10-09T00:00:00+08:00</published><updated>2016-10-09T00:00:00+08:00</updated><id>http://localhost:4000/2016/10/09/CutTomcatLogByLog4j</id><content type="html" xml:base="http://localhost:4000/2016/10/09/CutTomcatLogByLog4j/">&lt;h1 id=&quot;一log4jproperties解析&quot;&gt;一、Log4j.properties解析&lt;/h1&gt;
 
-&lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 根日志的级别定义为 DEBUG，并将名为 CATALINA 的 appender 添加其上。
+&lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 根日志的级别定义为 DEBUG，并将名为 CATALINA 的 appender 添加其上。
 &lt;/span&gt;&lt;span class=&quot;py&quot;&gt;log4j.rootLogger&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DEBUG, CATALINA&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;# 将名为 CATALINA 的 appender 设置为DailyRollingFileAppender。
@@ -893,8 +1356,7 @@ crontab -r
 &lt;span class=&quot;c&quot;&gt;# layout 被定义为 %m%n，即打印出来的日志信息末尾加入换行。
 &lt;/span&gt;&lt;span class=&quot;py&quot;&gt;log4j.appender.CATALINA.layout.conversionPattern&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;%m%n&lt;/span&gt;
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;conversionPattern&lt;/code&gt;可以自定义log的格式，相关参数有：&lt;/p&gt;
 
@@ -912,9 +1374,9 @@ crontab -r
   &lt;li&gt;%x 输出和当前线程相关联的NDC(嵌套诊断环境),尤其用到像java servlets这样的多客户多线程的应用中。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&quot;log4jcatalinaout&quot;&gt;二、使用Log4j接管catalina.out&lt;/h1&gt;
+&lt;h1 id=&quot;二使用log4j接管catalinaout&quot;&gt;二、使用Log4j接管catalina.out&lt;/h1&gt;
 
-&lt;h2 id=&quot;section&quot;&gt;2.1 接管前置准备&lt;/h2&gt;
+&lt;h2 id=&quot;21-接管前置准备&quot;&gt;2.1 接管前置准备&lt;/h2&gt;
 
 &lt;p&gt;我们先来了解一下&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME/bin/&lt;/code&gt;下的&lt;code class=&quot;highlighter-rouge&quot;&gt;catalina.sh&lt;/code&gt;的日志输出代码段：&lt;/p&gt;
 
@@ -922,33 +1384,31 @@ crontab -r
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_OUT&lt;/code&gt;是日志存放地址，默认为&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_BASE/logs/catalina.out&lt;/code&gt;，而&lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;gt;&amp;gt; &quot;$CATALINA_OUT&quot; 2&amp;gt;&amp;amp;1 &quot;&amp;amp;&quot;&lt;/code&gt;则是将启动时的主线程日志输出到&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_OUT&lt;/code&gt;中。&lt;/p&gt;
 
-&lt;h4 id=&quot;section-1&quot;&gt;前置一&lt;/h4&gt;
+&lt;h4 id=&quot;前置一&quot;&gt;前置一&lt;/h4&gt;
 
 &lt;p&gt;假如你要分割后的主日志名还是&lt;code class=&quot;highlighter-rouge&quot;&gt;catalina.out&lt;/code&gt;，那这个文件可不必修改，跳过此步骤，只需修改接下来要讲的&lt;code class=&quot;highlighter-rouge&quot;&gt;log4j.properties&lt;/code&gt;文件即可；倘若你要修改主日志文件名为其他文件名，则需要修改&lt;code class=&quot;highlighter-rouge&quot;&gt;catalina.sh&lt;/code&gt;文件：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; -z &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CATALINA_OUT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; ; &lt;span class=&quot;k&quot;&gt;then
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-z&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CATALINA_OUT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
   &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CATALINA_OUT&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CATALINA_BASE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/logs/catalina.out
 &lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;# 修改为你的日志路径，在这里我设置主日志文件名为&quot;catalina.&quot;&lt;/span&gt;
 
-&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; -z &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CATALINA_OUT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; ; &lt;span class=&quot;k&quot;&gt;then
+&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-z&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CATALINA_OUT&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;then
   &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CATALINA_OUT&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$CATALINA_BASE&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;/logs/catalina.
 &lt;span class=&quot;k&quot;&gt;fi&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h4 id=&quot;section-2&quot;&gt;前置二&lt;/h4&gt;
+&lt;h4 id=&quot;前置二&quot;&gt;前置二&lt;/h4&gt;
 
 &lt;p&gt;重命名&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME/bin/&lt;/code&gt;下的&lt;code class=&quot;highlighter-rouge&quot;&gt;logging.properties&lt;/code&gt;成其他名字，该文件不需要了，建议重命名保留:&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mv logging.properties loggin.properties
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;mv &lt;/span&gt;logging.properties loggin.properties
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h2 id=&quot;section-3&quot;&gt;2.2 切分方式&lt;/h2&gt;
+&lt;h2 id=&quot;22-切分方式&quot;&gt;2.2 切分方式&lt;/h2&gt;
 
-&lt;h3 id=&quot;section-4&quot;&gt;2.2.1 按时间切分&lt;/h3&gt;
+&lt;h3 id=&quot;221-按时间切分&quot;&gt;2.2.1 按时间切分&lt;/h3&gt;
 
 &lt;p&gt;如需按时段生成日志文件，需要使用&lt;code class=&quot;highlighter-rouge&quot;&gt;org.apache.Log4j.DailyRollingFileAppender&lt;/code&gt;，该类继承了&lt;code class=&quot;highlighter-rouge&quot;&gt;FileAppender&lt;/code&gt;类。该类多包涵了一个重要的属性：&lt;code class=&quot;highlighter-rouge&quot;&gt;DatePattern&lt;/code&gt;,该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。&lt;/p&gt;
 
@@ -965,7 +1425,7 @@ crontab -r
 
 &lt;p&gt;在项目中添加或修改&lt;code class=&quot;highlighter-rouge&quot;&gt;log4j.properties&lt;/code&gt;文件:&lt;/p&gt;
 
-&lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;py&quot;&gt;log4j.rootLogger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;INFO, CATALINA&lt;/span&gt;
+&lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;py&quot;&gt;log4j.rootLogger&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;INFO, CATALINA&lt;/span&gt;
 
 &lt;span class=&quot;py&quot;&gt;log4j.appender.CATALINA&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;org.apache.log4j.DailyRollingFileAppender&lt;/span&gt;
 &lt;span class=&quot;c&quot;&gt;# 此处文件路径对应前置准备中设置的路径
@@ -996,13 +1456,13 @@ crontab -r
 &lt;span class=&quot;py&quot;&gt;log4j.appender.MANAGER.layout&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;org.apache.log4j.PatternLayout&lt;/span&gt;
 &lt;span class=&quot;py&quot;&gt;log4j.appender.MANAGER.layout.ConversionPattern&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;%d [%t] %-5p %c- %m%n&lt;/span&gt;
 
-&lt;span class=&quot;err&quot;&gt;log4j.appender.HOST-&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;MANAGER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;org.apache.log4j.DailyRollingFileAppender&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;log4j.appender.HOST-&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;MANAGER.File&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;${catalina.base}/logs/host-manager.&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;log4j.appender.HOST-&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;MANAGER.Append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;true&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;log4j.appender.HOST-&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;MANAGER.Encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;UTF-8&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;log4j.appender.HOST-&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;MANAGER.DatePattern&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;yyyy-MM-dd-HH-mm'.log'&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;log4j.appender.HOST-&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;MANAGER.layout&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;org.apache.log4j.PatternLayout&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;log4j.appender.HOST-&lt;/span&gt;&lt;span class=&quot;py&quot;&gt;MANAGER.layout.ConversionPattern&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;%d [%t] %-5p %c- %m%n&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;log4j.appender.HOST-MANAGER&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;org.apache.log4j.DailyRollingFileAppender&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;log4j.appender.HOST-MANAGER.File&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;${catalina.base}/logs/host-manager.&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;log4j.appender.HOST-MANAGER.Append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;true&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;log4j.appender.HOST-MANAGER.Encoding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;UTF-8&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;log4j.appender.HOST-MANAGER.DatePattern&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;yyyy-MM-dd-HH-mm'.log'&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;log4j.appender.HOST-MANAGER.layout&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;org.apache.log4j.PatternLayout&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;log4j.appender.HOST-MANAGER.layout.ConversionPattern&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;%d [%t] %-5p %c- %m%n&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;# 配置哪个loggers属于哪个appenders，按需选择配置
 &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=INFO,&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;LOCALHOST&lt;/span&gt;
@@ -1011,10 +1471,9 @@ crontab -r
 &lt;span class=&quot;err&quot;&gt;log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/host-manager]=&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\
 &lt;/span&gt;  &lt;span class=&quot;err&quot;&gt;INFO,&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;HOST-MANAGER&lt;/span&gt;
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;section-5&quot;&gt;2.2.2 按日志文件大小拆分&lt;/h3&gt;
+&lt;h3 id=&quot;222-按日志文件大小拆分&quot;&gt;2.2.2 按日志文件大小拆分&lt;/h3&gt;
 
 &lt;p&gt;如需按日志文件大小分割日志，则需要使用 org.apache.Log4j.RollingFileAppender，该类继承了 FileAppender 类，继承了它的所有属性。
 该类多包括了以下可配置属性：&lt;/p&gt;
@@ -1026,45 +1485,42 @@ crontab -r
 
 &lt;p&gt;对log4j.properties配置引入以下关键项：&lt;/p&gt;
 
-&lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 设置日志文件阀值最大为5MB
+&lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 设置日志文件阀值最大为5MB
 &lt;/span&gt;&lt;span class=&quot;py&quot;&gt;Log4j.appender.CATALINA.MaxFileSize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;5MB&lt;/span&gt;
 
 &lt;span class=&quot;c&quot;&gt;# 设置日志文件个数为2
 &lt;/span&gt;&lt;span class=&quot;py&quot;&gt;Log4j.appender.CATALINA.MaxBackupIndex&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;该示例配置文件展示了每个日志文件最大为 5 MB，如果超过该最大值，则会生成一个新的日志文件。由于 &lt;code class=&quot;highlighter-rouge&quot;&gt;maxBackupIndex&lt;/code&gt; 的值为 2，当第二个文件的大小超过最大值时，会擦去第一个日志文件的内容，所有的日志都回滚至第一个日志文件。&lt;/p&gt;
 
-&lt;h1 id=&quot;section-6&quot;&gt;参考&lt;/h1&gt;
+&lt;h1 id=&quot;参考&quot;&gt;参考&lt;/h1&gt;
 &lt;p&gt;本文参考以下文章，在此对原作者表示感谢！&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://my.oschina.net/jsan/blog/205669&quot;&gt;Tomcat下使用Log4j 接管 catalina.out 日志文件生成方式&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary>一、Log4j.properties解析</summary></entry><entry><title>Linux环境Tomcat安全配置</title><link href="yazidchen.github.io/2016/09/13/TomcatSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Tomcat安全配置" /><published>2016-09-13T00:00:00+00:00</published><updated>2016-09-13T00:00:00+00:00</updated><id>yazidchen.github.io/2016/09/13/TomcatSecuritySettingOnUbuntu</id><content type="html" xml:base="yazidchen.github.io/2016/09/13/TomcatSecuritySettingOnUbuntu/">&lt;h1 id=&quot;tomcat-security-for-ubuntu1604&quot;&gt;Tomcat Security For Ubuntu16.04&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://my.oschina.net/jsan/blog/205669&quot;&gt;Tomcat下使用Log4j 接管 catalina.out 日志文件生成方式&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">一、Log4j.properties解析</summary></entry><entry><title type="html">Linux环境Tomcat安全配置</title><link href="http://localhost:4000/2016/09/13/TomcatSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Tomcat安全配置" /><published>2016-09-13T00:00:00+08:00</published><updated>2016-09-13T00:00:00+08:00</updated><id>http://localhost:4000/2016/09/13/TomcatSecuritySettingOnUbuntu</id><content type="html" xml:base="http://localhost:4000/2016/09/13/TomcatSecuritySettingOnUbuntu/">&lt;h1 id=&quot;tomcat-security-for-ubuntu1604&quot;&gt;Tomcat Security For Ubuntu16.04&lt;/h1&gt;
 
-&lt;h2 id=&quot;section&quot;&gt;一、权限&lt;/h2&gt;
+&lt;h2 id=&quot;一权限&quot;&gt;一、权限&lt;/h2&gt;
 
-&lt;h3 id=&quot;tomcat&quot;&gt;1.1 创建tomcat用户&lt;/h3&gt;
+&lt;h3 id=&quot;11-创建tomcat用户&quot;&gt;1.1 创建tomcat用户&lt;/h3&gt;
 
 &lt;p&gt;为了提高系统安全，tomcat不应该使用root运行。为它创建一个新用户和组。
 创建一个tomcat组：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo groupadd tomcat
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo groupadd tomcat
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;创建一个叫tomcat的用户：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;tomcat用户属于tomcat组，家目录是&lt;code class=&quot;highlighter-rouge&quot;&gt;/opt/tomcat&lt;/code&gt;，我要把tomcat安装在这个目录。&lt;code class=&quot;highlighter-rouge&quot;&gt;/bin/false&lt;/code&gt;代表这个用户是不能登录的。&lt;/p&gt;
 
-&lt;h3 id=&quot;section-1&quot;&gt;1.2 更改权限&lt;/h3&gt;
+&lt;h3 id=&quot;12-更改权限&quot;&gt;1.2 更改权限&lt;/h3&gt;
 
 &lt;p&gt;赋给tomcat用户各种权限：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd /opt
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd /opt
 sudo chgrp -R tomcat tomcat
 
 cd /opt/tomcat
@@ -1072,48 +1528,43 @@ sudo chgrp -R tomcat conf
 sudo chmod g+rwx conf
 sudo chmod g+r conf/*
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;修改各种目录的所有者：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd /opt
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd /opt
 sudo chown -R tomcat tomcat
 
 cd /opt/tomcat
 sudo chown -R tomcat webapps/ work/ temp/ logs/ bin/ lib/
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;section-2&quot;&gt;1.3 配置定时登出&lt;/h3&gt;
+&lt;h3 id=&quot;13-配置定时登出&quot;&gt;1.3 配置定时登出&lt;/h3&gt;
 
 &lt;p&gt;如果使用启用了Tomcat用户，则需要设置Tomcat定时登出，将&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME\conf\server.xml&lt;/code&gt;配置如下：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;Connector port=&quot;8080&quot; protocol=&quot;HTTP/1.1&quot;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;Connector port=&quot;8080&quot; protocol=&quot;HTTP/1.1&quot;
            connectionTimeout=&quot;20000&quot;
            redirectPort=&quot;8443&quot; /&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h2 id=&quot;section-3&quot;&gt;二、配置开机启动&lt;/h2&gt;
+&lt;h2 id=&quot;二配置开机启动&quot;&gt;二、配置开机启动&lt;/h2&gt;
 
 &lt;p&gt;我们需要把tomcat配置为服务，为了做到这一点，需要创建systemd服务配置文件。&lt;/p&gt;
 
 &lt;p&gt;使用下面命令查看Java安装路径：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo update-java-alternatives -l
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo update-java-alternatives -l
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;现在在&lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/systemd/system&lt;/code&gt;目录创建服务文件tomcat.service：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo vim /etc/systemd/system/tomcat.service
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo vim /etc/systemd/system/tomcat.service
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;tomcat.service内容如下：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[Unit]
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[Unit]
 Description=Apache Tomcat Web Application Container
 After=network.target
  
@@ -1135,88 +1586,79 @@ Group=tomcat
  
 [Install]
 WantedBy=multi-user.target
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;替换JAVA_HOME的值，注意在路径后加jre；上面配置内存要根据需要修改。&lt;/p&gt;
 
 &lt;p&gt;修改完成之后，重新加载systemd：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo systemctl daemon-reload
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo systemctl daemon-reload
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;启动tomcat：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo systemctl enable tomcat
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo systemctl enable tomcat
 sudo systemctl start tomcat
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;确认tomcat启动状态：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo systemctl status tomcat
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo systemctl status tomcat
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/wD55zo0.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;section-4&quot;&gt;三、安全加固配置&lt;/h2&gt;
+&lt;h2 id=&quot;三安全加固配置&quot;&gt;三、安全加固配置&lt;/h2&gt;
 
-&lt;h3 id=&quot;section-5&quot;&gt;3.1 删除应用包&lt;/h3&gt;
+&lt;h3 id=&quot;31-删除应用包&quot;&gt;3.1 删除应用包&lt;/h3&gt;
 
 &lt;p&gt;除了需要部署上去的应用，其余位于&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME\webapps&lt;/code&gt;文件夹中的应用如docs、examples、host-manager、manager和ROOT，若无业务必要，请执行删除上述的应用包。&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;rm -rf docs/ examples/ host-manager/ manager/ ROOT/
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;rm -rf docs/ examples/ host-manager/ manager/ ROOT/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;tomcat-1&quot;&gt;3.2 禁止Tomcat目录列表&lt;/h3&gt;
+&lt;h3 id=&quot;32-禁止tomcat目录列表&quot;&gt;3.2 禁止Tomcat目录列表&lt;/h3&gt;
 
 &lt;p&gt;确保&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME\conf\web.xml&lt;/code&gt;中listings的值为false：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;init-param&amp;gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;init-param&amp;gt;
     &amp;lt;param-name&amp;gt;listings&amp;lt;/param-name&amp;gt;
     &amp;lt;param-value&amp;gt;false&amp;lt;/param-value&amp;gt;
 &amp;lt;/init-param&amp;gt;
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;cookiehttponly&quot;&gt;3.3 设置Cookie的HttpOnly属性&lt;/h3&gt;
+&lt;h3 id=&quot;33-设置cookie的httponly属性&quot;&gt;3.3 设置Cookie的HttpOnly属性&lt;/h3&gt;
 
 &lt;p&gt;如果您在cookie中设置了HttpOnly属性，那么通过js脚本将无法读取到cookie信息，这样能有效的防止XSS攻击。&lt;/p&gt;
 
 &lt;p&gt;在&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME\conf\context.xml&lt;/code&gt;文件中添加&lt;code class=&quot;highlighter-rouge&quot;&gt;useHttpOnly=&quot;true&quot;&lt;/code&gt;配置如下：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;Context useHttpOnly=&quot;true&quot;&amp;gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;Context useHttpOnly=&quot;true&quot;&amp;gt;
     &amp;lt;WatchedResource&amp;gt;WEB-INF/web.xml&amp;lt;/WatchedResource&amp;gt;
     &amp;lt;WatchedResource&amp;gt;${catalina.base}/conf/web.xml&amp;lt;/WatchedResource&amp;gt;
 &amp;lt;/Context&amp;gt;
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;进入项目路径找到web.xml：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@yazid-chen:/opt/tomcat/webapps/api/WEB-INF# vim web.xml 
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@yazid-chen:/opt/tomcat/webapps/api/WEB-INF# vim web.xml 
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;加入http-only配置：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;session-config&amp;gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;session-config&amp;gt;
       &amp;lt;session-timeout&amp;gt;30&amp;lt;/session-timeout&amp;gt;
       &amp;lt;cookie-config&amp;gt;
             &amp;lt;http-only&amp;gt;true&amp;lt;/http-only&amp;gt;
             &amp;lt;secure&amp;gt;true&amp;lt;/secure&amp;gt;
       &amp;lt;/cookie-config&amp;gt;
 &amp;lt;/session-config&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;shutdown&quot;&gt;3.4 配置shutdown端口&lt;/h3&gt;
+&lt;h3 id=&quot;34-配置shutdown端口&quot;&gt;3.4 配置shutdown端口&lt;/h3&gt;
 
 &lt;p&gt;在&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME\conf\server.xml&lt;/code&gt;中有&lt;code class=&quot;highlighter-rouge&quot;&gt;“&amp;lt;Server port=&quot;8005&quot; shutdown=&quot;SHUTDOWN&quot;&amp;gt;”&lt;/code&gt;的配置。&lt;/p&gt;
 
@@ -1226,63 +1668,57 @@ sudo systemctl start tomcat
 
 &lt;p&gt;配置如下：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;Serverport=&quot;未被占用的端口&quot; shutdown=&quot;较为复杂的字符串&quot;&amp;gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;Serverport=&quot;未被占用的端口&quot; shutdown=&quot;较为复杂的字符串&quot;&amp;gt;
 #注：配置的端口需要大于1024。
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;tomcat-2&quot;&gt;3.5 隐藏Tomcat版本信息&lt;/h3&gt;
+&lt;h3 id=&quot;35-隐藏tomcat版本信息&quot;&gt;3.5 隐藏Tomcat版本信息&lt;/h3&gt;
 
 &lt;p&gt;在默认配置下，当应用出现异常时，客户端会显示Tomcat的版本信息。攻击者可以根据Tomcat版本信息选择漏洞库攻击，所以需要将Tomcat的版本信息隐藏，解压&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME\lib\catalina.jar&lt;/code&gt;：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@yazid-chen:/opt/tomcat/lib# jar xf catalina.jar 
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;root@yazid-chen:/opt/tomcat/lib# jar xf catalina.jar 
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;将&lt;code class=&quot;highlighter-rouge&quot;&gt;\org\apache\catalina\util&lt;/code&gt;中的配置ServerInfo.properties如下,info和number随意：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;server.info=Server
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;server.info=Server
 server.number=Y
 server.built=Jul 4 2016 18:22:47 UTC
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;war&quot;&gt;3.6 关闭war自动部署&lt;/h3&gt;
+&lt;h3 id=&quot;36-关闭war自动部署&quot;&gt;3.6 关闭war自动部署&lt;/h3&gt;
 
 &lt;p&gt;默认的配置war放在&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME\webapps&lt;/code&gt;中会自动部署，所以关闭war自动部署防止被植入木马等恶意程序。将&lt;code class=&quot;highlighter-rouge&quot;&gt;$CATALINA_HOME\conf\server.xml&lt;/code&gt;配置如下：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;Host name=&quot;localhost&quot;  appBase=&quot;webapps&quot;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;Host name=&quot;localhost&quot;  appBase=&quot;webapps&quot;
       unpackWARs=&quot;false&quot; autoDeploy=&quot;false&quot;&amp;gt;
 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;ajp&quot;&gt;3.7 管理AJP端口&lt;/h3&gt;
+&lt;h3 id=&quot;37-管理ajp端口&quot;&gt;3.7 管理AJP端口&lt;/h3&gt;
 
 &lt;p&gt;AJP是为 Tomcat 与 HTTP 服务器之间通信而定制的协议，能提供较高的通信速度和效率。如果tomcat前端放的是apache的时候，会使用到AJP这个连接器。如果用nginx做的反向代理，因此不使用此连接器，因此需要注销掉该连接器。&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;!--
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;!--
     &amp;lt;Connector port=&quot;8009&quot; protocol=&quot;AJP/1.3&quot; redirectPort=&quot;8443&quot; /&amp;gt;
 --&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;tomcat-3&quot;&gt;3.8 用普通用户启动Tomcat&lt;/h3&gt;
+&lt;h3 id=&quot;38-用普通用户启动tomcat&quot;&gt;3.8 用普通用户启动Tomcat&lt;/h3&gt;
 
 &lt;p&gt;用root用户启动tomcat有一个严重的问题，那就是tomcat具有root权限。这意味着你的任何一个jsp脚本都具有root权限，所以可以轻易地用jsp脚本删除你整个硬盘里的东西！所以我们最好不要使用root启动tomcat。&lt;/p&gt;
 
 &lt;p&gt;权限修改见上文1.2所示。&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#查看由哪个用户启动
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#查看由哪个用户启动
 ps aux | grep tomcat 
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/24sEcMq.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;section-6&quot;&gt;参考&lt;/h2&gt;
+&lt;h2 id=&quot;参考&quot;&gt;参考&lt;/h2&gt;
 
 &lt;p&gt;本文参考以下文章，在此对原作者表示感谢！&lt;/p&gt;
 
@@ -1290,7 +1726,7 @@ ps aux | grep tomcat
 
 &lt;p&gt;&lt;a href=&quot;http://www.51itong.net/tomcat-4687.html&quot;&gt;Tomcat安全加固配置手册&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://www.tuicool.com/articles/BRF732f&quot;&gt;Tomcat 安全配置与性能优化&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary>Tomcat Security For Ubuntu16.04</summary></entry><entry><title>Win环境Jekyll+Markdown+Github Pages搭建个人Blogs</title><link href="yazidchen.github.io/2016/08/19/CreateBlogsForJekyllOnGithub/" rel="alternate" type="text/html" title="Win环境Jekyll+Markdown+Github Pages搭建个人Blogs" /><published>2016-08-19T00:00:00+00:00</published><updated>2016-08-19T00:00:00+00:00</updated><id>yazidchen.github.io/2016/08/19/CreateBlogsForJekyllOnGithub</id><content type="html" xml:base="yazidchen.github.io/2016/08/19/CreateBlogsForJekyllOnGithub/">&lt;h2 id=&quot;github-pages&quot;&gt;开启Github Pages&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.tuicool.com/articles/BRF732f&quot;&gt;Tomcat 安全配置与性能优化&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">Tomcat Security For Ubuntu16.04</summary></entry><entry><title type="html">Win环境Jekyll+Markdown+Github Pages搭建个人Blogs</title><link href="http://localhost:4000/2016/08/19/CreateBlogsForJekyllOnGithub/" rel="alternate" type="text/html" title="Win环境Jekyll+Markdown+Github Pages搭建个人Blogs" /><published>2016-08-19T00:00:00+08:00</published><updated>2016-08-19T00:00:00+08:00</updated><id>http://localhost:4000/2016/08/19/CreateBlogsForJekyllOnGithub</id><content type="html" xml:base="http://localhost:4000/2016/08/19/CreateBlogsForJekyllOnGithub/">&lt;h2 id=&quot;开启github-pages&quot;&gt;开启Github Pages&lt;/h2&gt;
 
 &lt;p&gt;&lt;strong&gt;1、&lt;/strong&gt;在github中建立一个基于你的用户名的repository&lt;/p&gt;
 
@@ -1308,9 +1744,9 @@ ps aux | grep tomcat
 
 &lt;p&gt;&lt;img src=&quot;http://i.imgur.com/RhpshMR.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;jekyll&quot;&gt;部署Jekyll&lt;/h2&gt;
+&lt;h2 id=&quot;部署jekyll&quot;&gt;部署Jekyll&lt;/h2&gt;
 
-&lt;h3 id=&quot;rubyrubygems&quot;&gt;安装Ruby、RubyGems&lt;/h3&gt;
+&lt;h3 id=&quot;安装rubyrubygems&quot;&gt;安装Ruby、RubyGems&lt;/h3&gt;
 
 &lt;p&gt;&lt;strong&gt;1、&lt;/strong&gt;下载&lt;a href=&quot;http://rubyinstaller.org/downloads/&quot; title=&quot;RubyInstallers&quot;&gt;http://rubyinstaller.org/downloads/&lt;/a&gt;安装&lt;/p&gt;
 
@@ -1327,34 +1763,32 @@ ps aux | grep tomcat
   &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ruby setup.rb&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&quot;jekyll-1&quot;&gt;安装Jekyll&lt;/h3&gt;
+&lt;h3 id=&quot;安装jekyll&quot;&gt;安装Jekyll&lt;/h3&gt;
 
 &lt;ul&gt;
   &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;gem install jekyll&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&quot;blog&quot;&gt;创建本地blog站点&lt;/h3&gt;
+&lt;h3 id=&quot;创建本地blog站点&quot;&gt;创建本地blog站点&lt;/h3&gt;
 
 &lt;ul&gt;
   &lt;li&gt;cd进入想要存放blog的目录&lt;/li&gt;
   &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;jekyll new YazidChen.Github.io&lt;/code&gt;（目录名自拟）&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&quot;section&quot;&gt;开启站点服务&lt;/h3&gt;
+&lt;h3 id=&quot;开启站点服务&quot;&gt;开启站点服务&lt;/h3&gt;
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;jekll serve&lt;/code&gt; 开启服务。可能会报错，一般为缺少包，根据报错做相应处理&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gem install bundler
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gem install bundler
 gem install minima
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;minima报错时，在\Ruby23-x64\lib\ruby\gems\2.3.0\gems\jekyll-3.2.1\lib\jekyll目录下找到layout.rb，进行如下操作&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# Replace Line 38 with:
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# Replace Line 38 with:
 
 @path = base + &quot;/&quot; + name
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;section-1&quot;&gt;目录解读&lt;/h3&gt;
+&lt;h3 id=&quot;目录解读&quot;&gt;目录解读&lt;/h3&gt;
 
 &lt;p&gt;刚生成的YazidChen.Github.io下存在以下结构&lt;/p&gt;
 
@@ -1367,9 +1801,9 @@ gem install minima
   &lt;li&gt;_config.yml	-&amp;gt;	Jekyll的配置文件&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&quot;jekyll-2&quot;&gt;使用Jekyll写博文&lt;/h2&gt;
+&lt;h2 id=&quot;使用jekyll写博文&quot;&gt;使用Jekyll写博文&lt;/h2&gt;
 
-&lt;h3 id=&quot;section-2&quot;&gt;把仓库克隆到本地&lt;/h3&gt;
+&lt;h3 id=&quot;把仓库克隆到本地&quot;&gt;把仓库克隆到本地&lt;/h3&gt;
 
 &lt;p&gt;&lt;strong&gt;1、&lt;/strong&gt;下载&lt;a href=&quot;https://desktop.github.com/&quot;&gt;GitHub Desktop&lt;/a&gt;&lt;/p&gt;
 
@@ -1385,7 +1819,7 @@ gem install minima
 
 &lt;p&gt;&lt;strong&gt;5、&lt;/strong&gt;github 提交修改并同步&lt;/p&gt;
 
-&lt;h2 id=&quot;section-3&quot;&gt;参考&lt;/h2&gt;
+&lt;h2 id=&quot;参考&quot;&gt;参考&lt;/h2&gt;
 
 &lt;p&gt;本文参考以下文章，在此对原作者表示感谢！&lt;/p&gt;
 
@@ -1397,4 +1831,4 @@ gem install minima
 
 &lt;p&gt;&lt;a href=&quot;http://kresnik.wang/works/tech/2015/06/07/%E5%9C%A8github-pages%E7%BD%91%E7%AB%99%E4%B8%8B%E7%94%A8jekyll%E5%88%B6%E4%BD%9C%E5%8D%9A%E5%AE%A2%E6%95%99%E7%A8%8B.html&quot;&gt;在github pages网站下用jekyll制作博客教程&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://pizida.com/technology/2016/03/03/use-jekyll-create-blog-on-github/&quot;&gt;Jekyll本地搭建开发环境以及Github部署流程&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary>开启Github Pages</summary></entry></feed>
+&lt;p&gt;&lt;a href=&quot;http://pizida.com/technology/2016/03/03/use-jekyll-create-blog-on-github/&quot;&gt;Jekyll本地搭建开发环境以及Github部署流程&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">开启Github Pages</summary></entry></feed>

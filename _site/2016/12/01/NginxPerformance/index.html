@@ -21,7 +21,7 @@
     
 
     
-    <link rel="canonical" href="yazidchen.github.io/2016/12/01/NginxPerformance/">
+    <link rel="canonical" href="http://localhost:4000/2016/12/01/NginxPerformance/">
     <link rel="alternate" type="application/atom+xml" title="YazidChen Blog" href="/feed.xml">
     <link rel="shortcut icon" href="/favicon.ico">
     
@@ -37,7 +37,7 @@
     
         
     
-    <meta property="og:url" content="yazidchen.github.io/2016/12/01/NginxPerformance/">
+    <meta property="og:url" content="http://localhost:4000/2016/12/01/NginxPerformance/">
     <meta property="og:site_name" content="YazidChen Blog">
     <meta property="og:type" content="article">
     <meta property="og:locale" content="zh_CN" />
@@ -110,11 +110,11 @@
     <article class="article-content markdown-body">
     <h1 id="nginx-performance-optimize">Nginx performance optimize</h1>
 
-<h2 id="section">一、主配置文件</h2>
+<h2 id="一主配置文件">一、主配置文件</h2>
 
-<h3 id="section-1">主配置文件结构</h3>
+<h3 id="主配置文件结构">主配置文件结构</h3>
 
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c"># 主配置段，也即全局配置段；</span>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 主配置段，也即全局配置段；</span>
 ···
 
 <span class="c"># 事件驱动相关的配置；</span>
@@ -136,39 +136,37 @@
    stream <span class="o">{</span>
       ...
     <span class="o">}</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<h4 id="section-2">主配置段相关配置</h4>
+<h4 id="主配置段相关配置">主配置段相关配置</h4>
 
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c">##定义执行权限的用户及组，如果省略组，则组名为用户所在组。</span>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">##定义执行权限的用户及组，如果省略组，则组名为用户所在组。</span>
 <span class="c">#语法：</span>
-user user <span class="o">[</span>group];
+user user <span class="o">[</span>group]<span class="p">;</span>
 <span class="c">#默认：</span>
-user nobody;
+user nobody<span class="p">;</span>
 
 <span class="c">##指定存储nginx主进程编号pid的文件路径</span>
 <span class="c">#语法：</span>
-pid path;
+pid path<span class="p">;</span>
 <span class="c">#默认：</span>
-pid logs/nginx.pid;
+pid logs/nginx.pid<span class="p">;</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<h2 id="section-3">二、性能优化</h2>
+<h2 id="二性能优化">二、性能优化</h2>
 
-<h3 id="cpu">2.1 关于CPU的配置项</h3>
+<h3 id="21-关于cpu的配置项">2.1 关于CPU的配置项</h3>
 
-<h4 id="section-4">2.1.1 配置运行处理器</h4>
+<h4 id="211-配置运行处理器">2.1.1 配置运行处理器</h4>
 
 <p><strong>配置详解：</strong></p>
 
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c">##worker进程的数量，通常应该为当前主机的CPU的物理核心数。</span>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">##worker进程的数量，通常应该为当前主机的CPU的物理核心数。</span>
 <span class="c">#语法：</span>
-worker_processer number;
+worker_processer number<span class="p">;</span>
 <span class="c">#默认：</span>
-worker_processer  1;
+worker_processer  1<span class="p">;</span>
 
 <span class="c">##worker进程绑定到固定的处理器（processer）上</span>
 <span class="c"># cpumask(CPU掩码)，八位二进制，每一位代表一个处理器（processer），共8个，1代表固定使用，0代表不使用。</span>
@@ -176,11 +174,10 @@ worker_processer  1;
 <span class="c"># 00000010 : 1号processer</span>
 <span class="c"># 00000100 : 2号processer</span>
 <span class="c">#语法：</span>
-worker_cpu_affinity cpumask1 cpumask2 ...;
+worker_cpu_affinity cpumask1 cpumask2 ...<span class="p">;</span>
 <span class="c">#默认：</span>
-worker_cpu_affinity auto;
-</code></pre>
-</div>
+worker_cpu_affinity auto<span class="p">;</span>
+</code></pre></div></div>
 
 <p>搞懂上述配置，必须先弄清楚<strong>中央处理器（CPU）</strong>、<strong>内核</strong>、<strong>处理器（processer）</strong>三者的关系。</p>
 
@@ -188,22 +185,21 @@ worker_cpu_affinity auto;
 
 <p><strong>1)</strong> Linux查看CPU信息：</p>
 
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c">##总核(cpu cores)数 = 中央处理器（CPU）个数 X 每颗CPU的核数 </span>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">##总核(cpu cores)数 = 中央处理器（CPU）个数 X 每颗CPU的核数 </span>
 <span class="c">##总处理器（processor）数 =总核(cpu cores)数 X 超线程数</span>
 
 <span class="c">#查看CPU总体信息</span>
-cat /proc/cpuinfo
+<span class="nb">cat</span> /proc/cpuinfo
 
 <span class="c"># 查看CPU个数</span>
-cat /proc/cpuinfo| grep <span class="s2">"physical id"</span>| sort| uniq| wc -l
+<span class="nb">cat</span> /proc/cpuinfo| <span class="nb">grep</span> <span class="s2">"physical id"</span>| <span class="nb">sort</span>| <span class="nb">uniq</span>| <span class="nb">wc</span> <span class="nt">-l</span>
 
 <span class="c"># 查看每个CPU中的核数</span>
-cat /proc/cpuinfo| grep <span class="s2">"cpu cores"</span>| uniq
+<span class="nb">cat</span> /proc/cpuinfo| <span class="nb">grep</span> <span class="s2">"cpu cores"</span>| <span class="nb">uniq</span>
 
 <span class="c"># 查看总处理器（processor）个数</span>
-cat /proc/cpuinfo| grep <span class="s2">"processor"</span>| wc -l
-</code></pre>
-</div>
+<span class="nb">cat</span> /proc/cpuinfo| <span class="nb">grep</span> <span class="s2">"processor"</span>| <span class="nb">wc</span> <span class="nt">-l</span>
+</code></pre></div></div>
 
 <p>通过上述指令，查询到本机仅有1个CPU。</p>
 
@@ -235,18 +231,16 @@ cat /proc/cpuinfo| grep <span class="s2">"processor"</span>| wc -l
 
 <p>查看<code class="highlighter-rouge">worker_processes 4;</code>是否生效：</p>
 
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code>ps -aux | grep nginx
-</code></pre>
-</div>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ps <span class="nt">-aux</span> | <span class="nb">grep </span>nginx
+</code></pre></div></div>
 
 <p><img src="http://i.imgur.com/xqHVZPS.png" alt="" /></p>
 
 <p>查看<code class="highlighter-rouge">worker_cpu_affinity auto;</code>是否生效：</p>
 
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c">#查看nginx进程在哪个CPU内核上运行</span>
-ps -axo pid,user,comm,psr |grep nginx
-</code></pre>
-</div>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#查看nginx进程在哪个CPU内核上运行</span>
+ps <span class="nt">-axo</span> pid,user,comm,psr |grep nginx
+</code></pre></div></div>
 
 <p><img src="http://i.imgur.com/25fLoOI.png" alt="" /></p>
 
@@ -270,14 +264,13 @@ ps -axo pid,user,comm,psr |grep nginx
 
 <p>如此看来，<code class="highlighter-rouge">master</code>消耗的资源并不多。</p>
 
-<h4 id="section-5">2.1.2 配置进程优先级</h4>
+<h4 id="212-配置进程优先级">2.1.2 配置进程优先级</h4>
 
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c">##设定worker进程的nice值，nice值决定进程的优先级，在CPU运行队列较长时，可以被有限调度到CPU上运行。nice值默认为0，区间[-20,20]</span>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">##设定worker进程的nice值，nice值决定进程的优先级，在CPU运行队列较长时，可以被有限调度到CPU上运行。nice值默认为0，区间[-20,20]</span>
 <span class="c">#语法</span>
-worker_priority number;
+worker_priority number<span class="p">;</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>这里有个疑问：nice值是什么？</p>
 
@@ -305,9 +298,8 @@ worker_priority number;
 
 <p><strong>1）</strong> 查询修改前状态：</p>
 
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code>ps axo pid,user,comm,psr,nice | grep nginx
-</code></pre>
-</div>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ps axo pid,user,comm,psr,nice | <span class="nb">grep </span>nginx
+</code></pre></div></div>
 
 <p><img src="http://i.imgur.com/VErMiA9.png" alt="" /></p>
 
@@ -315,9 +307,8 @@ worker_priority number;
 
 <p><strong>2）</strong> 配置以提高优先级至-5：</p>
 
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code>worker_priority -5;
-</code></pre>
-</div>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>worker_priority <span class="nt">-5</span><span class="p">;</span>
+</code></pre></div></div>
 
 <p><code class="highlighter-rouge">./nginx -s reload</code> 重启nginx。</p>
 
@@ -327,7 +318,7 @@ worker_priority number;
 
 <p>可以看到，<code class="highlighter-rouge">worker</code>进程的<code class="highlighter-rouge">nice</code>值已经修改成了-5。</p>
 
-<h3 id="gzip">2.2 gzip压缩传输数据</h3>
+<h3 id="22-gzip压缩传输数据">2.2 gzip压缩传输数据</h3>
 
 <p><code class="highlighter-rouge">gzip</code>是若干种文件压缩程序的简称，代表<code class="highlighter-rouge">GNU zip</code>。</p>
 
@@ -337,56 +328,55 @@ worker_priority number;
 
 <p><code class="highlighter-rouge">gzip</code>的压缩页面需要浏览器和服务器双方都支持，实际上就是服务器端压缩，传到浏览器后浏览器解压缩并解析。目前的大多数浏览器都支持解析<code class="highlighter-rouge">gzip</code>压缩过的页面。</p>
 
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code><span class="c">##gzip压缩功能开关</span>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">##gzip压缩功能开关</span>
 <span class="c">#语法 </span>
-gzip on | off;
+<span class="nb">gzip </span>on | off<span class="p">;</span>
 <span class="c">#默认 </span>
-gzip off;
+<span class="nb">gzip </span>off<span class="p">;</span>
 
 <span class="c">##设置response响应的缓冲区大小。32 4k代表以4k为单位将响应数据以4k的32倍(128k)的大小申请内存。如果没有设置，缓冲区的大小默认为整个响应页面的大小。</span>
 <span class="c">#语法 </span>
-gzip_buffers number size;
+gzip_buffers number size<span class="p">;</span>
 <span class="c">#默认 </span>
-gzip_buffers 32 4k | 16 8k;
+gzip_buffers 32 4k | 16 8k<span class="p">;</span>
 
 <span class="c">##设置gzip的压缩级别，可接受的范围是从1到9，数字越大压缩率越高，但更消耗CPU，一般设置6即可。</span>
 <span class="c">#语法</span>
-gzip_comp_level level;
+gzip_comp_level level<span class="p">;</span>
 <span class="c">#默认</span>
-gzip_comp_level 1;
+gzip_comp_level 1<span class="p">;</span>
 
 <span class="c">##设置允许压缩的页面最小字节数，页面字节数从header头中的Content-Length中进行获取。因为过小的文件内容压缩之后效果不明显，甚至会比不压缩时更大，所以一般建议长度不小于1000或者1K。</span>
 <span class="c">#语法</span>
-gzip_min_length length;
+gzip_min_length length<span class="p">;</span>
 <span class="c">#默认</span>
-gzip_min_length 20;
+gzip_min_length 20<span class="p">;</span>
 
 <span class="c">##指定哪些类型的响应才启用gzip压缩，多个用空格分隔。通配符”*”可以匹配任意类型，不管是否指定”text/html”类型，该类型的响应总是启用压缩。一般js、css等文本文件都启用压缩，如application/x-javascript、text/css、application/xml 等。具体的文件类型对应的mimi-type可以参考conf/mime.types文件。例如 jpg / png 这类文件一般不开启，因为图片格式已经是高度压缩过的，再压一遍没什么效果不说还浪费 CPU</span>
 <span class="c">#语法</span>
-gzip_types mime-type ...;
+gzip_types mime-type ...<span class="p">;</span>
 <span class="c">#默认</span>
-gzip_types text/html;
+gzip_types text/html<span class="p">;</span>
 
 <span class="c">##设置gzip压缩所需要的请求的最小HTTP版本，低于该版本不使用gzip压缩。一般不用修改，默认即可。</span>
 <span class="c">#语法</span>
-gzip_http_version 1.0 | 1.1;
+gzip_http_version 1.0 | 1.1<span class="p">;</span>
 <span class="c">#默认</span>
-gzip_http_version 1.1;
+gzip_http_version 1.1<span class="p">;</span>
 
 <span class="c">##如果请求的”User-Agent”头信息能被指定的正则表达式匹配，则对响应禁用gzip压缩功能。主要是为了兼容不支持gzip压缩的浏览器。</span>
 <span class="c">#语法</span>
-gzip_disable regex ...;
+gzip_disable regex ...<span class="p">;</span>
 <span class="c">#默认</span>
 —
 
 <span class="c">##如果指令gzip,gzip_static或者gunzip被激活的话，启用Vary: Accept-Encoding响应头字段。</span>
 <span class="c">#语法</span>
-gzip_vary on | off;
+gzip_vary on | off<span class="p">;</span>
 <span class="c">#默认</span>
-gzip_vary off;
+gzip_vary off<span class="p">;</span>
 
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>我们对nginx做如下配置：</p>
 
@@ -437,7 +427,7 @@ gzip_vary off;
 
 <p>既然<code class="highlighter-rouge">gzip</code>是内容编码，则压缩是在传输之前进行的，所以传输的分块是按照压缩后的数据分块的。</p>
 
-<h2 id="section-6">参考</h2>
+<h2 id="参考">参考</h2>
 
 <p><a href="http://blog.liwenxin.com/2010/11/25/nginx-code-reading-4.html">nginx源码解析(4)-深入http模块</a></p>
 
@@ -473,7 +463,7 @@ gzip_vary off;
     <footer class="container">
         <div class="site-footer" role="contentinfo">
             <div class="copyright left mobile-block">
-                    © 2016
+                    © 2018
                     <span title="YazidChen">YazidChen</span>
                     <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
             </div>

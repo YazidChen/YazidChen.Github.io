@@ -21,7 +21,7 @@
     
 
     
-    <link rel="canonical" href="yazidchen.github.io/2016/08/19/CreateBlogsForJekyllOnGithub/">
+    <link rel="canonical" href="http://localhost:4000/2016/08/19/CreateBlogsForJekyllOnGithub/">
     <link rel="alternate" type="application/atom+xml" title="YazidChen Blog" href="/feed.xml">
     <link rel="shortcut icon" href="/favicon.ico">
     
@@ -37,7 +37,7 @@
     
         
     
-    <meta property="og:url" content="yazidchen.github.io/2016/08/19/CreateBlogsForJekyllOnGithub/">
+    <meta property="og:url" content="http://localhost:4000/2016/08/19/CreateBlogsForJekyllOnGithub/">
     <meta property="og:site_name" content="YazidChen Blog">
     <meta property="og:type" content="article">
     <meta property="og:locale" content="zh_CN" />
@@ -108,7 +108,7 @@
 <div class="columns">
   <div class="column three-fourths" >
     <article class="article-content markdown-body">
-    <h2 id="github-pages">开启Github Pages</h2>
+    <h2 id="开启github-pages">开启Github Pages</h2>
 
 <p><strong>1、</strong>在github中建立一个基于你的用户名的repository</p>
 
@@ -126,9 +126,9 @@
 
 <p><img src="http://i.imgur.com/RhpshMR.png" alt="" /></p>
 
-<h2 id="jekyll">部署Jekyll</h2>
+<h2 id="部署jekyll">部署Jekyll</h2>
 
-<h3 id="rubyrubygems">安装Ruby、RubyGems</h3>
+<h3 id="安装rubyrubygems">安装Ruby、RubyGems</h3>
 
 <p><strong>1、</strong>下载<a href="http://rubyinstaller.org/downloads/" title="RubyInstallers">http://rubyinstaller.org/downloads/</a>安装</p>
 
@@ -145,34 +145,32 @@
   <li><code class="highlighter-rouge">ruby setup.rb</code></li>
 </ul>
 
-<h3 id="jekyll-1">安装Jekyll</h3>
+<h3 id="安装jekyll">安装Jekyll</h3>
 
 <ul>
   <li><code class="highlighter-rouge">gem install jekyll</code></li>
 </ul>
 
-<h3 id="blog">创建本地blog站点</h3>
+<h3 id="创建本地blog站点">创建本地blog站点</h3>
 
 <ul>
   <li>cd进入想要存放blog的目录</li>
   <li><code class="highlighter-rouge">jekyll new YazidChen.Github.io</code>（目录名自拟）</li>
 </ul>
 
-<h3 id="section">开启站点服务</h3>
+<h3 id="开启站点服务">开启站点服务</h3>
 
 <p><code class="highlighter-rouge">jekll serve</code> 开启服务。可能会报错，一般为缺少包，根据报错做相应处理</p>
-<div class="highlighter-rouge"><pre class="highlight"><code>gem install bundler
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gem install bundler
 gem install minima
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>minima报错时，在\Ruby23-x64\lib\ruby\gems\2.3.0\gems\jekyll-3.2.1\lib\jekyll目录下找到layout.rb，进行如下操作</p>
-<div class="highlighter-rouge"><pre class="highlight"><code># Replace Line 38 with:
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Replace Line 38 with:
 
 @path = base + "/" + name
-</code></pre>
-</div>
+</code></pre></div></div>
 
-<h3 id="section-1">目录解读</h3>
+<h3 id="目录解读">目录解读</h3>
 
 <p>刚生成的YazidChen.Github.io下存在以下结构</p>
 
@@ -185,9 +183,9 @@ gem install minima
   <li>_config.yml	-&gt;	Jekyll的配置文件</li>
 </ul>
 
-<h2 id="jekyll-2">使用Jekyll写博文</h2>
+<h2 id="使用jekyll写博文">使用Jekyll写博文</h2>
 
-<h3 id="section-2">把仓库克隆到本地</h3>
+<h3 id="把仓库克隆到本地">把仓库克隆到本地</h3>
 
 <p><strong>1、</strong>下载<a href="https://desktop.github.com/">GitHub Desktop</a></p>
 
@@ -203,7 +201,7 @@ gem install minima
 
 <p><strong>5、</strong>github 提交修改并同步</p>
 
-<h2 id="section-3">参考</h2>
+<h2 id="参考">参考</h2>
 
 <p>本文参考以下文章，在此对原作者表示感谢！</p>
 
@@ -245,7 +243,7 @@ gem install minima
     <footer class="container">
         <div class="site-footer" role="contentinfo">
             <div class="copyright left mobile-block">
-                    © 2016
+                    © 2018
                     <span title="YazidChen">YazidChen</span>
                     <a href="javascript:window.scrollTo(0,0)" class="right mobile-visible">TOP</a>
             </div>
