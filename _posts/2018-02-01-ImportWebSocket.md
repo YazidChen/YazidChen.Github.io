@@ -1,8 +1,8 @@
 ---
 layout: post
-title:  "WebSocket应用"
+title:  "WebSocket SockJS STOMP"
 categories: WebSocket
-description: WebSocket应用实践。
+description: WebSocket 应用实践。
 keywords: WebSocket, SockJS, STOMP
 ---
 
