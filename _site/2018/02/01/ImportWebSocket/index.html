@@ -429,7 +429,6 @@
 <span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.springframework.messaging.simp.SimpMessagingTemplate</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">org.springframework.stereotype.Service</span><span class="o">;</span>
-
 <span class="kn">import</span> <span class="nn">java.util.HashMap</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
@@ -470,7 +469,119 @@
 
 </code></pre></div></div>
 
-<p>3、编写测试Controller:</p>
+<p>4、创建监听器：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">com.jz.service.jzcf_ums.api.form.UserSession</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.csms.core.user.service.UserService</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.csms.core.user.util.StatusEnum</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.csms.core.websocket.service.WsUsers</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.context.ApplicationListener</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.messaging.Message</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.messaging.MessageHeaders</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.messaging.SessionConnectedEvent</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.ArrayList</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+
+<span class="cm">/**
+ * @author YazidChen
+ * @date 2018/01/23 0023 11:41
+ **/</span>
+<span class="nd">@Component</span><span class="c1">//注解扫描</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WsConnectedListen</span> <span class="kd">implements</span> <span class="n">ApplicationListener</span><span class="o">&lt;</span><span class="n">SessionConnectedEvent</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">UserService</span> <span class="n">userService</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onApplicationEvent</span><span class="o">(</span><span class="n">SessionConnectedEvent</span> <span class="n">sessionConnectedEvent</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">MessageHeaders</span> <span class="n">messageHeader</span> <span class="o">=</span> <span class="n">sessionConnectedEvent</span><span class="o">.</span><span class="na">getMessage</span><span class="o">().</span><span class="na">getHeaders</span><span class="o">();</span>
+        <span class="n">Map</span> <span class="n">simpSessionAttributes</span> <span class="o">=</span> <span class="o">(</span><span class="n">Map</span><span class="o">)</span> <span class="o">((</span><span class="n">Message</span><span class="o">)</span> <span class="n">messageHeader</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"simpConnectMessage"</span><span class="o">)).</span><span class="na">getHeaders</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="s">"simpSessionAttributes"</span><span class="o">);</span>
+
+        <span class="n">UserSession</span> <span class="n">userSession</span> <span class="o">=</span> <span class="o">(</span><span class="n">UserSession</span><span class="o">)</span> <span class="n">simpSessionAttributes</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"userSession"</span><span class="o">);</span>
+        <span class="n">String</span> <span class="n">simpUser</span> <span class="o">=</span> <span class="n">messageHeader</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"simpUser"</span><span class="o">).</span><span class="na">toString</span><span class="o">();</span>
+        <span class="c1">//内存不存在当前用户ID</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">WsUsers</span><span class="o">.</span><span class="na">users</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">userSession</span><span class="o">.</span><span class="na">getUserId</span><span class="o">())</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;&gt;();</span>
+            <span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">simpUser</span><span class="o">);</span>
+            <span class="n">WsUsers</span><span class="o">.</span><span class="na">users</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="n">userSession</span><span class="o">.</span><span class="na">getUserId</span><span class="o">(),</span> <span class="n">list</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span><span class="c1">//内存存在当前用户ID</span>
+            <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">list</span> <span class="o">=</span> <span class="n">WsUsers</span><span class="o">.</span><span class="na">users</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">userSession</span><span class="o">.</span><span class="na">getUserId</span><span class="o">());</span>
+            <span class="c1">//校验是否不包含当前session</span>
+            <span class="k">if</span> <span class="o">(!</span><span class="n">list</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="n">simpUser</span><span class="o">))</span> <span class="o">{</span>
+                <span class="n">list</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">simpUser</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="c1">//用户上线</span>
+        <span class="n">userService</span><span class="o">.</span><span class="na">onOffLine</span><span class="o">(</span><span class="n">userSession</span><span class="o">,</span> <span class="n">StatusEnum</span><span class="o">.</span><span class="na">ON_OFF_LINE</span><span class="o">.</span><span class="na">ON_LINE</span><span class="o">.</span><span class="na">type</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">SessionConnectedEvent</code>事件在STOMP连接完全建立后发布，此处用于将用户一至多个浏览器窗口的sessionId存入内存中。（考虑到客服系统用户量小，选择存入内存。）</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">com.jz.service.jzcf_ums.api.form.UserSession</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.csms.core.user.service.UserService</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.csms.core.user.util.StatusEnum</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">com.jzcf.csms.core.websocket.service.WsUsers</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.beans.factory.annotation.Autowired</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.context.ApplicationListener</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.messaging.MessageHeaders</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.stereotype.Component</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">org.springframework.web.socket.messaging.SessionDisconnectEvent</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.List</span><span class="o">;</span>
+<span class="kn">import</span> <span class="nn">java.util.Map</span><span class="o">;</span>
+
+<span class="cm">/**
+ * @author YazidChen
+ * @date 2018/01/23 0023 14:15
+ **/</span>
+<span class="nd">@Component</span><span class="c1">//注解扫描</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">WsDisconnectListen</span> <span class="kd">implements</span> <span class="n">ApplicationListener</span><span class="o">&lt;</span><span class="n">SessionDisconnectEvent</span><span class="o">&gt;</span> <span class="o">{</span>
+
+    <span class="nd">@Autowired</span>
+    <span class="kd">private</span> <span class="n">UserService</span> <span class="n">userService</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onApplicationEvent</span><span class="o">(</span><span class="n">SessionDisconnectEvent</span> <span class="n">sessionDisconnectEvent</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">MessageHeaders</span> <span class="n">messageHeader</span> <span class="o">=</span> <span class="n">sessionDisconnectEvent</span><span class="o">.</span><span class="na">getMessage</span><span class="o">().</span><span class="na">getHeaders</span><span class="o">();</span>
+        <span class="n">UserSession</span> <span class="n">userSession</span> <span class="o">=</span> <span class="o">(</span><span class="n">UserSession</span><span class="o">)</span> <span class="o">((</span><span class="n">Map</span><span class="o">)</span> <span class="n">messageHeader</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"simpSessionAttributes"</span><span class="o">)).</span><span class="na">get</span><span class="o">(</span><span class="s">"userSession"</span><span class="o">);</span>
+        <span class="n">String</span> <span class="n">simpUser</span> <span class="o">=</span> <span class="n">messageHeader</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">"simpUser"</span><span class="o">).</span><span class="na">toString</span><span class="o">();</span>
+        <span class="c1">//如果内存中存在当前用户ID</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">WsUsers</span><span class="o">.</span><span class="na">users</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">userSession</span><span class="o">.</span><span class="na">getUserId</span><span class="o">())</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">List</span> <span class="n">list</span> <span class="o">=</span> <span class="n">WsUsers</span><span class="o">.</span><span class="na">users</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="n">userSession</span><span class="o">.</span><span class="na">getUserId</span><span class="o">());</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">list</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="n">simpUser</span><span class="o">))</span> <span class="o">{</span>
+                <span class="c1">//删除用户当前断开的session</span>
+                <span class="n">list</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">simpUser</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">list</span><span class="o">.</span><span class="na">size</span><span class="o">()</span> <span class="o">==</span> <span class="mi">0</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">WsUsers</span><span class="o">.</span><span class="na">users</span><span class="o">.</span><span class="na">remove</span><span class="o">(</span><span class="n">userSession</span><span class="o">.</span><span class="na">getUserId</span><span class="o">());</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="c1">//用户下线</span>
+        <span class="n">userService</span><span class="o">.</span><span class="na">onOffLine</span><span class="o">(</span><span class="n">userSession</span><span class="o">,</span> <span class="n">StatusEnum</span><span class="o">.</span><span class="na">ON_OFF_LINE</span><span class="o">.</span><span class="na">OFF_LINE</span><span class="o">.</span><span class="na">type</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">SessionDisconnectEvent</code>事件再STOMP连接完全关闭时发布，此处将用户sessionId移出内存。</p>
+
+<p><code class="highlighter-rouge">web.xml</code>中配置监听器包路径：</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nt">&lt;listener&gt;</span>
+        <span class="nt">&lt;listener-class&gt;</span>...websocket.listen.WsConnectedListen<span class="nt">&lt;/listener-class&gt;</span>
+    <span class="nt">&lt;/listener&gt;</span>
+
+    <span class="nt">&lt;listener&gt;</span>
+        <span class="nt">&lt;listener-class&gt;</span>...listen.WsDisconnectListen<span class="nt">&lt;/listener-class&gt;</span>
+    <span class="nt">&lt;/listener&gt;</span>
+</code></pre></div></div>
+
+<p>5、编写测试Controller:</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">com.jz.service.jzcf_ums.api.form.UserSession</span><span class="o">;</span>
 <span class="kn">import</span> <span class="nn">com.jzcf.csms.common.utils.R</span><span class="o">;</span>
@@ -607,6 +718,8 @@
 <h1 id="参考">参考</h1>
 
 <p>本文参考以下文章，在此对原作者表示感谢！</p>
+
+<p><a href="https://docs.spring.io/spring/docs/5.0.3.RELEASE/spring-framework-reference/web.html#websocket">Spring.io WebSocket</a></p>
 
 <p><a href="http://www.ruanyifeng.com/blog/2017/05/websocket.html">WebSocket 教程</a></p>
 

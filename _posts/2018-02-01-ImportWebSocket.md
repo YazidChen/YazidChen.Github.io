@@ -334,7 +334,6 @@ import com.jzcf.csms.core.callcenter.form.WsMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -375,7 +374,124 @@ public class WsUsers {
 
 ```
 
-3、编写测试Controller:
+4、创建监听器：
+
+```java
+import com.jz.service.jzcf_ums.api.form.UserSession;
+import com.jzcf.csms.core.user.service.UserService;
+import com.jzcf.csms.core.user.util.StatusEnum;
+import com.jzcf.csms.core.websocket.service.WsUsers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.messaging.SessionConnectedEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author YazidChen
+ * @date 2018/01/23 0023 11:41
+ **/
+@Component//注解扫描
+public class WsConnectedListen implements ApplicationListener<SessionConnectedEvent> {
+
+    @Autowired
+    private UserService userService;
+
+    @Override
+    public void onApplicationEvent(SessionConnectedEvent sessionConnectedEvent) {
+        MessageHeaders messageHeader = sessionConnectedEvent.getMessage().getHeaders();
+        Map simpSessionAttributes = (Map) ((Message) messageHeader.get("simpConnectMessage")).getHeaders().get("simpSessionAttributes");
+
+        UserSession userSession = (UserSession) simpSessionAttributes.get("userSession");
+        String simpUser = messageHeader.get("simpUser").toString();
+        //内存不存在当前用户ID
+        if (WsUsers.users.get(userSession.getUserId()) == null) {
+            List<String> list = new ArrayList<>();
+            list.add(simpUser);
+            WsUsers.users.put(userSession.getUserId(), list);
+        } else {//内存存在当前用户ID
+            List<String> list = WsUsers.users.get(userSession.getUserId());
+            //校验是否不包含当前session
+            if (!list.contains(simpUser)) {
+                list.add(simpUser);
+            }
+        }
+        //用户上线
+        userService.onOffLine(userSession, StatusEnum.ON_OFF_LINE.ON_LINE.type);
+    }
+}
+
+```
+
+`SessionConnectedEvent`事件在STOMP连接完全建立后发布，此处用于将用户一至多个浏览器窗口的sessionId存入内存中。（考虑到客服系统用户量小，选择存入内存。）
+
+
+```java
+import com.jz.service.jzcf_ums.api.form.UserSession;
+import com.jzcf.csms.core.user.service.UserService;
+import com.jzcf.csms.core.user.util.StatusEnum;
+import com.jzcf.csms.core.websocket.service.WsUsers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.stereotype.Component;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author YazidChen
+ * @date 2018/01/23 0023 14:15
+ **/
+@Component//注解扫描
+public class WsDisconnectListen implements ApplicationListener<SessionDisconnectEvent> {
+
+    @Autowired
+    private UserService userService;
+
+    @Override
+    public void onApplicationEvent(SessionDisconnectEvent sessionDisconnectEvent) {
+        MessageHeaders messageHeader = sessionDisconnectEvent.getMessage().getHeaders();
+        UserSession userSession = (UserSession) ((Map) messageHeader.get("simpSessionAttributes")).get("userSession");
+        String simpUser = messageHeader.get("simpUser").toString();
+        //如果内存中存在当前用户ID
+        if (WsUsers.users.get(userSession.getUserId()) != null) {
+            List list = WsUsers.users.get(userSession.getUserId());
+            if (list.contains(simpUser)) {
+                //删除用户当前断开的session
+                list.remove(simpUser);
+            }
+            if (list.size() == 0) {
+                WsUsers.users.remove(userSession.getUserId());
+            }
+        }
+        //用户下线
+        userService.onOffLine(userSession, StatusEnum.ON_OFF_LINE.OFF_LINE.type);
+    }
+}
+
+```
+
+`SessionDisconnectEvent`事件再STOMP连接完全关闭时发布，此处将用户sessionId移出内存。
+
+`web.xml`中配置监听器包路径：
+
+```xml
+    <listener>
+        <listener-class>...websocket.listen.WsConnectedListen</listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>...listen.WsDisconnectListen</listener-class>
+    </listener>
+```
+
+
+5、编写测试Controller:
 
 
 ```java
@@ -518,6 +634,8 @@ let socket = new SockJS('https://csms-dev.jzcaifu.com/portfolio');
 
 
 本文参考以下文章，在此对原作者表示感谢！
+
+[Spring.io WebSocket](https://docs.spring.io/spring/docs/5.0.3.RELEASE/spring-framework-reference/web.html#websocket)
 
 [WebSocket 教程](http://www.ruanyifeng.com/blog/2017/05/websocket.html)
 
