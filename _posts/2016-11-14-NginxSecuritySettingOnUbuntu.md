@@ -16,15 +16,15 @@ keywords: Nginx, Linux, 安全, Security, Nginx安全
 
 原始情况下，访问错误的链接会有暴露版本信息的危险。
 
-![](http://i.imgur.com/WOYn9rJ.png)
+![](https://i.imgur.com/7NmzOaN.png)
 
 用curl命令查出原始的版本信息：
 
 ```shell
-curl -I ddos.jinzhucaifu.com
+curl -I www.xxx.com
 ```
 
-![](http://i.imgur.com/vBvNuK2.png)
+![](https://i.imgur.com/GghodbU.png)
 
 ### 1.2 修改ngx_http_header_filter_module.c文件 ###
 
@@ -109,9 +109,9 @@ root@yazid-chen:/opt/nginx/nginx-1.11.4# /usr/local/nginx/sbin/nginx
 
 ### 1.6 隐藏后状态 ###
 
-![](http://i.imgur.com/VpB6yIF.png)
+![](https://i.imgur.com/PLrHNMX.png)
 
-![](http://i.imgur.com/EDN2dFS.png)
+![](https://i.imgur.com/xGhn3vE.png)
 
 
 ## 二、给Nginx以普通用户运行的权限 ##

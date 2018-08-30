@@ -293,15 +293,15 @@ gzip_vary off;
 
 保存重启后有：
 
-![](http://i.imgur.com/eUzpULs.png)
+![](https://i.imgur.com/3PKtSgS.png)
 
 而未开启gzip压缩的同一页面，其响应大小及时间如下：
 
-![](http://i.imgur.com/qQuBvDu.png)
+![](https://i.imgur.com/dNqJZ35.png)
 
 我们再来看一下响应头信息：
 
-![](http://i.imgur.com/n1qAMnb.png)
+![](https://i.imgur.com/JOnIK5R.png)
 
 可以看到，响应头中已经存在`Content-Encoding:gzip`，并且有返回我们设置的Vary值`Vary:Accept-Encoding`。
 

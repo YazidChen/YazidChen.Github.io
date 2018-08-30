@@ -34,15 +34,12 @@ keywords: Jekyll, Blogs, Github
 -  在Path中添加 %RUBY_HOME%\bin
 -  进cmd， `ruby -v`，如果显示ruby版本信息说明安装成功。
 
-
-**3、**安装rubyGems
-- `cd d:\OfficeSoft\rubygems-2.6.6`
-- `ruby setup.rb`
-
-
 ### 安装Jekyll ###
 
 - `gem install jekyll`
+
+注意ruby安装目录存在空格时会报Makefile异常。
+
 
 ### 创建本地blog站点 ###
 
@@ -62,6 +59,11 @@ minima报错时，在\Ruby23-x64\lib\ruby\gems\2.3.0\gems\jekyll-3.2.1\lib\jekyl
 # Replace Line 38 with:
 
 @path = base + "/" + name
+```
+
+Could not find gem 'tzinfo-data x64-mingw32' in any of the gem sources listed in your Gemfile.报错处理：
+```
+bundle
 ```
 
 ### 目录解读 ###

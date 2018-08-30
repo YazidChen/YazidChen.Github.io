@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.7.2">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-02-02T09:49:24+08:00</updated><id>http://localhost:4000/</id><title type="html">YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title type="html">WebSocket SockJS STOMP</title><link href="http://localhost:4000/2018/02/01/ImportWebSocket/" rel="alternate" type="text/html" title="WebSocket SockJS STOMP" /><published>2018-02-01T00:00:00+08:00</published><updated>2018-02-01T00:00:00+08:00</updated><id>http://localhost:4000/2018/02/01/ImportWebSocket</id><content type="html" xml:base="http://localhost:4000/2018/02/01/ImportWebSocket/">&lt;h1 id=&quot;一为何引入websocket&quot;&gt;一、为何引入WebSocket&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2018-08-30T15:39:50+08:00</updated><id>http://localhost:4000/</id><title type="html">YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title type="html">WebSocket SockJS STOMP</title><link href="http://localhost:4000/2018/02/01/ImportWebSocket/" rel="alternate" type="text/html" title="WebSocket SockJS STOMP" /><published>2018-02-01T00:00:00+08:00</published><updated>2018-02-01T00:00:00+08:00</updated><id>http://localhost:4000/2018/02/01/ImportWebSocket</id><content type="html" xml:base="http://localhost:4000/2018/02/01/ImportWebSocket/">&lt;h1 id=&quot;一为何引入websocket&quot;&gt;一、为何引入WebSocket&lt;/h1&gt;
 
 &lt;h2 id=&quot;11-遇到问题&quot;&gt;1.1 遇到问题&lt;/h2&gt;
 &lt;p&gt;当前有一客服管理系统，有以下业务需求：&lt;/p&gt;
@@ -83,8 +83,8 @@
 
 &lt;p&gt;2、创建握手拦截器：&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jz.service.jzcf_ums.api.form.UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.ums.sso.utils.ShiroUtils&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;api&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;form&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;ShiroUtils&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.http.server.ServerHttpRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.http.server.ServerHttpResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.stereotype.Service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -117,8 +117,8 @@
 
 &lt;p&gt;3、将WsHandler绑定到特定的URL上&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.websocket.handler.WsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.websocket.interceptor.WsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;websocket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;handler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;websocket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;interceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.beans.factory.annotation.Autowired&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.context.annotation.Configuration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.config.annotation.EnableWebSocket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -139,7 +139,7 @@
 
     &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
     &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;registerWebSocketHandlers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WebSocketHandlerRegistry&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/chat&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setAllowedOrigins&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;https://csms-dev.jzcaifu.com&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addInterceptors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/chat&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setAllowedOrigins&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;https://www.xxx.com&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addInterceptors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 
@@ -147,15 +147,15 @@
 
 &lt;ul&gt;
   &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;addHandler()&lt;/code&gt;将&lt;code class=&quot;highlighter-rouge&quot;&gt;WsHandler&lt;/code&gt;绑定在了&lt;code class=&quot;highlighter-rouge&quot;&gt;/chat&lt;/code&gt;路径上；&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;setAllowedOrigins()&lt;/code&gt;允许来源为&lt;code class=&quot;highlighter-rouge&quot;&gt;https://csms-dev.jzcaifu.com&lt;/code&gt;的请求，设置为&lt;code class=&quot;highlighter-rouge&quot;&gt;*&lt;/code&gt;允许所有来源；&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;setAllowedOrigins()&lt;/code&gt;允许来源为&lt;code class=&quot;highlighter-rouge&quot;&gt;https://www.xxx.com&lt;/code&gt;的请求，设置为&lt;code class=&quot;highlighter-rouge&quot;&gt;*&lt;/code&gt;允许所有来源；&lt;/li&gt;
   &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;addInterceptors()&lt;/code&gt;添加拦截器。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h3 id=&quot;332-客户端配置&quot;&gt;3.3.2 客户端配置&lt;/h3&gt;
+&lt;h3 id=&quot;312-客户端配置&quot;&gt;3.1.2 客户端配置&lt;/h3&gt;
 
 &lt;p&gt;客户端发起WebSocket链接请求：&lt;/p&gt;
 
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ws&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;WebSocket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;wss://csms-dev.jzcaifu.com/chat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//发起连接&lt;/span&gt;
+&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;ws&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;WebSocket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;wss://www.xxx.com/chat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//发起连接&lt;/span&gt;
             &lt;span class=&quot;nx&quot;&gt;ws&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;onopen&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
                 &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;WebSocket open now!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
                 &lt;span class=&quot;nx&quot;&gt;ws&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;message test!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//客户端向服务器发送消息&lt;/span&gt;
@@ -171,11 +171,11 @@
             &lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;333-运行结果&quot;&gt;3.3.3 运行结果&lt;/h3&gt;
+&lt;h3 id=&quot;313-运行结果&quot;&gt;3.1.3 运行结果&lt;/h3&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/mTgAbTb.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/s1QA73A.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/KwNihlQ.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/etFw6Kx.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Connection&lt;/code&gt;为Upgrade，表示客户端希望连接升级；&lt;/li&gt;
@@ -191,8 +191,8 @@
 
 &lt;h3 id=&quot;321-服务端配置&quot;&gt;3.2.1 服务端配置&lt;/h3&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.websocket.handler.WsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.websocket.interceptor.WsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;websocket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;handler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;websocket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;interceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.beans.factory.annotation.Autowired&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.context.annotation.Configuration&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.config.annotation.EnableWebSocket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -213,7 +213,7 @@
 
     &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
     &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;registerWebSocketHandlers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WebSocketHandlerRegistry&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/chat&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setAllowedOrigins&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;https://csms-dev.jzcaifu.com&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addInterceptors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;withSockJS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//此处使用SockJS&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;registry&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wsHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/chat&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setAllowedOrigins&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;https://www.xxx.com&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;addInterceptors&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wsHandshakeInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;withSockJS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//此处使用SockJS&lt;/span&gt;
     &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -225,7 +225,7 @@
 &lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;&amp;lt;!--&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;引入&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;sockjs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;--&amp;gt;&lt;/span&gt;
 &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;script&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;text/javascript&quot;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/statics/libs/sockjs.min.js&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/script&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&amp;gt;
 &lt;/span&gt;&lt;span class=&quot;c&quot;&gt;&amp;lt;!--&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;此处为&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;https&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;协议&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;--&amp;gt;&lt;/span&gt;
-            &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sock&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;SockJS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;https://csms-dev.jzcaifu.com/chat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;sock&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;SockJS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;https://www.xxx.com/chat&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
             &lt;span class=&quot;nx&quot;&gt;sock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;onopen&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
                 &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;WebSocket open now!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
                 &lt;span class=&quot;nx&quot;&gt;sock&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;message test!&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//客户端向服务器发送消息&lt;/span&gt;
@@ -247,7 +247,7 @@
 
 &lt;p&gt;&lt;img src=&quot;https://i.imgur.com/d91tSia.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/9bOXUOI.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/kPp9A4P.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;33-stomp&quot;&gt;3.3 STOMP&lt;/h2&gt;
 
@@ -257,8 +257,8 @@
 
 &lt;p&gt;1、创建拦截器：&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jz.service.jzcf_ums.api.form.UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.ums.sso.utils.ShiroUtils&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;api&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;form&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;ShiroUtils&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.http.server.ServerHttpRequest&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.http.server.ServerHttpResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.web.socket.WebSocketHandler&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -297,7 +297,7 @@
         &lt;span class=&quot;nt&quot;&gt;&amp;lt;websocket:stomp-endpoint&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;path=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/portfolio&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;allowed-origins=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
             &lt;span class=&quot;nt&quot;&gt;&amp;lt;websocket:handshake-interceptors&amp;gt;&lt;/span&gt;
                 &lt;span class=&quot;nt&quot;&gt;&amp;lt;bean&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;wsHandshakeInterceptor&quot;&lt;/span&gt;
-                      &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;com.jzcf.csms.core.websocket.interceptor.WsHandshakeInterceptor&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
+                      &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;com.*.websocket.interceptor.WsHandshakeInterceptor&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
             &lt;span class=&quot;nt&quot;&gt;&amp;lt;/websocket:handshake-interceptors&amp;gt;&lt;/span&gt;
             &lt;span class=&quot;nt&quot;&gt;&amp;lt;websocket:sockjs&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;message-codec=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;fastjsonSockJsMessageCodec&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;/&amp;gt;&lt;/span&gt;
         &lt;span class=&quot;nt&quot;&gt;&amp;lt;/websocket:stomp-endpoint&amp;gt;&lt;/span&gt;
@@ -315,7 +315,7 @@
 
 &lt;p&gt;3、对于用户目的地，编写一个用户管理中心：&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.callcenter.form.WsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;callcenter&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;form&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.beans.factory.annotation.Autowired&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.messaging.simp.SimpMessagingTemplate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.stereotype.Service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -361,10 +361,10 @@
 
 &lt;p&gt;4、创建监听器：&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jz.service.jzcf_ums.api.form.UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.user.service.UserService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.user.util.StatusEnum&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.websocket.service.WsUsers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;UserService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;StatusEnum&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;websocket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WsUsers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.beans.factory.annotation.Autowired&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.context.ApplicationListener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.messaging.Message&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -413,10 +413,10 @@
 
 &lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;SessionConnectedEvent&lt;/code&gt;事件在STOMP连接完全建立后发布，此处用于将用户一至多个浏览器窗口的sessionId存入内存中。（考虑到客服系统用户量小，选择存入内存。）&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jz.service.jzcf_ums.api.form.UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.user.service.UserService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.user.util.StatusEnum&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.websocket.service.WsUsers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;UserService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;StatusEnum&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;websocket&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WsUsers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.beans.factory.annotation.Autowired&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.context.ApplicationListener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.messaging.MessageHeaders&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -473,11 +473,11 @@
 
 &lt;p&gt;5、编写测试Controller:&lt;/p&gt;
 
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jz.service.jzcf_ums.api.form.UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.common.utils.R&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.callcenter.form.WsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.core.websocket.service.WsUsers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.jzcf.csms.shiro.controller.AbstractController&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;UserSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;R&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WsUsers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;com.*&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;controller&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;AbstractController&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.beans.factory.annotation.Autowired&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.messaging.handler.annotation.MessageMapping&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;org.springframework.messaging.simp.SimpMessageHeaderAccessor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
@@ -559,13 +559,13 @@
 
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;332-客户端配置-1&quot;&gt;3.3.2 客户端配置&lt;/h3&gt;
+&lt;h3 id=&quot;332-客户端配置&quot;&gt;3.3.2 客户端配置&lt;/h3&gt;
 
 &lt;p&gt;需要引入stomp.js:&lt;/p&gt;
 
 &lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;script&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;text/javascript&quot;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;/statics/libs/stomp.min.js&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/script&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&amp;gt;
 &lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;socket&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;SockJS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'https://csms-dev.jzcaifu.com/portfolio'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;socket&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;SockJS&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'https://www.xxx.com/portfolio'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
             &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;stompClient&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;Stomp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;over&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
             &lt;span class=&quot;cm&quot;&gt;/*            stompClient.debug = function (str) {
                             //不输出日志到控制台
@@ -591,11 +591,11 @@
             &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;333-运行结果-1&quot;&gt;3.3.3 运行结果&lt;/h3&gt;
+&lt;h3 id=&quot;333-运行结果&quot;&gt;3.3.3 运行结果&lt;/h3&gt;
 
 &lt;p&gt;1、连接结果：&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/rJCqnx9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/84b2sN9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;2、发送全局消息：&lt;/p&gt;
 
@@ -615,90 +615,7 @@
 
 &lt;p&gt;&lt;a href=&quot;https://zh.wikipedia.org/wiki/WebSocket&quot;&gt;WebSocket维基百科&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://www.zhihu.com/question/20215561&quot;&gt;WebSocket 是什么原理？为什么可以实现持久连接？&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">一、为何引入WebSocket</summary></entry><entry><title type="html">我的2016、我的2017</title><link href="http://localhost:4000/2017/01/08/My2016AndMy2017/" rel="alternate" type="text/html" title="我的2016、我的2017" /><published>2017-01-08T00:00:00+08:00</published><updated>2017-01-08T00:00:00+08:00</updated><id>http://localhost:4000/2017/01/08/My2016AndMy2017</id><content type="html" xml:base="http://localhost:4000/2017/01/08/My2016AndMy2017/">&lt;h1 id=&quot;我的2016&quot;&gt;我的2016&lt;/h1&gt;
-
-&lt;h2 id=&quot;学习&quot;&gt;学习&lt;/h2&gt;
-
-&lt;p&gt;年初很杂乱，啥都想去学，啥都没学好。没有确定下自己的方向。大学用了两年半的时间自学的Android出来发现都是皮毛。又回到了JAVA重新开始。&lt;/p&gt;
-
-&lt;p&gt;年中开始确立了自己的方向，安全及微服务。开始从服务器方面入手学习。另外，JAVA也不能落下，必须达到精通的水准。&lt;/p&gt;
-
-&lt;p&gt;16年买了一大堆书，自己总是没有静下心好好去读。年内读了不到两本的技术书。已读完的是《软件工程与计算·卷一》，《JAVA核心技术·卷一》这本书还没读完。所以17年需要补上了，给自己定计划，要把几本书读深读透。&lt;/p&gt;
-
-&lt;h2 id=&quot;工作&quot;&gt;工作&lt;/h2&gt;
-
-&lt;p&gt;我喜欢现在的工作模式，工作氛围。晨会、过需求、任务分配等等。从中也学到了如何去带领团队，以及如何去被带领。但是自己工作不专注，思维容易发散。再加上自己拖延症作怪，实际工作时间往往大于有效工作时间，而且还多得多。另外就是不细心，有时候自己去寻找BUG出现的原因，得到结果后真的是觉得自己超乎想象的白痴。不专注，拖延症，还有不细心，必须在17年改正。&lt;/p&gt;
-
-&lt;p&gt;16年，我学会如何去全方位的分析一个问题，而不是单纯的从一两个角度去考虑。再者，会需求及功能分析，自己拆分一个功能的各个细节点，这也是我最喜欢也慢慢习惯的一种编码方式，即将一个功能完全分解，拆成各个小零件（包括公有、私有），小零件之间在缔造连接枢纽，最终整合。&lt;/p&gt;
-
-&lt;h2 id=&quot;处事&quot;&gt;处事&lt;/h2&gt;
-
-&lt;p&gt;沟通大障碍，不熟的人真是一句话都聊不上。熟的人又自己话少必须要别人带动。不过一年过去了这毛病还算有所改善，外向了很多。&lt;/p&gt;
-
-&lt;p&gt;不说则已，一说太直，整个一直肠子。注意场合呀！17年必改。&lt;/p&gt;
-
-&lt;h1 id=&quot;我的2017&quot;&gt;我的2017&lt;/h1&gt;
-
-&lt;h2 id=&quot;读书计划&quot;&gt;读书计划&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;1月~2月 -&amp;gt; 《JAVA核心技术·卷一》剩余两章、《软技能·代码之外的生存指南》&lt;/li&gt;
-  &lt;li&gt;3月~6月 -&amp;gt; 《JAVA核心技术·卷二》&lt;/li&gt;
-  &lt;li&gt;7月~9月 -&amp;gt; 《软件架构设计》&lt;/li&gt;
-  &lt;li&gt;10月~12月 -&amp;gt; 《重构·改善既有代码的设计》&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;学习计划&quot;&gt;学习计划&lt;/h2&gt;
-
-&lt;h3 id=&quot;一安全加固&quot;&gt;一、安全加固&lt;/h3&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;hacker知识。（1月~3月）&lt;/li&gt;
-  &lt;li&gt;将nginx、tomcat安全加固完善。（1月~3月）&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&quot;二性能提升&quot;&gt;二、性能提升&lt;/h3&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;配置监控系统。（4月~5月）&lt;/li&gt;
-  &lt;li&gt;配置nginx、tomcat性能提升。（6月~9月）&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&quot;三架构学习&quot;&gt;三、架构学习&lt;/h3&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;安全架构。（广泛，需拆分）(拆分时间段1月~3月)&lt;/li&gt;
-  &lt;li&gt;微服务架构。（广泛，需拆分）（拆分时间段4月~6月）&lt;/li&gt;
-  &lt;li&gt;DevOps。（2月~5月）&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h2 id=&quot;工作计划&quot;&gt;工作计划&lt;/h2&gt;
-
-&lt;h3 id=&quot;一习惯养成计划&quot;&gt;一、习惯养成计划&lt;/h3&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;工作为主，研究为辅。&lt;/li&gt;
-  &lt;li&gt;接手功能后，先进行模块拆分，列举案例。再进行构建零件，组装。最后单元测试+全局测试。&lt;/li&gt;
-  &lt;li&gt;每周末回顾本周开发的功能，存档。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&quot;二代码提升计划&quot;&gt;二、代码提升计划&lt;/h3&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;减少BUG出现率，平均每个功能3个。&lt;/li&gt;
-  &lt;li&gt;提升代码质量，可读性。降低代码影响性能的不足。&lt;/li&gt;
-  &lt;li&gt;接入JAVA8特性，准备对接JAVA9。&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&quot;三系统提升计划&quot;&gt;三、系统提升计划&lt;/h3&gt;
-
-&lt;p&gt;以下完成条件为上生产并稳定通过:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;安全加固(nginx,tomcat)(依据需求进度，大概4月~7月)&lt;/li&gt;
-  &lt;li&gt;监控系统(依据需求进度，大概8月~9月)&lt;/li&gt;
-  &lt;li&gt;性能提升（nginx,tomcat）(依据需求进度，大概10月~12月)&lt;/li&gt;
-&lt;/ol&gt;</content><author><name>YazidChen</name></author><summary type="html">我的2016</summary></entry><entry><title type="html">公钥、私钥、数字签名</title><link href="http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature/" rel="alternate" type="text/html" title="公钥、私钥、数字签名" /><published>2016-12-25T00:00:00+08:00</published><updated>2016-12-25T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature</id><content type="html" xml:base="http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">&lt;h1 id=&quot;公钥私钥数字签名&quot;&gt;公钥、私钥、数字签名&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.zhihu.com/question/20215561&quot;&gt;WebSocket 是什么原理？为什么可以实现持久连接？&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">一、为何引入WebSocket</summary></entry><entry><title type="html">公钥、私钥、数字签名</title><link href="http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature/" rel="alternate" type="text/html" title="公钥、私钥、数字签名" /><published>2016-12-25T00:00:00+08:00</published><updated>2016-12-25T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature</id><content type="html" xml:base="http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">&lt;h1 id=&quot;公钥私钥数字签名&quot;&gt;公钥、私钥、数字签名&lt;/h1&gt;
 
 &lt;h2 id=&quot;公钥私钥&quot;&gt;公钥私钥&lt;/h2&gt;
 
@@ -738,7 +655,7 @@
 
 &lt;p&gt;小明收到我的信后，用CA的公钥解开数字证书，就可以拿到我的真实公钥，之后小明就能验签了。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/29Dejr4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">公钥、私钥、数字签名</summary></entry><entry><title type="html">Linux环境Nginx性能优化</title><link href="http://localhost:4000/2016/12/01/NginxPerformance/" rel="alternate" type="text/html" title="Linux环境Nginx性能优化" /><published>2016-12-01T00:00:00+08:00</published><updated>2016-12-01T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/01/NginxPerformance</id><content type="html" xml:base="http://localhost:4000/2016/12/01/NginxPerformance/">&lt;h1 id=&quot;nginx-performance-optimize&quot;&gt;Nginx performance optimize&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/29Dejr4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">公钥、私钥、数字签名</summary></entry><entry><title type="html">Linux环境Nginx性能优化</title><link href="http://localhost:4000/2016/12/01/NginxPerformance/" rel="alternate" type="text/html" title="Linux环境Nginx性能优化" /><published>2016-12-01T00:00:00+08:00</published><updated>2016-12-01T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/01/NginxPerformance</id><content type="html" xml:base="http://localhost:4000/2016/12/01/NginxPerformance/">&lt;h1 id=&quot;nginx-performance-optimize&quot;&gt;Nginx performance optimize#&lt;/h1&gt;
 
 &lt;h2 id=&quot;一主配置文件&quot;&gt;一、主配置文件&lt;/h2&gt;
 
@@ -1014,15 +931,15 @@ gzip_vary off&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 &lt;p&gt;保存重启后有：&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/eUzpULs.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/3PKtSgS.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;而未开启gzip压缩的同一页面，其响应大小及时间如下：&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/qQuBvDu.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/dNqJZ35.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;我们再来看一下响应头信息：&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/n1qAMnb.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/JOnIK5R.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;可以看到，响应头中已经存在&lt;code class=&quot;highlighter-rouge&quot;&gt;Content-Encoding:gzip&lt;/code&gt;，并且有返回我们设置的Vary值&lt;code class=&quot;highlighter-rouge&quot;&gt;Vary:Accept-Encoding&lt;/code&gt;。&lt;/p&gt;
 
@@ -1063,7 +980,7 @@ gzip_vary off&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://phpor.net/blog/post/2037&quot;&gt;Response与Transfer-Encoding:chunked、Content-Length、Content-Encoding:gzip&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://imququ.com/post/transfer-encoding-header-in-http.html&quot;&gt;HTTP 协议中的 Transfer-Encoding&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">Nginx performance optimize</summary></entry><entry><title type="html">Linux环境Nginx安全配置</title><link href="http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Nginx安全配置" /><published>2016-11-14T00:00:00+08:00</published><updated>2016-11-14T00:00:00+08:00</updated><id>http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu</id><content type="html" xml:base="http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu/">&lt;h1 id=&quot;nginx-security-for-ubuntu1604&quot;&gt;Nginx Security For Ubuntu16.04&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://imququ.com/post/transfer-encoding-header-in-http.html&quot;&gt;HTTP 协议中的 Transfer-Encoding&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">Nginx performance optimize#</summary></entry><entry><title type="html">Linux环境Nginx安全配置</title><link href="http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Nginx安全配置" /><published>2016-11-14T00:00:00+08:00</published><updated>2016-11-14T00:00:00+08:00</updated><id>http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu</id><content type="html" xml:base="http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu/">&lt;h1 id=&quot;nginx-security-for-ubuntu1604&quot;&gt;Nginx Security For Ubuntu16.04&lt;/h1&gt;
 
 &lt;h2 id=&quot;一隐藏版本号&quot;&gt;一、隐藏版本号&lt;/h2&gt;
 
@@ -1074,14 +991,14 @@ gzip_vary off&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 &lt;p&gt;原始情况下，访问错误的链接会有暴露版本信息的危险。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/WOYn9rJ.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/7NmzOaN.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;用curl命令查出原始的版本信息：&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-I&lt;/span&gt; ddos.jinzhucaifu.com
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-I&lt;/span&gt; www.xxx.com
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/vBvNuK2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/GghodbU.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;12-修改ngx_http_header_filter_modulec文件&quot;&gt;1.2 修改ngx_http_header_filter_module.c文件&lt;/h3&gt;
 
@@ -1159,9 +1076,9 @@ root@yazid-chen:/opt/nginx/nginx-1.11.4# /usr/local/nginx/sbin/nginx
 
 &lt;h3 id=&quot;16-隐藏后状态&quot;&gt;1.6 隐藏后状态&lt;/h3&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/VpB6yIF.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/PLrHNMX.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/EDN2dFS.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://i.imgur.com/xGhn3vE.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;二给nginx以普通用户运行的权限&quot;&gt;二、给Nginx以普通用户运行的权限&lt;/h2&gt;
 
@@ -1870,17 +1787,13 @@ ps aux | grep tomcat
   &lt;li&gt;进cmd， &lt;code class=&quot;highlighter-rouge&quot;&gt;ruby -v&lt;/code&gt;，如果显示ruby版本信息说明安装成功。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;strong&gt;3、&lt;/strong&gt;安装rubyGems&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;cd d:\OfficeSoft\rubygems-2.6.6&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;ruby setup.rb&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
 &lt;h3 id=&quot;安装jekyll&quot;&gt;安装Jekyll&lt;/h3&gt;
 
 &lt;ul&gt;
   &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;gem install jekyll&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;p&gt;注意ruby安装目录存在空格时会报Makefile异常。&lt;/p&gt;
 
 &lt;h3 id=&quot;创建本地blog站点&quot;&gt;创建本地blog站点&lt;/h3&gt;
 
@@ -1899,6 +1812,10 @@ gem install minima
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# Replace Line 38 with:
 
 @path = base + &quot;/&quot; + name
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Could not find gem ‘tzinfo-data x64-mingw32’ in any of the gem sources listed in your Gemfile.报错处理：&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bundle
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h3 id=&quot;目录解读&quot;&gt;目录解读&lt;/h3&gt;

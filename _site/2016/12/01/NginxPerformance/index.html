@@ -30,8 +30,8 @@
     <meta name="keywords" content="Nginx, Linux, 性能, performance, Nginx性能, Nginx performance">
     <meta name="og:keywords" content="Nginx, Linux, 性能, performance, Nginx性能, Nginx performance">
       
-    <meta name="description" content="Nginx performance optimize">
-    <meta name="og:description" content="Nginx performance optimize">
+    <meta name="description" content="Nginx performance optimize#">
+    <meta name="og:description" content="Nginx performance optimize#">
       
     
     
@@ -108,7 +108,7 @@
 <div class="columns">
   <div class="column three-fourths" >
     <article class="article-content markdown-body">
-    <h1 id="nginx-performance-optimize">Nginx performance optimize</h1>
+    <h1 id="nginx-performance-optimize">Nginx performance optimize#</h1>
 
 <h2 id="一主配置文件">一、主配置文件</h2>
 
@@ -384,15 +384,15 @@ gzip_vary off<span class="p">;</span>
 
 <p>保存重启后有：</p>
 
-<p><img src="http://i.imgur.com/eUzpULs.png" alt="" /></p>
+<p><img src="https://i.imgur.com/3PKtSgS.png" alt="" /></p>
 
 <p>而未开启gzip压缩的同一页面，其响应大小及时间如下：</p>
 
-<p><img src="http://i.imgur.com/qQuBvDu.png" alt="" /></p>
+<p><img src="https://i.imgur.com/dNqJZ35.png" alt="" /></p>
 
 <p>我们再来看一下响应头信息：</p>
 
-<p><img src="http://i.imgur.com/n1qAMnb.png" alt="" /></p>
+<p><img src="https://i.imgur.com/JOnIK5R.png" alt="" /></p>
 
 <p>可以看到，响应头中已经存在<code class="highlighter-rouge">Content-Encoding:gzip</code>，并且有返回我们设置的Vary值<code class="highlighter-rouge">Vary:Accept-Encoding</code>。</p>
 

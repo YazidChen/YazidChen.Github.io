@@ -139,17 +139,13 @@
   <li>进cmd， <code class="highlighter-rouge">ruby -v</code>，如果显示ruby版本信息说明安装成功。</li>
 </ul>
 
-<p><strong>3、</strong>安装rubyGems</p>
-<ul>
-  <li><code class="highlighter-rouge">cd d:\OfficeSoft\rubygems-2.6.6</code></li>
-  <li><code class="highlighter-rouge">ruby setup.rb</code></li>
-</ul>
-
 <h3 id="安装jekyll">安装Jekyll</h3>
 
 <ul>
   <li><code class="highlighter-rouge">gem install jekyll</code></li>
 </ul>
+
+<p>注意ruby安装目录存在空格时会报Makefile异常。</p>
 
 <h3 id="创建本地blog站点">创建本地blog站点</h3>
 
@@ -168,6 +164,10 @@ gem install minima
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Replace Line 38 with:
 
 @path = base + "/" + name
+</code></pre></div></div>
+
+<p>Could not find gem ‘tzinfo-data x64-mingw32’ in any of the gem sources listed in your Gemfile.报错处理：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bundle
 </code></pre></div></div>
 
 <h3 id="目录解读">目录解读</h3>

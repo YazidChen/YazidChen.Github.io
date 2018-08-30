@@ -92,8 +92,8 @@ public class WsHandler extends AbstractWebSocketHandler {
 2、创建握手拦截器：
 
 ```java
-import com.jz.service.jzcf_ums.api.form.UserSession;
-import com.jzcf.ums.sso.utils.ShiroUtils;
+import com.*.api.form.UserSession;
+import com.*.ShiroUtils;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Service;
@@ -127,8 +127,8 @@ public class WsHandshakeInterceptor implements HandshakeInterceptor {
 3、将WsHandler绑定到特定的URL上
 
 ```java
-import com.jzcf.csms.core.websocket.handler.WsHandler;
-import com.jzcf.csms.core.websocket.interceptor.WsHandshakeInterceptor;
+import com.*.websocket.handler.WsHandler;
+import com.*.websocket.interceptor.WsHandshakeInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -149,23 +149,23 @@ public class WsConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(wsHandler, "/chat").setAllowedOrigins("https://csms-dev.jzcaifu.com").addInterceptors(wsHandshakeInterceptor);
+        registry.addHandler(wsHandler, "/chat").setAllowedOrigins("https://www.xxx.com").addInterceptors(wsHandshakeInterceptor);
     }
 }
 
 ```
 
 - `addHandler()`将`WsHandler`绑定在了`/chat`路径上；
-- `setAllowedOrigins()`允许来源为`https://csms-dev.jzcaifu.com`的请求，设置为`*`允许所有来源；
+- `setAllowedOrigins()`允许来源为`https://www.xxx.com`的请求，设置为`*`允许所有来源；
 - `addInterceptors()`添加拦截器。
 
 
-### 3.3.2 客户端配置 ###
+### 3.1.2 客户端配置 ###
 
 客户端发起WebSocket链接请求：
 
 ```js
-let ws = new WebSocket("wss://csms-dev.jzcaifu.com/chat");//发起连接
+let ws = new WebSocket("wss://www.xxx.com/chat");//发起连接
             ws.onopen = function () {
                 console.log("WebSocket open now!")
                 ws.send("message test!");//客户端向服务器发送消息
@@ -181,11 +181,11 @@ let ws = new WebSocket("wss://csms-dev.jzcaifu.com/chat");//发起连接
             };
 ```
 
-### 3.3.3 运行结果 ###
+### 3.1.3 运行结果 ###
 
-![](https://i.imgur.com/mTgAbTb.png)
+![](https://i.imgur.com/s1QA73A.png)
 
-![](https://i.imgur.com/KwNihlQ.png)
+![](https://i.imgur.com/etFw6Kx.png)
 
 - `Connection`为Upgrade，表示客户端希望连接升级；
 - `Upgrade`为Websocket，表示希望升级到Websocket协议；
@@ -201,8 +201,8 @@ let ws = new WebSocket("wss://csms-dev.jzcaifu.com/chat");//发起连接
 ### 3.2.1 服务端配置 ###
 
 ```java
-import com.jzcf.csms.core.websocket.handler.WsHandler;
-import com.jzcf.csms.core.websocket.interceptor.WsHandshakeInterceptor;
+import com.*.websocket.handler.WsHandler;
+import com.*.websocket.interceptor.WsHandshakeInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -223,7 +223,7 @@ public class WsConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(wsHandler, "/chat").setAllowedOrigins("https://csms-dev.jzcaifu.com").addInterceptors(wsHandshakeInterceptor).withSockJS();//此处使用SockJS
+        registry.addHandler(wsHandler, "/chat").setAllowedOrigins("https://www.xxx.com").addInterceptors(wsHandshakeInterceptor).withSockJS();//此处使用SockJS
     }
 }
 ```
@@ -236,7 +236,7 @@ public class WsConfig implements WebSocketConfigurer {
 <!--引入sockjs-->
 <script type="text/javascript" src="/statics/libs/sockjs.min.js"></script>
 <!--此处为https协议-->
-            let sock = new SockJS("https://csms-dev.jzcaifu.com/chat");
+            let sock = new SockJS("https://www.xxx.com/chat");
             sock.onopen = function () {
                 console.log("WebSocket open now!")
                 sock.send("message test!");//客户端向服务器发送消息
@@ -258,7 +258,7 @@ public class WsConfig implements WebSocketConfigurer {
 
 ![](https://i.imgur.com/d91tSia.png)
 
-![](https://i.imgur.com/9bOXUOI.png)
+![](https://i.imgur.com/kPp9A4P.png)
 
 ## 3.3 STOMP ##
 
@@ -270,8 +270,8 @@ public class WsConfig implements WebSocketConfigurer {
 
 
 ```java
-import com.jz.service.jzcf_ums.api.form.UserSession;
-import com.jzcf.ums.sso.utils.ShiroUtils;
+import com.*.api.form.UserSession;
+import com.*.ShiroUtils;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.socket.WebSocketHandler;
@@ -312,7 +312,7 @@ public class WsHandshakeInterceptor implements HandshakeInterceptor {
         <websocket:stomp-endpoint path="/portfolio" allowed-origins="*">
             <websocket:handshake-interceptors>
                 <bean id="wsHandshakeInterceptor"
-                      class="com.jzcf.csms.core.websocket.interceptor.WsHandshakeInterceptor"/>
+                      class="com.*.websocket.interceptor.WsHandshakeInterceptor"/>
             </websocket:handshake-interceptors>
             <websocket:sockjs message-codec="fastjsonSockJsMessageCodec"/>
         </websocket:stomp-endpoint>
@@ -330,7 +330,7 @@ public class WsHandshakeInterceptor implements HandshakeInterceptor {
 
 
 ```java
-import com.jzcf.csms.core.callcenter.form.WsMessage;
+import com.*.callcenter.form.WsMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -377,10 +377,10 @@ public class WsUsers {
 4、创建监听器：
 
 ```java
-import com.jz.service.jzcf_ums.api.form.UserSession;
-import com.jzcf.csms.core.user.service.UserService;
-import com.jzcf.csms.core.user.util.StatusEnum;
-import com.jzcf.csms.core.websocket.service.WsUsers;
+import com.*.UserSession;
+import com.*.UserService;
+import com.*.StatusEnum;
+import com.*.websocket.service.WsUsers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.Message;
@@ -431,10 +431,10 @@ public class WsConnectedListen implements ApplicationListener<SessionConnectedEv
 
 
 ```java
-import com.jz.service.jzcf_ums.api.form.UserSession;
-import com.jzcf.csms.core.user.service.UserService;
-import com.jzcf.csms.core.user.util.StatusEnum;
-import com.jzcf.csms.core.websocket.service.WsUsers;
+import com.*.UserSession;
+import com.*.UserService;
+import com.*.StatusEnum;
+import com.*.websocket.service.WsUsers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.messaging.MessageHeaders;
@@ -495,11 +495,11 @@ public class WsDisconnectListen implements ApplicationListener<SessionDisconnect
 
 
 ```java
-import com.jz.service.jzcf_ums.api.form.UserSession;
-import com.jzcf.csms.common.utils.R;
-import com.jzcf.csms.core.callcenter.form.WsMessage;
-import com.jzcf.csms.core.websocket.service.WsUsers;
-import com.jzcf.csms.shiro.controller.AbstractController;
+import com.*.UserSession;
+import com.*.R;
+import com.*.WsMessage;
+import com.*.WsUsers;
+import com.*.controller.AbstractController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -589,7 +589,7 @@ public class WsController extends AbstractController {
 ```js
 <script type="text/javascript" src="/statics/libs/stomp.min.js"></script>
 
-let socket = new SockJS('https://csms-dev.jzcaifu.com/portfolio');
+let socket = new SockJS('https://www.xxx.com/portfolio');
             let stompClient = Stomp.over(socket);
             /*            stompClient.debug = function (str) {
                             //不输出日志到控制台
@@ -619,7 +619,7 @@ let socket = new SockJS('https://csms-dev.jzcaifu.com/portfolio');
 
 1、连接结果：
 
-![](https://i.imgur.com/rJCqnx9.png)
+![](https://i.imgur.com/84b2sN9.png)
 
 2、发送全局消息：
 
