@@ -1,5 +1,11 @@
 {
   
+  "2018-10-22-lambdaofstreamapi": {
+    "title": "Lambda Of StreamAPI",
+    "url": " /2018/10/22/LambdaOfStreamAPI/",
+    "category": "Java"
+  },
+  
   "2018-02-01-importwebsocket": {
     "title": "WebSocket SockJS STOMP",
     "url": " /2018/02/01/ImportWebSocket/",
@@ -83,6 +89,8 @@
   
   
   
+  
+  
 
   
   "2016-08-19-createblogsforjekyllongithub": {
@@ -131,6 +139,12 @@
     "title": "WebSocket SockJS STOMP",
     "url": "/2018/02/01/ImportWebSocket/",
     "category": "[&quot;WebSocket&quot;]"
+  },
+  
+  "2018-10-22-lambdaofstreamapi": {
+    "title": "Lambda Of StreamAPI",
+    "url": "/2018/10/22/LambdaOfStreamAPI/",
+    "category": "[&quot;Java&quot;]"
   }
   
 }
