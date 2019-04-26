@@ -1,3 +1,3 @@
 # YazidChen.Github.io
-YazidChen Blog
+YazidChen Blog:
 https://www.yazidchen.com
