@@ -7,7 +7,7 @@ menu: 关于
 permalink: /about/
 ---
 
-## 征途，因兴趣而铺。路途甚远，早些起行 ##
+## 路途甚远，早些起行 ##
 
 **Author：**YazidChen
 
