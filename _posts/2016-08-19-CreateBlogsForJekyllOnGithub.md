@@ -49,7 +49,7 @@ keywords: Jekyll, Blogs, Github
 
 ### 开启站点服务 ###
 
-`jekll serve` 开启服务。可能会报错，一般为缺少包，根据报错做相应处理
+`jekyll serve` 开启服务。可能会报错，一般为缺少包，根据报错做相应处理
 ```
 gem install bundler
 gem install minima

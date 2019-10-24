@@ -1,5 +1,11 @@
 {
   
+  "2019-10-24-platformofdeploy": {
+    "title": "Platform Of Deploy",
+    "url": " /2019/10/24/PlatformOfDeploy/",
+    "category": "Architecture"
+  },
+  
   "2018-10-22-lambdaofstreamapi": {
     "title": "Lambda Of StreamAPI",
     "url": " /2018/10/22/LambdaOfStreamAPI/",
@@ -145,6 +151,12 @@
     "title": "Lambda Of StreamAPI",
     "url": "/2018/10/22/LambdaOfStreamAPI/",
     "category": "[&quot;Java&quot;]"
+  },
+  
+  "2019-10-24-platformofdeploy": {
+    "title": "Platform Of Deploy",
+    "url": "/2019/10/24/PlatformOfDeploy/",
+    "category": "[&quot;Architecture&quot;]"
   }
   
 }

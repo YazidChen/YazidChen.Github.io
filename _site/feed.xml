@@ -1,4 +1,471 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-04-26T08:26:09+00:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title type="html">Lambda Of StreamAPI</title><link href="http://localhost:4000/2018/10/22/LambdaOfStreamAPI/" rel="alternate" type="text/html" title="Lambda Of StreamAPI" /><published>2018-10-22T00:00:00+00:00</published><updated>2018-10-22T00:00:00+00:00</updated><id>http://localhost:4000/2018/10/22/LambdaOfStreamAPI</id><content type="html" xml:base="http://localhost:4000/2018/10/22/LambdaOfStreamAPI/">&lt;h1 id=&quot;stream-apilambda表达式的核心包&quot;&gt;Stream API——Lambda表达式的核心包&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2019-10-24T16:01:46+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">YazidChen Blog</title><subtitle>不归路，因兴趣而铺</subtitle><author><name>YazidChen</name></author><entry><title type="html">Platform Of Deploy</title><link href="http://localhost:4000/2019/10/24/PlatformOfDeploy/" rel="alternate" type="text/html" title="Platform Of Deploy" /><published>2019-10-24T00:00:00+08:00</published><updated>2019-10-24T00:00:00+08:00</updated><id>http://localhost:4000/2019/10/24/PlatformOfDeploy</id><content type="html" xml:base="http://localhost:4000/2019/10/24/PlatformOfDeploy/">&lt;h2 id=&quot;部署平台设计与研发&quot;&gt;部署平台设计与研发&lt;/h2&gt;
+
+&lt;h2 id=&quot;一简介&quot;&gt;一、简介&lt;/h2&gt;
+
+&lt;h3 id=&quot;11-目标&quot;&gt;1.1 目标&lt;/h3&gt;
+
+&lt;p&gt;在项目研发过程中，解决繁重的应用系统部署流程，彻底放下双手。并且能够支持版本存在多种环境情况下的应用系统部署操作。&lt;/p&gt;
+
+&lt;h3 id=&quot;12-介绍&quot;&gt;1.2 介绍&lt;/h3&gt;
+
+&lt;p&gt;部署平台提供给研发团队一个部署项目应用系统的可视化平台，支持应用系统多版本、多环境、多主机实例，方便快捷的配置管理功能也提高了研发测试团队的生产效率。部署平台适合初创、中小企业快速上手，提高新产品的产出速度，缩短产出时间。部署平台可支持容器扩展。&lt;/p&gt;
+
+&lt;h3 id=&quot;13-特性&quot;&gt;1.3 特性&lt;/h3&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;功能点&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;部署平台&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;应用管理&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;版本管理&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;环境管理&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;主机实例管理&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;配置管理&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;应用部署&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;应用重启&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;封板解封及发布&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;支持版本多环境关联卸载&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;支持环境多主机实例关联卸载&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;支持应用多种编译方式部署&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;不存在配置文件特殊字符转义异常&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;支持配置项删除&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;强制获取SVN版本库&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;强制拉取Maven仓库依赖包&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;支持部署记录&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;✔&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&quot;二结构&quot;&gt;二、结构&lt;/h2&gt;
+
+&lt;h3 id=&quot;21-系统架构&quot;&gt;2.1 系统架构&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191024110423.jpg?x-oss-process=style/Watermark&quot; alt=&quot;部署平台系统架构图&quot; /&gt;&lt;/p&gt;
+
+&lt;center&gt;2-1 系统架构图&lt;/center&gt;
+&lt;h3 id=&quot;22-业务构件关系&quot;&gt;2.2 业务构件关系&lt;/h3&gt;
+
+&lt;p&gt;涉及应用系统、配置文件、环境、版本及主机实例。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191024110445.jpg?x-oss-process=style/Watermark&quot; alt=&quot;部署平台业务构件图&quot; /&gt;&lt;/p&gt;
+
+&lt;center&gt;2-2 业务构件图&lt;/center&gt;
+&lt;h3 id=&quot;23-部署流程&quot;&gt;2.3 部署流程&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191024110453.jpg?x-oss-process=style/Watermark&quot; alt=&quot;部署平台部署流程时序图&quot; /&gt;&lt;/p&gt;
+
+&lt;center&gt;2-3 部署流程时序图&lt;/center&gt;
+&lt;h2 id=&quot;三技术要点&quot;&gt;三、技术要点&lt;/h2&gt;
+
+&lt;h3 id=&quot;31-ssh免密登录&quot;&gt;3.1 SSH免密登录&lt;/h3&gt;
+
+&lt;p&gt;系统中不需要保存主机实例密码，只需在添加主机实例时授权主机免密登录即可。从而降低了主机实例泄密的风险，提高主机安全性。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191024134641.jpg?x-oss-process=style/Watermark&quot; alt=&quot;授权SSH免密登录示意图&quot; /&gt;&lt;/p&gt;
+
+&lt;center&gt;3-1 授权SSH免密登录示意图&lt;/center&gt;
+&lt;p&gt;SSH免密登录授权操作需要人为干预，管理员前往堡垒机对Jenkins所在主机及目标客户机进行授权，授权操作如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#重置jenkins密码&lt;/span&gt;
+passwd jenkins
+&lt;span class=&quot;c&quot;&gt;#将jenkins用户设置为可登录&lt;/span&gt;
+usermod &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; /bin/bash jenkins
+&lt;span class=&quot;c&quot;&gt;#以jenkins用户登录&lt;/span&gt;
+su jenkins
+&lt;span class=&quot;c&quot;&gt;#生成密钥，无需输入密码&lt;/span&gt;
+ssh-keygen &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; rsa
+&lt;span class=&quot;c&quot;&gt;#复制公钥到目标客户机,实现免密登录&lt;/span&gt;
+ssh-copy-id &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; ~/.ssh/id_rsa.pub root@[ip]
+&lt;span class=&quot;c&quot;&gt;#将jenkins用户设置为不可登录&lt;/span&gt;
+usermod &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; /bin/false jenkins
+&lt;span class=&quot;c&quot;&gt;#以下为验证操作&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#复制文件&lt;/span&gt;
+scp ROOT.war root@[ip]:/temp
+&lt;span class=&quot;c&quot;&gt;#远程执行命令&lt;/span&gt;
+ssh root@[ip] &lt;span class=&quot;s2&quot;&gt;&quot;df -h&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;32-jenkins-pipeline-script&quot;&gt;3.2 Jenkins pipeline script&lt;/h3&gt;
+
+&lt;p&gt;部署平台下发部署指令，部署全流程由Jenkins pipeline实现。groovy语言编写pipeline脚本，部署的应用涉及多种编译方式，例如war、jar、web、nodejs。根据不同的编译方式编写不同的pipeline脚本，以下列举几种编译方式的pipeline脚本：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;编译方式：war&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-groovy highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;//节点,多台实例多个node节点&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;node&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//主机IP&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;host&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{host}'&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//应用目标主机部署Web服务器路径&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;appPath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{appPath}'&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//应用目标主机部署包路径&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;packagePath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{packagePath}'&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//应用目标主机配置文件路径&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;configPath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{configPath}'&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//Jenkins主机本地配置项存放路径&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;localConfigPath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{localConfigPath}'&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//代码版本库路径&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;codePath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{codePath}'&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//代码编译路径&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;compilePath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{compilePath}'&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//Jenkins管理的版本库验证ID&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;credentialsId&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{credentialsId}'&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//环境类型：开发、测试、预发布、生产&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;envType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{envType}'&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//操作类型：部署、重启&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;operateType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{operateType}'&lt;/span&gt;
+
+    &lt;span class=&quot;c1&quot;&gt;//移除目标主机配置文件，拷贝部署平台生产的配置文件至目标主机&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;stage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Properties'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \&quot;rm -rf $configPath/*.properties\&quot;&quot;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;scp $localConfigPath/properties/*.properties $host:$configPath/&quot;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;operateType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'deploy'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;envType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'PRD'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;c1&quot;&gt;//拉代码至Jenkins主机&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;stage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Checkout'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;checkout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;$class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'SubversionSCM'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;additionalCredentials:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[],&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;excludedCommitMessages:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;excludedRegions:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;excludedRevprop:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;excludedUsers:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;filterChangelog:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;ignoreDirPropChanges:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;includedRegions:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;locations:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;cancelProcessOnExternalsFail:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;credentialsId:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;$credentialsId&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;depthOption:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'infinity'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;ignoreExternalsOption:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;local:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'.'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;remote:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;$codePath&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]],&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;quietOperation:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;workspaceUpdater:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;$class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'UpdateUpdater'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]])&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+            &lt;span class=&quot;c1&quot;&gt;//编译打包&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;stage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Build'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;withEnv&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;JAVA_HOME=${tool 'JDK'}&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;PATH+MAVEN=${tool 'M3'}/bin&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                    &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'mvn clean package -U'&lt;/span&gt;
+                &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//停止进程&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;stage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Stop Progress'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pids&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;returnStdout:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;script:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \&quot;ps -ef | grep $appPath | grep -v \'grep\' | awk \'{print \\\$2}\' | xargs\&quot;&quot;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;$pids&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;trim&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \&quot;sh $appPath/bin/shutdown.sh\&quot;&quot;&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;sleep&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;//如果存在无法自动shutdown的进程，强制kill&lt;/span&gt;
+        &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lastPids&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;returnStdout:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;script:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \&quot;ps -ef | grep $appPath | grep -v \'grep\' | awk \'{print \\\$2}\' | xargs\&quot;&quot;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;$lastPids&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;trim&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \&quot;kill -9 $pids\&quot;&quot;&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;operateType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'deploy'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;//更换应用war包&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;stage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Change Package'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \&quot;rm -rf $packagePath/*\&quot;&quot;&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;compilePath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;scp target/*.war $host:$packagePath/&quot;&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;scp $compilePath/target/*.war $host:$packagePath/&quot;&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//启动进程&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;stage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Start Progress'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \&quot;sh $appPath/bin/startup.sh\&quot;&quot;&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;//拉取部署日志&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \'timeout 100 tail -f $appPath/logs/catalina.out |sed /org.apache.coyote.AbstractProtocol.start[[:space:]]Starting[[:space:]]ProtocolHandler[[:space:]][[][\\\&quot;]ajp-nio-/q\'&quot;&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;编译方式：nodejs&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-groovy highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;node&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;host&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{host}'&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;packagePath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{packagePath}'&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;localConfigPath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{localConfigPath}'&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;configPath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{configPath}'&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;codePath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{codePath}'&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;appName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{appName}'&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;compilePath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{compilePath}'&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;credentialsId&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{credentialsId}'&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;envType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{envType}'&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;operateType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'#{operateType}'&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configPath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;stage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Properties'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \&quot;rm -rf $configPath/*.json\&quot;&quot;&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;scp $localConfigPath/properties/*.json $host:$configPath/&quot;&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;operateType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'deploy'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;envType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'PRD'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;stage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Checkout'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;checkout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;([&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;$class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'SubversionSCM'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;additionalCredentials:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[],&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;excludedCommitMessages:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;excludedRegions:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;excludedRevprop:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;excludedUsers:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;filterChangelog:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;ignoreDirPropChanges:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;includedRegions:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;locations:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;cancelProcessOnExternalsFail:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;credentialsId:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;$credentialsId&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;depthOption:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'infinity'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;ignoreExternalsOption:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;local:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'.'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;remote:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;$codePath&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]],&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;quietOperation:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;workspaceUpdater:&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;$class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'UpdateUpdater'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]])&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configPath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;stage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Stop Progress'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;kt&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pids&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;returnStdout:&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nl&quot;&gt;script:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \&quot;pm2 pid $appName\&quot;&quot;&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;$pids&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;trim&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \&quot;pm2 stop $appName\&quot;&quot;&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;operateType&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'deploy'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;stage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Change Package'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \&quot;rm -rf $packagePath/*\&quot;&quot;&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;compilePath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;scp -r * $host:$packagePath/&quot;&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;scp -r $compilePath/* $host:$packagePath/&quot;&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configPath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \&quot;cd $packagePath/app;npm install --production;\&quot;&quot;&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;configPath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;stage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Start Progress'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \&quot;pm2 start $configPath/pm2.json\&quot;&quot;&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;33-jenkins-api&quot;&gt;3.3 Jenkins API&lt;/h3&gt;
+
+&lt;p&gt;部署平台与Jenkins的通信，用了开源工具包com.offbytwo.jenkins。上述pipeline脚本借由此工具完成替换：&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;cm&quot;&gt;/**
+     * 更新文件夹中任务script
+     *
+     * @param systemName  系统名称
+     * @param versionName 版本名称
+     * @param scriptXml   更新脚本
+     * @throws IOException
+     * @author YazidChen
+     * @date 2019/08/16 0016
+     */&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;updateJobXmlOfFolder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;systemName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;versionName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scriptXml&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IOException&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;【Info】:updateJobXmlOfFolder-&amp;gt;Method Start!-&amp;gt;[systemName:{}, versionName:{}]&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;systemName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;versionName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;FolderJob&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;folderJob&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FolderJob&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;systemName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HOST_JENKINS&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;job/&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;systemName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;jenkinsServer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;updateJob&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;folderJob&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;versionName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;scriptXml&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;替换内容为xml，只需替换&lt;strong&gt;#{nodes}&lt;/strong&gt;节点即可(即上述的pipeline脚本)：&lt;/p&gt;
+
+&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?xml version='1.1' encoding='UTF-8'?&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;flow-definition&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;plugin=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;workflow-job@2.33&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;actions/&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;description&amp;gt;&amp;lt;/description&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;keepDependencies&amp;gt;&lt;/span&gt;false&lt;span class=&quot;nt&quot;&gt;&amp;lt;/keepDependencies&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;properties/&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;definition&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;plugin=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;workflow-cps@2.72&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;script&amp;gt;&lt;/span&gt;#{nodes}&lt;span class=&quot;nt&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;nt&quot;&gt;&amp;lt;sandbox&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/sandbox&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/definition&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;triggers/&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;disabled&amp;gt;&lt;/span&gt;false&lt;span class=&quot;nt&quot;&gt;&amp;lt;/disabled&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/flow-definition&amp;gt;&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;34-实时日志&quot;&gt;3.4 实时日志&lt;/h3&gt;
+
+&lt;p&gt;pipeline脚本中，已将实时部署日志拉取到了jenkins日志中：&lt;/p&gt;
+
+&lt;div class=&quot;language-groovy highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;//拉取部署日志&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;sh&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;ssh $host \'timeout 100 tail -f $appPath/logs/catalina.out |sed /org.apache.coyote.AbstractProtocol.start[[:space:]]Starting[[:space:]]ProtocolHandler[[:space:]][[][\\\&quot;]ajp-nio-/q\'&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;接下来需要将jenkins的日志拉取到部署平台，实时展示到部署平台上：&lt;/p&gt;
+
+&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;cm&quot;&gt;/**
+     * 部署日志输出
+     *
+     * @param versionId   版本ID
+     * @param envId       环境ID
+     * @param systemName  系统名称
+     * @param versionName 版本名称
+     * @throws IOException
+     * @throws InterruptedException
+     * @author YazidChen
+     * @date 2019/09/11 0011
+     */&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;streamConsoleOutput&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lastBuildNum&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;versionId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;envId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;systemName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;versionName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; 
+        &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IOException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;InterruptedException&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;FolderJob&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;folderJob&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;FolderJob&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;systemName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HOST_JENKINS&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;job/&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;systemName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;JobWithDetails&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;job&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;startTime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;currentTimeMillis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;Thread&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;sleep&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;currentTime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;currentTimeMillis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;job&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;jenkinsServer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getJob&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;folderJob&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;versionName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;job&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getLastBuild&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getNumber&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lastBuildNum&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;currentTime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;startTime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10000&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Build&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;build&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;job&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getLastBuild&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;BuildWithDetails&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buildWithDetails&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;build&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;details&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;//WebSocket广播订阅地址&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;subscribePath&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Constant&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WS_SUBSCRIPTION&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Constant&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WS_KIND&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;T_DEPLOY&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Constant&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WS_BUSINESS_TYPE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;BUILD_LOG&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;versionId&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;envId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HashMap&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;gt;();&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;//封装的WebSocket消息体&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;WsMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setBusinessType&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Constant&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WS_BUSINESS_TYPE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;BUILD_LOG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;//封装的WebSocket订阅用户列表&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;WsUsers&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsUsers&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SpringContextUtils&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getBean&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;wsUsers&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;WsUsers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;JenkinsUtil&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;streamConsoleOutput&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;buildWithDetails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BuildConsoleStreamListener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;c1&quot;&gt;//每秒监听到的字符串，广播给所有订阅用户&lt;/span&gt;
+            &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
+            &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;onData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;newLogChunk&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;logString&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;newLogChunk&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;wsUsers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;sendToAll&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subscribePath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+            &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
+            &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;finished&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;put&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;logString&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Jenkins build finished!&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;wsUsers&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;sendToAll&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;subscribePath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wsMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;},&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;600&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;//以下修复了com.offbytwo.jenkins包中的问题&lt;/span&gt;
+    &lt;span class=&quot;cm&quot;&gt;/**
+     * Stream build console output log as text using BuildConsoleStreamListener
+     * Method can be used to asynchronously obtain logs for running build.
+     *
+     * @param listener        interface used to asynchronously obtain logs
+     * @param poolingInterval interval (seconds) used to pool jenkins for logs
+     * @param poolingTimeout  pooling timeout (seconds) used to break pooling in case build stuck
+     * @throws InterruptedException in case of an error.
+     * @throws IOException          in case of an error.
+     */&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;streamConsoleOutput&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BuildWithDetails&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buildWithDetails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BuildConsoleStreamListener&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;listener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;poolingInterval&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;poolingTimeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;boolean&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;crumbFlag&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;InterruptedException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IOException&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;// Calculate start and timeout&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;startTime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;currentTimeMillis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timeoutTime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;startTime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;poolingTimeout&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bufferOffset&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;Thread&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;sleep&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;poolingInterval&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+
+            &lt;span class=&quot;n&quot;&gt;ConsoleLog&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;consoleLog&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;consoleLog&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;getConsoleOutputText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;buildWithDetails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bufferOffset&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;crumbFlag&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;logString&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;consoleLog&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getConsoleLog&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;logString&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;logString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;isEmpty&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;listener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;onData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;logString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;consoleLog&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getHasMoreData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;bufferOffset&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;consoleLog&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getCurrentBufferSize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;listener&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;finished&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+            &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;currentTime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;currentTimeMillis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+
+            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;currentTime&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;timeoutTime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;warn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Pooling for build {0} for {2} timeout! Check if job stuck in jenkins&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
+                        &lt;span class=&quot;n&quot;&gt;buildWithDetails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getDisplayName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buildWithDetails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getNumber&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
+                &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+
+    &lt;span class=&quot;cm&quot;&gt;/**
+     * Get build console output log as text.
+     * Use this method to periodically obtain logs from jenkins and skip chunks that were already received
+     *
+     * @param bufferOffset offset in console lo
+     * @param crumbFlag    &amp;lt;code&amp;gt;true&amp;lt;/code&amp;gt; or &amp;lt;code&amp;gt;false&amp;lt;/code&amp;gt;.
+     * @return ConsoleLog object containing console output of the build. The line separation is done by
+     * {@code CR+LF}.
+     * @throws IOException in case of a failure.
+     */&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ConsoleLog&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getConsoleOutputText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BuildWithDetails&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buildWithDetails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bufferOffset&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;boolean&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;crumbFlag&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IOException&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;List&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NameValuePair&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;formData&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ArrayList&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;gt;();&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;formData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;add&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;BasicNameValuePair&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;start&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Integer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bufferOffset&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)));&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;path&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buildWithDetails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getUrl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;logText/progressiveText&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;HttpResponse&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;httpResponse&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;client&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;post_form_with_result&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;formData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;crumbFlag&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+
+        &lt;span class=&quot;n&quot;&gt;Header&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;moreDataHeader&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;httpResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getFirstHeader&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BuildWithDetails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;MORE_DATA_HEADER&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Header&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;textSizeHeader&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;httpResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getFirstHeader&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BuildWithDetails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;TEXT_SIZE_HEADER&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;response&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;EntityUtils&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;httpResponse&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getEntity&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
+        &lt;span class=&quot;kt&quot;&gt;boolean&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hasMoreData&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;moreDataHeader&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;n&quot;&gt;hasMoreData&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Boolean&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;TRUE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;equals&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;moreDataHeader&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getValue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Integer&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;currentBufferSize&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bufferOffset&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;textSizeHeader&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;currentBufferSize&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Integer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;parseInt&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;textSizeHeader&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getValue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NumberFormatException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+                &lt;span class=&quot;n&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;warn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Cannot parse buffer size for job {0} build {1}. Using current offset!&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt;
+                        &lt;span class=&quot;n&quot;&gt;buildWithDetails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getDisplayName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;buildWithDetails&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getNumber&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
+            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;ConsoleLog&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hasMoreData&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;currentBufferSize&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;参考&quot;&gt;参考&lt;/h2&gt;
+
+&lt;p&gt;本文参考以下文章及项目，在此对原作者表示感谢！&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://jenkins.io/zh/doc/&quot;&gt;Jenkins用户手册&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/jenkinsci/java-client-api&quot;&gt;java-client-api&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">部署平台设计与研发</summary></entry><entry><title type="html">Lambda Of StreamAPI</title><link href="http://localhost:4000/2018/10/22/LambdaOfStreamAPI/" rel="alternate" type="text/html" title="Lambda Of StreamAPI" /><published>2018-10-22T00:00:00+08:00</published><updated>2018-10-22T00:00:00+08:00</updated><id>http://localhost:4000/2018/10/22/LambdaOfStreamAPI</id><content type="html" xml:base="http://localhost:4000/2018/10/22/LambdaOfStreamAPI/">&lt;h1 id=&quot;stream-apilambda表达式的核心包&quot;&gt;Stream API——Lambda表达式的核心包&lt;/h1&gt;
 
 &lt;h2 id=&quot;一lambda表达式&quot;&gt;一、Lambda表达式&lt;/h2&gt;
 
@@ -418,7 +885,7 @@
 
 &lt;p&gt;&lt;a href=&quot;https://howtodoinjava.com/java-8-tutorial/&quot;&gt;java-8-tutorial&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://my.oschina.net/u/2377110/blog/1573456&quot;&gt;Java8 Stream API使用&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">Stream API——Lambda表达式的核心包</summary></entry><entry><title type="html">WebSocket SockJS STOMP</title><link href="http://localhost:4000/2018/02/01/ImportWebSocket/" rel="alternate" type="text/html" title="WebSocket SockJS STOMP" /><published>2018-02-01T00:00:00+00:00</published><updated>2018-02-01T00:00:00+00:00</updated><id>http://localhost:4000/2018/02/01/ImportWebSocket</id><content type="html" xml:base="http://localhost:4000/2018/02/01/ImportWebSocket/">&lt;h1 id=&quot;一为何引入websocket&quot;&gt;一、为何引入WebSocket&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://my.oschina.net/u/2377110/blog/1573456&quot;&gt;Java8 Stream API使用&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">Stream API——Lambda表达式的核心包</summary></entry><entry><title type="html">WebSocket SockJS STOMP</title><link href="http://localhost:4000/2018/02/01/ImportWebSocket/" rel="alternate" type="text/html" title="WebSocket SockJS STOMP" /><published>2018-02-01T00:00:00+08:00</published><updated>2018-02-01T00:00:00+08:00</updated><id>http://localhost:4000/2018/02/01/ImportWebSocket</id><content type="html" xml:base="http://localhost:4000/2018/02/01/ImportWebSocket/">&lt;h1 id=&quot;一为何引入websocket&quot;&gt;一、为何引入WebSocket&lt;/h1&gt;
 
 &lt;h2 id=&quot;11-遇到问题&quot;&gt;1.1 遇到问题&lt;/h2&gt;
 &lt;p&gt;当前有一客服管理系统，有以下业务需求：&lt;/p&gt;
@@ -1035,7 +1502,7 @@
 
 &lt;p&gt;&lt;a href=&quot;https://zh.wikipedia.org/wiki/WebSocket&quot;&gt;WebSocket维基百科&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://www.zhihu.com/question/20215561&quot;&gt;WebSocket 是什么原理？为什么可以实现持久连接？&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">一、为何引入WebSocket</summary></entry><entry><title type="html">公钥、私钥、数字签名</title><link href="http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature/" rel="alternate" type="text/html" title="公钥、私钥、数字签名" /><published>2016-12-25T00:00:00+00:00</published><updated>2016-12-25T00:00:00+00:00</updated><id>http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature</id><content type="html" xml:base="http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">&lt;h1 id=&quot;公钥私钥数字签名&quot;&gt;公钥、私钥、数字签名&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.zhihu.com/question/20215561&quot;&gt;WebSocket 是什么原理？为什么可以实现持久连接？&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">一、为何引入WebSocket</summary></entry><entry><title type="html">公钥、私钥、数字签名</title><link href="http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature/" rel="alternate" type="text/html" title="公钥、私钥、数字签名" /><published>2016-12-25T00:00:00+08:00</published><updated>2016-12-25T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature</id><content type="html" xml:base="http://localhost:4000/2016/12/25/PublicKeyPrivateKeyDigitalSignature/">&lt;h1 id=&quot;公钥私钥数字签名&quot;&gt;公钥、私钥、数字签名&lt;/h1&gt;
 
 &lt;h2 id=&quot;公钥私钥&quot;&gt;公钥私钥&lt;/h2&gt;
 
@@ -1075,7 +1542,7 @@
 
 &lt;p&gt;小明收到我的信后，用CA的公钥解开数字证书，就可以拿到我的真实公钥，之后小明就能验签了。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/29Dejr4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">公钥、私钥、数字签名</summary></entry><entry><title type="html">Linux环境Nginx性能优化</title><link href="http://localhost:4000/2016/12/01/NginxPerformance/" rel="alternate" type="text/html" title="Linux环境Nginx性能优化" /><published>2016-12-01T00:00:00+00:00</published><updated>2016-12-01T00:00:00+00:00</updated><id>http://localhost:4000/2016/12/01/NginxPerformance</id><content type="html" xml:base="http://localhost:4000/2016/12/01/NginxPerformance/">&lt;h1 id=&quot;nginx-performance-optimize&quot;&gt;Nginx performance optimize#&lt;/h1&gt;
+&lt;p&gt;&lt;img src=&quot;http://i.imgur.com/29Dejr4.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">公钥、私钥、数字签名</summary></entry><entry><title type="html">Linux环境Nginx性能优化</title><link href="http://localhost:4000/2016/12/01/NginxPerformance/" rel="alternate" type="text/html" title="Linux环境Nginx性能优化" /><published>2016-12-01T00:00:00+08:00</published><updated>2016-12-01T00:00:00+08:00</updated><id>http://localhost:4000/2016/12/01/NginxPerformance</id><content type="html" xml:base="http://localhost:4000/2016/12/01/NginxPerformance/">&lt;h1 id=&quot;nginx-performance-optimize&quot;&gt;Nginx performance optimize#&lt;/h1&gt;
 
 &lt;h2 id=&quot;一主配置文件&quot;&gt;一、主配置文件&lt;/h2&gt;
 
@@ -1400,7 +1867,7 @@ gzip_vary off&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://phpor.net/blog/post/2037&quot;&gt;Response与Transfer-Encoding:chunked、Content-Length、Content-Encoding:gzip&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://imququ.com/post/transfer-encoding-header-in-http.html&quot;&gt;HTTP 协议中的 Transfer-Encoding&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">Nginx performance optimize#</summary></entry><entry><title type="html">Linux环境Nginx安全配置</title><link href="http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Nginx安全配置" /><published>2016-11-14T00:00:00+00:00</published><updated>2016-11-14T00:00:00+00:00</updated><id>http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu</id><content type="html" xml:base="http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu/">&lt;h1 id=&quot;nginx-security-for-ubuntu1604&quot;&gt;Nginx Security For Ubuntu16.04&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://imququ.com/post/transfer-encoding-header-in-http.html&quot;&gt;HTTP 协议中的 Transfer-Encoding&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">Nginx performance optimize#</summary></entry><entry><title type="html">Linux环境Nginx安全配置</title><link href="http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Nginx安全配置" /><published>2016-11-14T00:00:00+08:00</published><updated>2016-11-14T00:00:00+08:00</updated><id>http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu</id><content type="html" xml:base="http://localhost:4000/2016/11/14/NginxSecuritySettingOnUbuntu/">&lt;h1 id=&quot;nginx-security-for-ubuntu1604&quot;&gt;Nginx Security For Ubuntu16.04&lt;/h1&gt;
 
 &lt;h2 id=&quot;一隐藏版本号&quot;&gt;一、隐藏版本号&lt;/h2&gt;
 
@@ -1711,7 +2178,7 @@ limit_conn_zone &lt;span class=&quot;nv&quot;&gt;$limit&lt;/span&gt; &lt;span cl
 
 &lt;p&gt;&lt;a href=&quot;https://imququ.com/post/my-nginx-conf-for-security.html#simple_thread&quot;&gt;本博客 Nginx 配置之安全篇&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://nginx.org/en/docs/&quot;&gt;nginx documentation&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">Nginx Security For Ubuntu16.04</summary></entry><entry><title type="html">定时切分Nginx日志</title><link href="http://localhost:4000/2016/10/12/CutNginxLog/" rel="alternate" type="text/html" title="定时切分Nginx日志" /><published>2016-10-12T00:00:00+00:00</published><updated>2016-10-12T00:00:00+00:00</updated><id>http://localhost:4000/2016/10/12/CutNginxLog</id><content type="html" xml:base="http://localhost:4000/2016/10/12/CutNginxLog/">&lt;h1 id=&quot;一编写日志自动切割脚本&quot;&gt;一、编写日志自动切割脚本&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;http://nginx.org/en/docs/&quot;&gt;nginx documentation&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">Nginx Security For Ubuntu16.04</summary></entry><entry><title type="html">定时切分Nginx日志</title><link href="http://localhost:4000/2016/10/12/CutNginxLog/" rel="alternate" type="text/html" title="定时切分Nginx日志" /><published>2016-10-12T00:00:00+08:00</published><updated>2016-10-12T00:00:00+08:00</updated><id>http://localhost:4000/2016/10/12/CutNginxLog</id><content type="html" xml:base="http://localhost:4000/2016/10/12/CutNginxLog/">&lt;h1 id=&quot;一编写日志自动切割脚本&quot;&gt;一、编写日志自动切割脚本&lt;/h1&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim /usr/local/nginx/sbin/cut_nginx_log.sh
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -1777,7 +2244,7 @@ crontab &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt;
 
 &lt;p&gt;本文参考以下文章，在此对原作者表示感谢！&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://pvbutler.blog.51cto.com/7662323/1653088&quot;&gt;Linux下定时切割nginx日志并删除指定天数前的日志记录&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">一、编写日志自动切割脚本</summary></entry><entry><title type="html">以Log4j切分Tomcat日志</title><link href="http://localhost:4000/2016/10/09/CutTomcatLogByLog4j/" rel="alternate" type="text/html" title="以Log4j切分Tomcat日志" /><published>2016-10-09T00:00:00+00:00</published><updated>2016-10-09T00:00:00+00:00</updated><id>http://localhost:4000/2016/10/09/CutTomcatLogByLog4j</id><content type="html" xml:base="http://localhost:4000/2016/10/09/CutTomcatLogByLog4j/">&lt;h1 id=&quot;一log4jproperties解析&quot;&gt;一、Log4j.properties解析&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;http://pvbutler.blog.51cto.com/7662323/1653088&quot;&gt;Linux下定时切割nginx日志并删除指定天数前的日志记录&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">一、编写日志自动切割脚本</summary></entry><entry><title type="html">以Log4j切分Tomcat日志</title><link href="http://localhost:4000/2016/10/09/CutTomcatLogByLog4j/" rel="alternate" type="text/html" title="以Log4j切分Tomcat日志" /><published>2016-10-09T00:00:00+08:00</published><updated>2016-10-09T00:00:00+08:00</updated><id>http://localhost:4000/2016/10/09/CutTomcatLogByLog4j</id><content type="html" xml:base="http://localhost:4000/2016/10/09/CutTomcatLogByLog4j/">&lt;h1 id=&quot;一log4jproperties解析&quot;&gt;一、Log4j.properties解析&lt;/h1&gt;
 
 &lt;div class=&quot;language-properties highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# 根日志的级别定义为 DEBUG，并将名为 CATALINA 的 appender 添加其上。
 &lt;/span&gt;&lt;span class=&quot;py&quot;&gt;log4j.rootLogger&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DEBUG, CATALINA&lt;/span&gt;
@@ -1947,7 +2414,7 @@ crontab &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt;
 &lt;h1 id=&quot;参考&quot;&gt;参考&lt;/h1&gt;
 &lt;p&gt;本文参考以下文章，在此对原作者表示感谢！&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://my.oschina.net/jsan/blog/205669&quot;&gt;Tomcat下使用Log4j 接管 catalina.out 日志文件生成方式&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">一、Log4j.properties解析</summary></entry><entry><title type="html">Linux环境Tomcat安全配置</title><link href="http://localhost:4000/2016/09/13/TomcatSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Tomcat安全配置" /><published>2016-09-13T00:00:00+00:00</published><updated>2016-09-13T00:00:00+00:00</updated><id>http://localhost:4000/2016/09/13/TomcatSecuritySettingOnUbuntu</id><content type="html" xml:base="http://localhost:4000/2016/09/13/TomcatSecuritySettingOnUbuntu/">&lt;h1 id=&quot;tomcat-security-for-ubuntu1604&quot;&gt;Tomcat Security For Ubuntu16.04&lt;/h1&gt;
+&lt;p&gt;&lt;a href=&quot;https://my.oschina.net/jsan/blog/205669&quot;&gt;Tomcat下使用Log4j 接管 catalina.out 日志文件生成方式&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">一、Log4j.properties解析</summary></entry><entry><title type="html">Linux环境Tomcat安全配置</title><link href="http://localhost:4000/2016/09/13/TomcatSecuritySettingOnUbuntu/" rel="alternate" type="text/html" title="Linux环境Tomcat安全配置" /><published>2016-09-13T00:00:00+08:00</published><updated>2016-09-13T00:00:00+08:00</updated><id>http://localhost:4000/2016/09/13/TomcatSecuritySettingOnUbuntu</id><content type="html" xml:base="http://localhost:4000/2016/09/13/TomcatSecuritySettingOnUbuntu/">&lt;h1 id=&quot;tomcat-security-for-ubuntu1604&quot;&gt;Tomcat Security For Ubuntu16.04&lt;/h1&gt;
 
 &lt;h2 id=&quot;一权限&quot;&gt;一、权限&lt;/h2&gt;
 
@@ -2176,7 +2643,7 @@ ps aux | grep tomcat
 
 &lt;p&gt;&lt;a href=&quot;http://www.51itong.net/tomcat-4687.html&quot;&gt;Tomcat安全加固配置手册&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://www.tuicool.com/articles/BRF732f&quot;&gt;Tomcat 安全配置与性能优化&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">Tomcat Security For Ubuntu16.04</summary></entry><entry><title type="html">Win环境Jekyll+Markdown+Github Pages搭建个人Blogs</title><link href="http://localhost:4000/2016/08/19/CreateBlogsForJekyllOnGithub/" rel="alternate" type="text/html" title="Win环境Jekyll+Markdown+Github Pages搭建个人Blogs" /><published>2016-08-19T00:00:00+00:00</published><updated>2016-08-19T00:00:00+00:00</updated><id>http://localhost:4000/2016/08/19/CreateBlogsForJekyllOnGithub</id><content type="html" xml:base="http://localhost:4000/2016/08/19/CreateBlogsForJekyllOnGithub/">&lt;h2 id=&quot;开启github-pages&quot;&gt;开启Github Pages&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.tuicool.com/articles/BRF732f&quot;&gt;Tomcat 安全配置与性能优化&lt;/a&gt;&lt;/p&gt;</content><author><name>YazidChen</name></author><summary type="html">Tomcat Security For Ubuntu16.04</summary></entry><entry><title type="html">Win环境Jekyll+Markdown+Github Pages搭建个人Blogs</title><link href="http://localhost:4000/2016/08/19/CreateBlogsForJekyllOnGithub/" rel="alternate" type="text/html" title="Win环境Jekyll+Markdown+Github Pages搭建个人Blogs" /><published>2016-08-19T00:00:00+08:00</published><updated>2016-08-19T00:00:00+08:00</updated><id>http://localhost:4000/2016/08/19/CreateBlogsForJekyllOnGithub</id><content type="html" xml:base="http://localhost:4000/2016/08/19/CreateBlogsForJekyllOnGithub/">&lt;h2 id=&quot;开启github-pages&quot;&gt;开启Github Pages&lt;/h2&gt;
 
 &lt;p&gt;&lt;strong&gt;1、&lt;/strong&gt;在github中建立一个基于你的用户名的repository&lt;/p&gt;
 
@@ -2224,7 +2691,7 @@ ps aux | grep tomcat
 
 &lt;h3 id=&quot;开启站点服务&quot;&gt;开启站点服务&lt;/h3&gt;
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;jekll serve&lt;/code&gt; 开启服务。可能会报错，一般为缺少包，根据报错做相应处理&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;jekyll serve&lt;/code&gt; 开启服务。可能会报错，一般为缺少包，根据报错做相应处理&lt;/p&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gem install bundler
 gem install minima
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
