@@ -1,12 +1,12 @@
 ---
 layout: post
-title:  "Platform Of Deploy"
+title:  "部署平台设计与研发"
 categories: Architecture
-description: Stream API——Lambda表达式的核心包。
-keywords: Lambda, lambda, Stream, Stream API, Java8, JAVA8
+description: 部署平台设计与研发实践。
+keywords: deploy, 部署, 部署平台, Jenkins, Java, pipeline
 ---
 
-## 部署平台设计与研发
+## Platform Of Deploy
 
 ## 一、简介
 
