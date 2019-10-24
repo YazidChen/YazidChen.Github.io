@@ -119,7 +119,7 @@
 <span class="c"># author YazidChen</span>
 
 <span class="c"># 一般设定切割时间是0点，切除昨天的日志。</span>
-<span class="nv">DATE</span><span class="o">=</span><span class="k">$(</span><span class="nb">date</span> <span class="nt">-d</span> <span class="s2">"yesterday"</span> +<span class="s2">"%Y%m%d"</span><span class="k">)</span>
+<span class="nv">DATE</span><span class="o">=</span><span class="si">$(</span><span class="nb">date</span> <span class="nt">-d</span> <span class="s2">"yesterday"</span> +<span class="s2">"%Y%m%d"</span><span class="si">)</span>
 <span class="nv">LOG_PATH</span><span class="o">=</span>/usr/local/nginx/logs/
 <span class="nv">ACCESS_LOG_NAME</span><span class="o">=</span>access.log
 <span class="nv">ERROR_LOG_NAME</span><span class="o">=</span>error.log

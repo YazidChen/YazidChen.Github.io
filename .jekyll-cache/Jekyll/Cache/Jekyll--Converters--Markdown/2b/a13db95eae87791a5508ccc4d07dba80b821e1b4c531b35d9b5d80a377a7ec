@@ -1,0 +1,469 @@
+I"��<h2 id="部署平台设计与研发">部署平台设计与研发</h2>
+
+<h2 id="一简介">一、简介</h2>
+
+<h3 id="11-目标">1.1 目标</h3>
+
+<p>在项目研发过程中，解决繁重的应用系统部署流程，彻底放下双手。并且能够支持版本存在多种环境情况下的应用系统部署操作。</p>
+
+<h3 id="12-介绍">1.2 介绍</h3>
+
+<p>部署平台提供给研发团队一个部署项目应用系统的可视化平台，支持应用系统多版本、多环境、多主机实例，方便快捷的配置管理功能也提高了研发测试团队的生产效率。部署平台适合初创、中小企业快速上手，提高新产品的产出速度，缩短产出时间。部署平台可支持容器扩展。</p>
+
+<h3 id="13-特性">1.3 特性</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">功能点</th>
+      <th style="text-align: center">部署平台</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">应用管理</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">版本管理</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">环境管理</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">主机实例管理</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">配置管理</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">应用部署</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">应用重启</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">封板解封及发布</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">支持版本多环境关联卸载</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">支持环境多主机实例关联卸载</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">支持应用多种编译方式部署</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">不存在配置文件特殊字符转义异常</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">支持配置项删除</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">强制获取SVN版本库</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">强制拉取Maven仓库依赖包</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">支持部署记录</td>
+      <td style="text-align: center">✔</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="二结构">二、结构</h2>
+
+<h3 id="21-系统架构">2.1 系统架构</h3>
+
+<p><img src="https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191024110423.jpg?x-oss-process=style/Watermark" alt="部署平台系统架构图" /></p>
+
+<center>2-1 系统架构图</center>
+<h3 id="22-业务构件关系">2.2 业务构件关系</h3>
+
+<p>涉及应用系统、配置文件、环境、版本及主机实例。</p>
+
+<p><img src="https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191024110445.jpg?x-oss-process=style/Watermark" alt="部署平台业务构件图" /></p>
+
+<center>2-2 业务构件图</center>
+<h3 id="23-部署流程">2.3 部署流程</h3>
+
+<p><img src="https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191024110453.jpg?x-oss-process=style/Watermark" alt="部署平台部署流程时序图" /></p>
+
+<center>2-3 部署流程时序图</center>
+<h2 id="三技术要点">三、技术要点</h2>
+
+<h3 id="31-ssh免密登录">3.1 SSH免密登录</h3>
+
+<p>系统中不需要保存主机实例密码，只需在添加主机实例时授权主机免密登录即可。从而降低了主机实例泄密的风险，提高主机安全性。</p>
+
+<p><img src="https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191024134641.jpg?x-oss-process=style/Watermark" alt="授权SSH免密登录示意图" /></p>
+
+<center>3-1 授权SSH免密登录示意图</center>
+<p>SSH免密登录授权操作需要人为干预，管理员前往堡垒机对Jenkins所在主机及目标客户机进行授权，授权操作如下：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#重置jenkins密码</span>
+passwd jenkins
+<span class="c">#将jenkins用户设置为可登录</span>
+usermod <span class="nt">-s</span> /bin/bash jenkins
+<span class="c">#以jenkins用户登录</span>
+su jenkins
+<span class="c">#生成密钥，无需输入密码</span>
+ssh-keygen <span class="nt">-t</span> rsa
+<span class="c">#复制公钥到目标客户机,实现免密登录</span>
+ssh-copy-id <span class="nt">-i</span> ~/.ssh/id_rsa.pub root@[ip]
+<span class="c">#将jenkins用户设置为不可登录</span>
+usermod <span class="nt">-s</span> /bin/false jenkins
+<span class="c">#以下为验证操作</span>
+<span class="c">#复制文件</span>
+scp ROOT.war root@[ip]:/temp
+<span class="c">#远程执行命令</span>
+ssh root@[ip] <span class="s2">"df -h"</span>
+</code></pre></div></div>
+
+<h3 id="32-jenkins-pipeline-script">3.2 Jenkins pipeline script</h3>
+
+<p>部署平台下发部署指令，部署全流程由Jenkins pipeline实现。groovy语言编写pipeline脚本，部署的应用涉及多种编译方式，例如war、jar、web、nodejs。根据不同的编译方式编写不同的pipeline脚本，以下列举几种编译方式的pipeline脚本：</p>
+
+<ul>
+  <li>编译方式：war</li>
+</ul>
+
+<div class="language-groovy highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//节点,多台实例多个node节点</span>
+<span class="n">node</span> <span class="o">{</span>
+    <span class="c1">//主机IP</span>
+    <span class="kt">def</span> <span class="n">host</span> <span class="o">=</span> <span class="s1">'#{host}'</span>
+    <span class="c1">//应用目标主机部署Web服务器路径</span>
+    <span class="kt">def</span> <span class="n">appPath</span> <span class="o">=</span> <span class="s1">'#{appPath}'</span>
+    <span class="c1">//应用目标主机部署包路径</span>
+    <span class="kt">def</span> <span class="n">packagePath</span> <span class="o">=</span> <span class="s1">'#{packagePath}'</span>
+    <span class="c1">//应用目标主机配置文件路径</span>
+    <span class="kt">def</span> <span class="n">configPath</span> <span class="o">=</span> <span class="s1">'#{configPath}'</span>
+    <span class="c1">//Jenkins主机本地配置项存放路径</span>
+    <span class="kt">def</span> <span class="n">localConfigPath</span> <span class="o">=</span> <span class="s1">'#{localConfigPath}'</span>
+    <span class="c1">//代码版本库路径</span>
+    <span class="kt">def</span> <span class="n">codePath</span> <span class="o">=</span> <span class="s1">'#{codePath}'</span>
+    <span class="c1">//代码编译路径</span>
+    <span class="kt">def</span> <span class="n">compilePath</span> <span class="o">=</span> <span class="s1">'#{compilePath}'</span>
+    <span class="c1">//Jenkins管理的版本库验证ID</span>
+    <span class="kt">def</span> <span class="n">credentialsId</span> <span class="o">=</span> <span class="s1">'#{credentialsId}'</span>
+    <span class="c1">//环境类型：开发、测试、预发布、生产</span>
+    <span class="kt">def</span> <span class="n">envType</span> <span class="o">=</span> <span class="s1">'#{envType}'</span>
+    <span class="c1">//操作类型：部署、重启</span>
+    <span class="kt">def</span> <span class="n">operateType</span> <span class="o">=</span> <span class="s1">'#{operateType}'</span>
+
+    <span class="c1">//移除目标主机配置文件，拷贝部署平台生产的配置文件至目标主机</span>
+    <span class="n">stage</span><span class="o">(</span><span class="s1">'Properties'</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">sh</span> <span class="s2">"ssh $host \"rm -rf $configPath/*.properties\""</span>
+        <span class="n">sh</span> <span class="s2">"scp $localConfigPath/properties/*.properties $host:$configPath/"</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">operateType</span> <span class="o">==</span> <span class="s1">'deploy'</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">envType</span> <span class="o">!=</span> <span class="s1">'PRD'</span><span class="o">)</span> <span class="o">{</span>
+            <span class="c1">//拉代码至Jenkins主机</span>
+            <span class="n">stage</span><span class="o">(</span><span class="s1">'Checkout'</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">checkout</span><span class="o">([</span><span class="n">$class</span><span class="o">:</span> <span class="s1">'SubversionSCM'</span><span class="o">,</span> <span class="nl">additionalCredentials:</span> <span class="o">[],</span> <span class="nl">excludedCommitMessages:</span> <span class="s1">''</span><span class="o">,</span> <span class="nl">excludedRegions:</span> <span class="s1">''</span><span class="o">,</span> <span class="nl">excludedRevprop:</span> <span class="s1">''</span><span class="o">,</span> <span class="nl">excludedUsers:</span> <span class="s1">''</span><span class="o">,</span> <span class="nl">filterChangelog:</span> <span class="kc">false</span><span class="o">,</span> <span class="nl">ignoreDirPropChanges:</span> <span class="kc">false</span><span class="o">,</span> <span class="nl">includedRegions:</span> <span class="s1">''</span><span class="o">,</span> <span class="nl">locations:</span> <span class="o">[[</span><span class="nl">cancelProcessOnExternalsFail:</span> <span class="kc">true</span><span class="o">,</span> <span class="nl">credentialsId:</span> <span class="s2">"$credentialsId"</span><span class="o">,</span> <span class="nl">depthOption:</span> <span class="s1">'infinity'</span><span class="o">,</span> <span class="nl">ignoreExternalsOption:</span> <span class="kc">true</span><span class="o">,</span> <span class="nl">local:</span> <span class="s1">'.'</span><span class="o">,</span> <span class="nl">remote:</span> <span class="s2">"$codePath"</span><span class="o">]],</span> <span class="nl">quietOperation:</span> <span class="kc">true</span><span class="o">,</span> <span class="nl">workspaceUpdater:</span> <span class="o">[</span><span class="n">$class</span><span class="o">:</span> <span class="s1">'UpdateUpdater'</span><span class="o">]])</span>
+            <span class="o">}</span>
+            <span class="c1">//编译打包</span>
+            <span class="n">stage</span><span class="o">(</span><span class="s1">'Build'</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">withEnv</span><span class="o">([</span><span class="s2">"JAVA_HOME=${tool 'JDK'}"</span><span class="o">,</span> <span class="s2">"PATH+MAVEN=${tool 'M3'}/bin"</span><span class="o">])</span> <span class="o">{</span>
+                    <span class="n">sh</span> <span class="s1">'mvn clean package -U'</span>
+                <span class="o">}</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="c1">//停止进程</span>
+    <span class="n">stage</span><span class="o">(</span><span class="s1">'Stop Progress'</span><span class="o">)</span> <span class="o">{</span>
+        <span class="kt">def</span> <span class="n">pids</span> <span class="o">=</span> <span class="n">sh</span> <span class="nl">returnStdout:</span> <span class="kc">true</span><span class="o">,</span> <span class="nl">script:</span> <span class="s2">"ssh $host \"ps -ef | grep $appPath | grep -v \'grep\' | awk \'{print \\\$2}\' | xargs\""</span>
+        <span class="k">if</span> <span class="o">(</span><span class="s2">"$pids"</span><span class="o">.</span><span class="na">trim</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">sh</span> <span class="s2">"ssh $host \"sh $appPath/bin/shutdown.sh\""</span>
+        <span class="o">}</span>
+        <span class="n">sleep</span><span class="o">(</span><span class="mi">5</span><span class="o">)</span>
+        <span class="c1">//如果存在无法自动shutdown的进程，强制kill</span>
+        <span class="kt">def</span> <span class="n">lastPids</span> <span class="o">=</span> <span class="n">sh</span> <span class="nl">returnStdout:</span> <span class="kc">true</span><span class="o">,</span> <span class="nl">script:</span> <span class="s2">"ssh $host \"ps -ef | grep $appPath | grep -v \'grep\' | awk \'{print \\\$2}\' | xargs\""</span>
+        <span class="k">if</span> <span class="o">(</span><span class="s2">"$lastPids"</span><span class="o">.</span><span class="na">trim</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">sh</span> <span class="s2">"ssh $host \"kill -9 $pids\""</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">operateType</span> <span class="o">==</span> <span class="s1">'deploy'</span><span class="o">)</span> <span class="o">{</span>
+        <span class="c1">//更换应用war包</span>
+        <span class="n">stage</span><span class="o">(</span><span class="s1">'Change Package'</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">sh</span> <span class="s2">"ssh $host \"rm -rf $packagePath/*\""</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">compilePath</span> <span class="o">==</span> <span class="s1">''</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">sh</span> <span class="s2">"scp target/*.war $host:$packagePath/"</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="n">sh</span> <span class="s2">"scp $compilePath/target/*.war $host:$packagePath/"</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="c1">//启动进程</span>
+    <span class="n">stage</span><span class="o">(</span><span class="s1">'Start Progress'</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">sh</span> <span class="s2">"ssh $host \"sh $appPath/bin/startup.sh\""</span>
+        <span class="c1">//拉取部署日志</span>
+        <span class="n">sh</span> <span class="s2">"ssh $host \'timeout 100 tail -f $appPath/logs/catalina.out |sed /org.apache.coyote.AbstractProtocol.start[[:space:]]Starting[[:space:]]ProtocolHandler[[:space:]][[][\\\"]ajp-nio-/q\'"</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<ul>
+  <li>编译方式：nodejs</li>
+</ul>
+
+<div class="language-groovy highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">node</span> <span class="o">{</span>
+    <span class="kt">def</span> <span class="n">host</span> <span class="o">=</span> <span class="s1">'#{host}'</span>
+    <span class="kt">def</span> <span class="n">packagePath</span> <span class="o">=</span> <span class="s1">'#{packagePath}'</span>
+    <span class="kt">def</span> <span class="n">localConfigPath</span> <span class="o">=</span> <span class="s1">'#{localConfigPath}'</span>
+    <span class="kt">def</span> <span class="n">configPath</span> <span class="o">=</span> <span class="s1">'#{configPath}'</span>
+    <span class="kt">def</span> <span class="n">codePath</span> <span class="o">=</span> <span class="s1">'#{codePath}'</span>
+    <span class="kt">def</span> <span class="n">appName</span> <span class="o">=</span> <span class="s1">'#{appName}'</span>
+    <span class="kt">def</span> <span class="n">compilePath</span> <span class="o">=</span> <span class="s1">'#{compilePath}'</span>
+    <span class="kt">def</span> <span class="n">credentialsId</span> <span class="o">=</span> <span class="s1">'#{credentialsId}'</span>
+    <span class="kt">def</span> <span class="n">envType</span> <span class="o">=</span> <span class="s1">'#{envType}'</span>
+    <span class="kt">def</span> <span class="n">operateType</span> <span class="o">=</span> <span class="s1">'#{operateType}'</span>
+
+    <span class="k">if</span> <span class="o">(</span><span class="n">configPath</span> <span class="o">!=</span> <span class="s1">''</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">stage</span><span class="o">(</span><span class="s1">'Properties'</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">sh</span> <span class="s2">"ssh $host \"rm -rf $configPath/*.json\""</span>
+            <span class="n">sh</span> <span class="s2">"scp $localConfigPath/properties/*.json $host:$configPath/"</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">operateType</span> <span class="o">==</span> <span class="s1">'deploy'</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">envType</span> <span class="o">!=</span> <span class="s1">'PRD'</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">stage</span><span class="o">(</span><span class="s1">'Checkout'</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">checkout</span><span class="o">([</span><span class="n">$class</span><span class="o">:</span> <span class="s1">'SubversionSCM'</span><span class="o">,</span> <span class="nl">additionalCredentials:</span> <span class="o">[],</span> <span class="nl">excludedCommitMessages:</span> <span class="s1">''</span><span class="o">,</span> <span class="nl">excludedRegions:</span> <span class="s1">''</span><span class="o">,</span> <span class="nl">excludedRevprop:</span> <span class="s1">''</span><span class="o">,</span> <span class="nl">excludedUsers:</span> <span class="s1">''</span><span class="o">,</span> <span class="nl">filterChangelog:</span> <span class="kc">false</span><span class="o">,</span> <span class="nl">ignoreDirPropChanges:</span> <span class="kc">false</span><span class="o">,</span> <span class="nl">includedRegions:</span> <span class="s1">''</span><span class="o">,</span> <span class="nl">locations:</span> <span class="o">[[</span><span class="nl">cancelProcessOnExternalsFail:</span> <span class="kc">true</span><span class="o">,</span> <span class="nl">credentialsId:</span> <span class="s2">"$credentialsId"</span><span class="o">,</span> <span class="nl">depthOption:</span> <span class="s1">'infinity'</span><span class="o">,</span> <span class="nl">ignoreExternalsOption:</span> <span class="kc">true</span><span class="o">,</span> <span class="nl">local:</span> <span class="s1">'.'</span><span class="o">,</span> <span class="nl">remote:</span> <span class="s2">"$codePath"</span><span class="o">]],</span> <span class="nl">quietOperation:</span> <span class="kc">true</span><span class="o">,</span> <span class="nl">workspaceUpdater:</span> <span class="o">[</span><span class="n">$class</span><span class="o">:</span> <span class="s1">'UpdateUpdater'</span><span class="o">]])</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">configPath</span> <span class="o">!=</span> <span class="s1">''</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">stage</span><span class="o">(</span><span class="s1">'Stop Progress'</span><span class="o">)</span> <span class="o">{</span>
+            <span class="kt">def</span> <span class="n">pids</span> <span class="o">=</span> <span class="n">sh</span> <span class="nl">returnStdout:</span> <span class="kc">true</span><span class="o">,</span> <span class="nl">script:</span> <span class="s2">"ssh $host \"pm2 pid $appName\""</span>
+            <span class="k">if</span> <span class="o">(</span><span class="s2">"$pids"</span><span class="o">.</span><span class="na">trim</span><span class="o">())</span> <span class="o">{</span>
+                <span class="n">sh</span> <span class="s2">"ssh $host \"pm2 stop $appName\""</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">operateType</span> <span class="o">==</span> <span class="s1">'deploy'</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">stage</span><span class="o">(</span><span class="s1">'Change Package'</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">sh</span> <span class="s2">"ssh $host \"rm -rf $packagePath/*\""</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">compilePath</span> <span class="o">==</span> <span class="s1">''</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">sh</span> <span class="s2">"scp -r * $host:$packagePath/"</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="n">sh</span> <span class="s2">"scp -r $compilePath/* $host:$packagePath/"</span>
+            <span class="o">}</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">configPath</span> <span class="o">!=</span> <span class="s1">''</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">sh</span> <span class="s2">"ssh $host \"cd $packagePath/app;npm install --production;\""</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">configPath</span> <span class="o">!=</span> <span class="s1">''</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">stage</span><span class="o">(</span><span class="s1">'Start Progress'</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">sh</span> <span class="s2">"ssh $host \"pm2 start $configPath/pm2.json\""</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<h3 id="33-jenkins-api">3.3 Jenkins API</h3>
+
+<p>部署平台与Jenkins的通信，用了开源工具包com.offbytwo.jenkins。上述pipeline脚本借由此工具完成替换：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="cm">/**
+     * 更新文件夹中任务script
+     *
+     * @param systemName  系统名称
+     * @param versionName 版本名称
+     * @param scriptXml   更新脚本
+     * @throws IOException
+     * @author YazidChen
+     * @date 2019/08/16 0016
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">updateJobXmlOfFolder</span><span class="o">(</span><span class="nc">String</span> <span class="n">systemName</span><span class="o">,</span> <span class="nc">String</span> <span class="n">versionName</span><span class="o">,</span> <span class="nc">String</span> <span class="n">scriptXml</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"【Info】:updateJobXmlOfFolder-&gt;Method Start!-&gt;[systemName:{}, versionName:{}]"</span><span class="o">,</span> <span class="n">systemName</span><span class="o">,</span> <span class="n">versionName</span><span class="o">);</span>
+        <span class="nc">FolderJob</span> <span class="n">folderJob</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">FolderJob</span><span class="o">(</span><span class="n">systemName</span><span class="o">,</span> <span class="no">HOST_JENKINS</span> <span class="o">+</span> <span class="s">"job/"</span> <span class="o">+</span> <span class="n">systemName</span> <span class="o">+</span> <span class="s">"/"</span><span class="o">);</span>
+        <span class="n">jenkinsServer</span><span class="o">.</span><span class="na">updateJob</span><span class="o">(</span><span class="n">folderJob</span><span class="o">,</span> <span class="n">versionName</span><span class="o">,</span> <span class="n">scriptXml</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+<p>替换内容为xml，只需替换<strong>#{nodes}</strong>节点即可(即上述的pipeline脚本)：</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version='1.1' encoding='UTF-8'?&gt;</span>
+<span class="nt">&lt;flow-definition</span> <span class="na">plugin=</span><span class="s">"workflow-job@2.33"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;actions/&gt;</span>
+    <span class="nt">&lt;description&gt;&lt;/description&gt;</span>
+    <span class="nt">&lt;keepDependencies&gt;</span>false<span class="nt">&lt;/keepDependencies&gt;</span>
+    <span class="nt">&lt;properties/&gt;</span>
+    <span class="nt">&lt;definition</span> <span class="na">class=</span><span class="s">"org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition"</span> <span class="na">plugin=</span><span class="s">"workflow-cps@2.72"</span><span class="nt">&gt;</span>
+        <span class="nt">&lt;script&gt;</span>#{nodes}<span class="nt">&lt;/script&gt;</span>
+        <span class="nt">&lt;sandbox&gt;</span>true<span class="nt">&lt;/sandbox&gt;</span>
+    <span class="nt">&lt;/definition&gt;</span>
+    <span class="nt">&lt;triggers/&gt;</span>
+    <span class="nt">&lt;disabled&gt;</span>false<span class="nt">&lt;/disabled&gt;</span>
+<span class="nt">&lt;/flow-definition&gt;</span>
+
+</code></pre></div></div>
+
+<h3 id="34-实时日志">3.4 实时日志</h3>
+
+<p>pipeline脚本中，已将实时部署日志拉取到了jenkins日志中：</p>
+
+<div class="language-groovy highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//拉取部署日志</span>
+<span class="n">sh</span> <span class="s2">"ssh $host \'timeout 100 tail -f $appPath/logs/catalina.out |sed /org.apache.coyote.AbstractProtocol.start[[:space:]]Starting[[:space:]]ProtocolHandler[[:space:]][[][\\\"]ajp-nio-/q\'"</span>
+</code></pre></div></div>
+
+<p>接下来需要将jenkins的日志拉取到部署平台，实时展示到部署平台上：</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="cm">/**
+     * 部署日志输出
+     *
+     * @param versionId   版本ID
+     * @param envId       环境ID
+     * @param systemName  系统名称
+     * @param versionName 版本名称
+     * @throws IOException
+     * @throws InterruptedException
+     * @author YazidChen
+     * @date 2019/09/11 0011
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">streamConsoleOutput</span><span class="o">(</span><span class="kt">int</span> <span class="n">lastBuildNum</span><span class="o">,</span> <span class="nc">Long</span> <span class="n">versionId</span><span class="o">,</span> <span class="nc">Long</span> <span class="n">envId</span><span class="o">,</span> <span class="nc">String</span> <span class="n">systemName</span><span class="o">,</span><span class="nc">String</span> <span class="n">versionName</span><span class="o">)</span> 
+        <span class="kd">throws</span> <span class="nc">IOException</span><span class="o">,</span><span class="nc">InterruptedException</span> <span class="o">{</span>
+        <span class="nc">FolderJob</span> <span class="n">folderJob</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">FolderJob</span><span class="o">(</span><span class="n">systemName</span><span class="o">,</span> <span class="no">HOST_JENKINS</span> <span class="o">+</span> <span class="s">"job/"</span> <span class="o">+</span> <span class="n">systemName</span> <span class="o">+</span> <span class="s">"/"</span><span class="o">);</span>
+        <span class="nc">JobWithDetails</span> <span class="n">job</span><span class="o">;</span>
+        <span class="kd">final</span> <span class="kt">long</span> <span class="n">startTime</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
+        <span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">1000</span><span class="o">);</span>
+            <span class="kt">long</span> <span class="n">currentTime</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">jenkinsServer</span><span class="o">.</span><span class="na">getJob</span><span class="o">(</span><span class="n">folderJob</span><span class="o">,</span> <span class="n">versionName</span><span class="o">);</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">job</span><span class="o">.</span><span class="na">getLastBuild</span><span class="o">().</span><span class="na">getNumber</span><span class="o">()</span> <span class="o">!=</span> <span class="n">lastBuildNum</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">break</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">currentTime</span> <span class="o">&gt;</span> <span class="n">startTime</span> <span class="o">+</span> <span class="mi">10000</span><span class="o">)</span> <span class="o">{</span>
+                <span class="k">break</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="nc">Build</span> <span class="n">build</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="na">getLastBuild</span><span class="o">();</span>
+        <span class="nc">BuildWithDetails</span> <span class="n">buildWithDetails</span> <span class="o">=</span> <span class="n">build</span><span class="o">.</span><span class="na">details</span><span class="o">();</span>
+        <span class="c1">//WebSocket广播订阅地址</span>
+        <span class="nc">String</span> <span class="n">subscribePath</span> <span class="o">=</span> <span class="nc">Constant</span><span class="o">.</span><span class="na">WS_SUBSCRIPTION</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="nc">Constant</span><span class="o">.</span><span class="na">WS_KIND</span><span class="o">.</span><span class="na">T_DEPLOY</span><span class="o">)</span> <span class="o">+</span> <span class="nc">Constant</span><span class="o">.</span><span class="na">WS_BUSINESS_TYPE</span><span class="o">.</span><span class="na">BUILD_LOG</span> <span class="o">+</span> <span class="s">"/"</span> <span class="o">+</span> <span class="n">versionId</span> <span class="o">+</span> <span class="s">"/"</span> <span class="o">+</span> <span class="n">envId</span><span class="o">;</span>
+        <span class="nc">Map</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">Object</span><span class="o">&gt;</span> <span class="n">map</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HashMap</span><span class="o">&lt;&gt;();</span>
+        <span class="c1">//封装的WebSocket消息体</span>
+        <span class="nc">WsMessage</span> <span class="n">wsMessage</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">WsMessage</span><span class="o">();</span>
+        <span class="n">wsMessage</span><span class="o">.</span><span class="na">setBusinessType</span><span class="o">(</span><span class="nc">Constant</span><span class="o">.</span><span class="na">WS_BUSINESS_TYPE</span><span class="o">.</span><span class="na">BUILD_LOG</span><span class="o">);</span>
+        <span class="c1">//封装的WebSocket订阅用户列表</span>
+        <span class="nc">WsUsers</span> <span class="n">wsUsers</span> <span class="o">=</span> <span class="nc">SpringContextUtils</span><span class="o">.</span><span class="na">getBean</span><span class="o">(</span><span class="s">"wsUsers"</span><span class="o">,</span> <span class="nc">WsUsers</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+        <span class="nc">JenkinsUtil</span><span class="o">.</span><span class="na">streamConsoleOutput</span><span class="o">(</span><span class="n">buildWithDetails</span><span class="o">,</span> <span class="k">new</span> <span class="nc">BuildConsoleStreamListener</span><span class="o">()</span> <span class="o">{</span>
+            <span class="c1">//每秒监听到的字符串，广播给所有订阅用户</span>
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onData</span><span class="o">(</span><span class="nc">String</span> <span class="n">newLogChunk</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"logString"</span><span class="o">,</span> <span class="n">newLogChunk</span><span class="o">);</span>
+                <span class="n">wsMessage</span><span class="o">.</span><span class="na">setData</span><span class="o">(</span><span class="n">map</span><span class="o">);</span>
+                <span class="n">wsUsers</span><span class="o">.</span><span class="na">sendToAll</span><span class="o">(</span><span class="n">subscribePath</span><span class="o">,</span> <span class="n">wsMessage</span><span class="o">);</span>
+            <span class="o">}</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">finished</span><span class="o">()</span> <span class="o">{</span>
+                <span class="n">map</span><span class="o">.</span><span class="na">put</span><span class="o">(</span><span class="s">"logString"</span><span class="o">,</span> <span class="s">"Jenkins build finished!"</span><span class="o">);</span>
+                <span class="n">wsUsers</span><span class="o">.</span><span class="na">sendToAll</span><span class="o">(</span><span class="n">subscribePath</span><span class="o">,</span> <span class="n">wsMessage</span><span class="o">);</span>
+            <span class="o">}</span>
+        <span class="o">},</span> <span class="mi">1</span><span class="o">,</span> <span class="mi">600</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+    <span class="o">}</span>
+<span class="c1">//以下修复了com.offbytwo.jenkins包中的问题</span>
+    <span class="cm">/**
+     * Stream build console output log as text using BuildConsoleStreamListener
+     * Method can be used to asynchronously obtain logs for running build.
+     *
+     * @param listener        interface used to asynchronously obtain logs
+     * @param poolingInterval interval (seconds) used to pool jenkins for logs
+     * @param poolingTimeout  pooling timeout (seconds) used to break pooling in case build stuck
+     * @throws InterruptedException in case of an error.
+     * @throws IOException          in case of an error.
+     */</span>
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">streamConsoleOutput</span><span class="o">(</span><span class="nc">BuildWithDetails</span> <span class="n">buildWithDetails</span><span class="o">,</span> <span class="kd">final</span> <span class="nc">BuildConsoleStreamListener</span> <span class="n">listener</span><span class="o">,</span><span class="kd">final</span> <span class="kt">int</span> <span class="n">poolingInterval</span><span class="o">,</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">poolingTimeout</span><span class="o">,</span> <span class="kt">boolean</span> <span class="n">crumbFlag</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">InterruptedException</span><span class="o">,</span> <span class="nc">IOException</span> <span class="o">{</span>
+        <span class="c1">// Calculate start and timeout</span>
+        <span class="kd">final</span> <span class="kt">long</span> <span class="n">startTime</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
+        <span class="kd">final</span> <span class="kt">long</span> <span class="n">timeoutTime</span> <span class="o">=</span> <span class="n">startTime</span> <span class="o">+</span> <span class="o">(</span><span class="n">poolingTimeout</span> <span class="o">*</span> <span class="mi">1000</span><span class="o">);</span>
+        <span class="kt">int</span> <span class="n">bufferOffset</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span>
+        <span class="k">while</span> <span class="o">(</span><span class="kc">true</span><span class="o">)</span> <span class="o">{</span>
+            <span class="nc">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="n">poolingInterval</span> <span class="o">*</span> <span class="mi">1000</span><span class="o">);</span>
+
+            <span class="nc">ConsoleLog</span> <span class="n">consoleLog</span><span class="o">;</span>
+            <span class="n">consoleLog</span> <span class="o">=</span> <span class="n">getConsoleOutputText</span><span class="o">(</span><span class="n">buildWithDetails</span><span class="o">,</span> <span class="n">bufferOffset</span><span class="o">,</span> <span class="n">crumbFlag</span><span class="o">);</span>
+            <span class="nc">String</span> <span class="n">logString</span> <span class="o">=</span> <span class="n">consoleLog</span><span class="o">.</span><span class="na">getConsoleLog</span><span class="o">();</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">logString</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="n">logString</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+                <span class="n">listener</span><span class="o">.</span><span class="na">onData</span><span class="o">(</span><span class="n">logString</span><span class="o">);</span>
+            <span class="o">}</span>
+            <span class="k">if</span> <span class="o">(</span><span class="n">consoleLog</span><span class="o">.</span><span class="na">getHasMoreData</span><span class="o">())</span> <span class="o">{</span>
+                <span class="n">bufferOffset</span> <span class="o">=</span> <span class="n">consoleLog</span><span class="o">.</span><span class="na">getCurrentBufferSize</span><span class="o">();</span>
+            <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+                <span class="n">listener</span><span class="o">.</span><span class="na">finished</span><span class="o">();</span>
+                <span class="k">break</span><span class="o">;</span>
+            <span class="o">}</span>
+            <span class="kt">long</span> <span class="n">currentTime</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
+
+            <span class="k">if</span> <span class="o">(</span><span class="n">currentTime</span> <span class="o">&gt;</span> <span class="n">timeoutTime</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">log</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"Pooling for build {0} for {2} timeout! Check if job stuck in jenkins"</span><span class="o">,</span>
+                        <span class="n">buildWithDetails</span><span class="o">.</span><span class="na">getDisplayName</span><span class="o">(),</span> <span class="n">buildWithDetails</span><span class="o">.</span><span class="na">getNumber</span><span class="o">());</span>
+                <span class="k">break</span><span class="o">;</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+
+    <span class="cm">/**
+     * Get build console output log as text.
+     * Use this method to periodically obtain logs from jenkins and skip chunks that were already received
+     *
+     * @param bufferOffset offset in console lo
+     * @param crumbFlag    &lt;code&gt;true&lt;/code&gt; or &lt;code&gt;false&lt;/code&gt;.
+     * @return ConsoleLog object containing console output of the build. The line separation is done by
+     * {@code CR+LF}.
+     * @throws IOException in case of a failure.
+     */</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="nc">ConsoleLog</span> <span class="nf">getConsoleOutputText</span><span class="o">(</span><span class="nc">BuildWithDetails</span> <span class="n">buildWithDetails</span><span class="o">,</span> <span class="kt">int</span> <span class="n">bufferOffset</span><span class="o">,</span><span class="kt">boolean</span> <span class="n">crumbFlag</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+        <span class="nc">List</span><span class="o">&lt;</span><span class="nc">NameValuePair</span><span class="o">&gt;</span> <span class="n">formData</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">ArrayList</span><span class="o">&lt;&gt;();</span>
+        <span class="n">formData</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="nc">BasicNameValuePair</span><span class="o">(</span><span class="s">"start"</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">bufferOffset</span><span class="o">)));</span>
+        <span class="nc">String</span> <span class="n">path</span> <span class="o">=</span> <span class="n">buildWithDetails</span><span class="o">.</span><span class="na">getUrl</span><span class="o">()</span> <span class="o">+</span> <span class="s">"logText/progressiveText"</span><span class="o">;</span>
+        <span class="nc">HttpResponse</span> <span class="n">httpResponse</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="na">post_form_with_result</span><span class="o">(</span><span class="n">path</span><span class="o">,</span> <span class="n">formData</span><span class="o">,</span> <span class="n">crumbFlag</span><span class="o">);</span>
+
+        <span class="nc">Header</span> <span class="n">moreDataHeader</span> <span class="o">=</span> <span class="n">httpResponse</span><span class="o">.</span><span class="na">getFirstHeader</span><span class="o">(</span><span class="nc">BuildWithDetails</span><span class="o">.</span><span class="na">MORE_DATA_HEADER</span><span class="o">);</span>
+        <span class="nc">Header</span> <span class="n">textSizeHeader</span> <span class="o">=</span> <span class="n">httpResponse</span><span class="o">.</span><span class="na">getFirstHeader</span><span class="o">(</span><span class="nc">BuildWithDetails</span><span class="o">.</span><span class="na">TEXT_SIZE_HEADER</span><span class="o">);</span>
+        <span class="nc">String</span> <span class="n">response</span> <span class="o">=</span> <span class="nc">EntityUtils</span><span class="o">.</span><span class="na">toString</span><span class="o">(</span><span class="n">httpResponse</span><span class="o">.</span><span class="na">getEntity</span><span class="o">());</span>
+        <span class="kt">boolean</span> <span class="n">hasMoreData</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">moreDataHeader</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="n">hasMoreData</span> <span class="o">=</span> <span class="nc">Boolean</span><span class="o">.</span><span class="na">TRUE</span><span class="o">.</span><span class="na">toString</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="n">moreDataHeader</span><span class="o">.</span><span class="na">getValue</span><span class="o">());</span>
+        <span class="o">}</span>
+        <span class="nc">Integer</span> <span class="n">currentBufferSize</span> <span class="o">=</span> <span class="n">bufferOffset</span><span class="o">;</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">textSizeHeader</span> <span class="o">!=</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">try</span> <span class="o">{</span>
+                <span class="n">currentBufferSize</span> <span class="o">=</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">parseInt</span><span class="o">(</span><span class="n">textSizeHeader</span><span class="o">.</span><span class="na">getValue</span><span class="o">());</span>
+            <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">NumberFormatException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">log</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"Cannot parse buffer size for job {0} build {1}. Using current offset!"</span><span class="o">,</span>
+                        <span class="n">buildWithDetails</span><span class="o">.</span><span class="na">getDisplayName</span><span class="o">(),</span> <span class="n">buildWithDetails</span><span class="o">.</span><span class="na">getNumber</span><span class="o">());</span>
+            <span class="o">}</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="k">new</span> <span class="nf">ConsoleLog</span><span class="o">(</span><span class="n">response</span><span class="o">,</span> <span class="n">hasMoreData</span><span class="o">,</span> <span class="n">currentBufferSize</span><span class="o">);</span>
+    <span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="参考">参考</h2>
+
+<p>本文参考以下文章及项目，在此对原作者表示感谢！</p>
+
+<p><a href="https://jenkins.io/zh/doc/">Jenkins用户手册</a></p>
+
+<p><a href="https://github.com/jenkinsci/java-client-api">java-client-api</a></p>
+:ET

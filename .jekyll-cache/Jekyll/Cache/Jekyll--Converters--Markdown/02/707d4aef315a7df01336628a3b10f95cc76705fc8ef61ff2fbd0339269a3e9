@@ -1,0 +1,172 @@
+I"v6<h1 id="一log4jproperties解析">一、Log4j.properties解析</h1>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 根日志的级别定义为 DEBUG，并将名为 CATALINA 的 appender 添加其上。
+</span><span class="py">log4j.rootLogger</span> <span class="p">=</span> <span class="s">DEBUG, CATALINA</span>
+
+<span class="c"># 将名为 CATALINA 的 appender 设置为DailyRollingFileAppender。
+</span><span class="py">log4j.appender.CATALINA</span><span class="p">=</span><span class="s">org.apache.Log4j.DailyRollingFileAppender</span>
+
+<span class="c"># 他将日志写入 log 目录下一个名为 log.out 的文件中。
+</span><span class="py">log4j.appender.CATALINA.File</span><span class="p">=</span><span class="s">${log}/log.out</span>
+
+<span class="c"># 该标志位默认为 true，意味着每次日志追加操作都将输出流刷新至文件。
+</span><span class="py">log4j.appender.CATALINA.ImmediateFlush</span><span class="p">=</span><span class="s">true</span>
+
+<span class="c"># 设置appender 对象的阀值。
+</span><span class="py">log4j.appender.CATALINA.Threshold</span><span class="p">=</span><span class="s">debug</span>
+
+<span class="c"># 该值默认为 true，其含义是让日志追加至文件末尾。
+</span><span class="py">log4j.appender.CATALINA.Append</span><span class="p">=</span><span class="s">true</span>
+
+<span class="c"># 设置回滚规则，在此我们设置为每分钟回滚方便测试。
+</span><span class="py">log4j.appender.CATALINA.DatePattern</span><span class="p">=</span><span class="s">'.'</span> <span class="s">yyyy-MM-dd-HH-mm</span>
+
+<span class="c"># 设置 appender CATALINA 的 layout。
+</span><span class="py">log4j.appender.CATALINA.layout</span><span class="p">=</span><span class="s">org.apache.Log4j.PatternLayout</span>
+
+<span class="c"># layout 被定义为 %m%n，即打印出来的日志信息末尾加入换行。
+</span><span class="py">log4j.appender.CATALINA.layout.conversionPattern</span><span class="p">=</span><span class="s">%m%n</span>
+
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">conversionPattern</code>可以自定义log的格式，相关参数有：</p>
+
+<ul>
+  <li>%p 输出优先级，即<code class="highlighter-rouge">DEBUG，INFO，WARN，ERROR，FATAL</code>。</li>
+  <li>%r 输出自应用启动到输出该log信息耗费的毫秒数。</li>
+  <li>%c 输出所属的类目，通常就是所在类的全名。</li>
+  <li>%t 输出产生该日志事件的线程名。</li>
+  <li>%m 输出代码中指定的消息。</li>
+  <li>%n 输出一个回车换行符，Windows平台为“rn”，Unix平台为“n”。</li>
+  <li>%d 输出日志时间点的日期或时间，默认格式为ISO8601，也可以在其后指定格式，比如：<code class="highlighter-rouge">%d{yyyy MMM dd HH:mm:ss,SSS}</code>，输出类似：2016年10月09日 ：15：41，628。</li>
+  <li>%l 输出日志事件的发生位置，包括类目名、发生的线程，以及在代码中的行数。</li>
+  <li>%L 输出当前记录器所在的文件行号，如输出: “51”。</li>
+  <li>%F 输出当前记录器所在的文件名称，如输出: “main.cpp”。</li>
+  <li>%x 输出和当前线程相关联的NDC(嵌套诊断环境),尤其用到像java servlets这样的多客户多线程的应用中。</li>
+</ul>
+
+<h1 id="二使用log4j接管catalinaout">二、使用Log4j接管catalina.out</h1>
+
+<h2 id="21-接管前置准备">2.1 接管前置准备</h2>
+
+<p>我们先来了解一下<code class="highlighter-rouge">$CATALINA_HOME/bin/</code>下的<code class="highlighter-rouge">catalina.sh</code>的日志输出代码段：</p>
+
+<p><img src="http://i.imgur.com/XF5gMJn.png" alt="" /></p>
+
+<p><code class="highlighter-rouge">$CATALINA_OUT</code>是日志存放地址，默认为<code class="highlighter-rouge">$CATALINA_BASE/logs/catalina.out</code>，而<code class="highlighter-rouge">&gt;&gt; "$CATALINA_OUT" 2&gt;&amp;1 "&amp;"</code>则是将启动时的主线程日志输出到<code class="highlighter-rouge">$CATALINA_OUT</code>中。</p>
+
+<h4 id="前置一">前置一</h4>
+
+<p>假如你要分割后的主日志名还是<code class="highlighter-rouge">catalina.out</code>，那这个文件可不必修改，跳过此步骤，只需修改接下来要讲的<code class="highlighter-rouge">log4j.properties</code>文件即可；倘若你要修改主日志文件名为其他文件名，则需要修改<code class="highlighter-rouge">catalina.sh</code>文件：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$CATALINA_OUT</span><span class="s2">"</span> <span class="o">]</span> <span class="p">;</span> <span class="k">then
+  </span><span class="nv">CATALINA_OUT</span><span class="o">=</span><span class="s2">"</span><span class="nv">$CATALINA_BASE</span><span class="s2">"</span>/logs/catalina.out
+<span class="k">fi</span>
+
+<span class="c"># 修改为你的日志路径，在这里我设置主日志文件名为"catalina."</span>
+
+<span class="k">if</span> <span class="o">[</span> <span class="nt">-z</span> <span class="s2">"</span><span class="nv">$CATALINA_OUT</span><span class="s2">"</span> <span class="o">]</span> <span class="p">;</span> <span class="k">then
+  </span><span class="nv">CATALINA_OUT</span><span class="o">=</span><span class="s2">"</span><span class="nv">$CATALINA_BASE</span><span class="s2">"</span>/logs/catalina.
+<span class="k">fi</span>
+</code></pre></div></div>
+
+<h4 id="前置二">前置二</h4>
+
+<p>重命名<code class="highlighter-rouge">$CATALINA_HOME/bin/</code>下的<code class="highlighter-rouge">logging.properties</code>成其他名字，该文件不需要了，建议重命名保留:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mv </span>logging.properties loggin.properties
+</code></pre></div></div>
+
+<h2 id="22-切分方式">2.2 切分方式</h2>
+
+<h3 id="221-按时间切分">2.2.1 按时间切分</h3>
+
+<p>如需按时段生成日志文件，需要使用<code class="highlighter-rouge">org.apache.Log4j.DailyRollingFileAppender</code>，该类继承了<code class="highlighter-rouge">FileAppender</code>类。该类多包涵了一个重要的属性：<code class="highlighter-rouge">DatePattern</code>,该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。</p>
+
+<p><code class="highlighter-rouge">DatePattern</code>使用如下规则控制回滚计划：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">yyyy-MM</code>				在本月末，下月初回滚文件。</li>
+  <li><code class="highlighter-rouge">yyyy-MM-dd	</code>		在每天午夜回滚文件，这是缺省值。</li>
+  <li><code class="highlighter-rouge">yyyy-MM-dd-a</code>			在每天中午和午夜回滚文件。</li>
+  <li><code class="highlighter-rouge">yyyy-MM-dd-HH</code>		在每个整点回滚文件。</li>
+  <li><code class="highlighter-rouge">yyyy-MM-dd-HH-mm</code>		每分钟回滚文件。</li>
+  <li><code class="highlighter-rouge">yyyy-ww</code>				根据地域，在每周的第一天回滚。</li>
+</ul>
+
+<p>在项目中添加或修改<code class="highlighter-rouge">log4j.properties</code>文件:</p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">log4j.rootLogger</span><span class="p">=</span><span class="s">INFO, CATALINA</span>
+
+<span class="py">log4j.appender.CATALINA</span><span class="p">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
+<span class="c"># 此处文件路径对应前置准备中设置的路径
+</span><span class="py">log4j.appender.CATALINA.File</span><span class="p">=</span><span class="s">${catalina.base}/logs/catalina.</span>
+<span class="py">log4j.appender.CATALINA.Append</span><span class="p">=</span><span class="s">true</span>
+<span class="py">log4j.appender.CATALINA.Encoding</span><span class="p">=</span><span class="s">UTF-8</span>
+<span class="c"># 为方便测试，此处设置为每分钟分割一次
+</span><span class="py">log4j.appender.CATALINA.DatePattern</span><span class="p">=</span><span class="s">yyyy-MM-dd-HH-mm'.log'</span>
+<span class="py">log4j.appender.CATALINA.layout</span> <span class="p">=</span> <span class="s">org.apache.log4j.PatternLayout</span>
+<span class="py">log4j.appender.CATALINA.layout.ConversionPattern</span> <span class="p">=</span> <span class="s">%d{yyyy-MM-dd HH:mm:ss} [%t] %-5p %c{1}:%L - %m%n</span>
+
+<span class="py">log4j.logger.org.springframework</span><span class="p">=</span><span class="s">DEBUG</span>
+
+<span class="c"># 以下按需要选择
+</span><span class="py">log4j.appender.LOCALHOST</span><span class="p">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
+<span class="py">log4j.appender.LOCALHOST.File</span><span class="p">=</span><span class="s">${catalina.base}/logs/localhost.</span>
+<span class="py">log4j.appender.LOCALHOST.Append</span><span class="p">=</span><span class="s">true</span>
+<span class="py">log4j.appender.LOCALHOST.Encoding</span><span class="p">=</span><span class="s">UTF-8</span>
+<span class="py">log4j.appender.LOCALHOST.DatePattern</span><span class="p">=</span><span class="s">yyyy-MM-dd-HH-mm'.log'</span>
+<span class="py">log4j.appender.LOCALHOST.layout</span> <span class="p">=</span> <span class="s">org.apache.log4j.PatternLayout</span>
+<span class="py">log4j.appender.LOCALHOST.layout.ConversionPattern</span> <span class="p">=</span> <span class="s">%d [%t] %-5p %c- %m%n</span>
+
+<span class="py">log4j.appender.MANAGER</span><span class="p">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
+<span class="py">log4j.appender.MANAGER.File</span><span class="p">=</span><span class="s">${catalina.base}/logs/manager.</span>
+<span class="py">log4j.appender.MANAGER.Append</span><span class="p">=</span><span class="s">true</span>
+<span class="py">log4j.appender.MANAGER.Encoding</span><span class="p">=</span><span class="s">UTF-8</span>
+<span class="py">log4j.appender.MANAGER.DatePattern</span><span class="p">=</span><span class="s">yyyy-MM-dd-HH-mm'.log'</span>
+<span class="py">log4j.appender.MANAGER.layout</span> <span class="p">=</span> <span class="s">org.apache.log4j.PatternLayout</span>
+<span class="py">log4j.appender.MANAGER.layout.ConversionPattern</span> <span class="p">=</span> <span class="s">%d [%t] %-5p %c- %m%n</span>
+
+<span class="py">log4j.appender.HOST-MANAGER</span><span class="p">=</span><span class="s">org.apache.log4j.DailyRollingFileAppender</span>
+<span class="py">log4j.appender.HOST-MANAGER.File</span><span class="p">=</span><span class="s">${catalina.base}/logs/host-manager.</span>
+<span class="py">log4j.appender.HOST-MANAGER.Append</span><span class="p">=</span><span class="s">true</span>
+<span class="py">log4j.appender.HOST-MANAGER.Encoding</span><span class="p">=</span><span class="s">UTF-8</span>
+<span class="py">log4j.appender.HOST-MANAGER.DatePattern</span><span class="p">=</span><span class="s">yyyy-MM-dd-HH-mm'.log'</span>
+<span class="py">log4j.appender.HOST-MANAGER.layout</span> <span class="p">=</span> <span class="s">org.apache.log4j.PatternLayout</span>
+<span class="py">log4j.appender.HOST-MANAGER.layout.ConversionPattern</span> <span class="p">=</span> <span class="s">%d [%t] %-5p %c- %m%n</span>
+
+<span class="c"># 配置哪个loggers属于哪个appenders，按需选择配置
+</span><span class="err">log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost]=INFO,</span> <span class="err">LOCALHOST</span>
+<span class="err">log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager]=</span><span class="se">\
+</span>  <span class="err">INFO,</span> <span class="err">MANAGER</span>
+<span class="err">log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/host-manager]=</span><span class="se">\
+</span>  <span class="err">INFO,</span> <span class="err">HOST-MANAGER</span>
+
+</code></pre></div></div>
+
+<h3 id="222-按日志文件大小拆分">2.2.2 按日志文件大小拆分</h3>
+
+<p>如需按日志文件大小分割日志，则需要使用 org.apache.Log4j.RollingFileAppender，该类继承了 FileAppender 类，继承了它的所有属性。
+该类多包括了以下可配置属性：</p>
+
+<ul>
+  <li><code class="highlighter-rouge">maxFileSize</code>：这是文件大小的阀值，大于该值时，文件会回滚。该值默认为 10 MB。</li>
+  <li><code class="highlighter-rouge">maxBackupIndex</code>：该值表示备份文件的个数，默认为 1。</li>
+</ul>
+
+<p>对log4j.properties配置引入以下关键项：</p>
+
+<div class="language-properties highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 设置日志文件阀值最大为5MB
+</span><span class="py">Log4j.appender.CATALINA.MaxFileSize</span><span class="p">=</span><span class="s">5MB</span>
+
+<span class="c"># 设置日志文件个数为2
+</span><span class="py">Log4j.appender.CATALINA.MaxBackupIndex</span><span class="p">=</span><span class="s">2</span>
+</code></pre></div></div>
+
+<p>该示例配置文件展示了每个日志文件最大为 5 MB，如果超过该最大值，则会生成一个新的日志文件。由于 <code class="highlighter-rouge">maxBackupIndex</code> 的值为 2，当第二个文件的大小超过最大值时，会擦去第一个日志文件的内容，所有的日志都回滚至第一个日志文件。</p>
+
+<h1 id="参考">参考</h1>
+<p>本文参考以下文章，在此对原作者表示感谢！</p>
+
+<p><a href="https://my.oschina.net/jsan/blog/205669">Tomcat下使用Log4j 接管 catalina.out 日志文件生成方式</a></p>
+:ET

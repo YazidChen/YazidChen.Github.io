@@ -1,0 +1,108 @@
+I"�<h2 id="开启github-pages">开启Github Pages</h2>
+
+<p><strong>1、</strong>在github中建立一个基于你的用户名的repository</p>
+
+<p><img src="http://i.imgur.com/pJBemgT.png" alt="" /></p>
+
+<p><strong>2、</strong>进入仓库 -&gt; Setting -&gt;找到Launch automatic page generator进入</p>
+
+<p><img src="http://i.imgur.com/NX82S2v.png" alt="" /></p>
+
+<p><strong>3、</strong>此时相当于一篇博客页，填入必要的字段后，点击Continue to layouts</p>
+
+<p><strong>4、</strong>选样式 -&gt; Publish page</p>
+
+<p><strong>5、</strong>之后，你就能在Setting的GitHub Pages下看到你的地址了</p>
+
+<p><img src="http://i.imgur.com/RhpshMR.png" alt="" /></p>
+
+<h2 id="部署jekyll">部署Jekyll</h2>
+
+<h3 id="安装rubyrubygems">安装Ruby、RubyGems</h3>
+
+<p><strong>1、</strong>下载<a href="http://rubyinstaller.org/downloads/" title="RubyInstallers">http://rubyinstaller.org/downloads/</a>安装</p>
+
+<p><strong>2、</strong>配置环境变量：</p>
+<ul>
+  <li>RUBY_HOME=D:\OfficeSoft\Ruby23-x64（目录地址）</li>
+  <li>在Path中添加 %RUBY_HOME%\bin</li>
+  <li>进cmd， <code class="highlighter-rouge">ruby -v</code>，如果显示ruby版本信息说明安装成功。</li>
+</ul>
+
+<h3 id="安装jekyll">安装Jekyll</h3>
+
+<ul>
+  <li><code class="highlighter-rouge">gem install jekyll</code></li>
+</ul>
+
+<p>注意ruby安装目录存在空格时会报Makefile异常。</p>
+
+<h3 id="创建本地blog站点">创建本地blog站点</h3>
+
+<ul>
+  <li>cd进入想要存放blog的目录</li>
+  <li><code class="highlighter-rouge">jekyll new YazidChen.Github.io</code>（目录名自拟）</li>
+</ul>
+
+<h3 id="开启站点服务">开启站点服务</h3>
+
+<p><code class="highlighter-rouge">jekyll serve</code> 开启服务。可能会报错，一般为缺少包，根据报错做相应处理</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gem install bundler
+gem install minima
+</code></pre></div></div>
+<p>minima报错时，在\Ruby23-x64\lib\ruby\gems\2.3.0\gems\jekyll-3.2.1\lib\jekyll目录下找到layout.rb，进行如下操作</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Replace Line 38 with:
+
+@path = base + "/" + name
+</code></pre></div></div>
+
+<p>Could not find gem ‘tzinfo-data x64-mingw32’ in any of the gem sources listed in your Gemfile.报错处理：</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>bundle
+</code></pre></div></div>
+
+<h3 id="目录解读">目录解读</h3>
+
+<p>刚生成的YazidChen.Github.io下存在以下结构</p>
+
+<p><img src="http://i.imgur.com/xCQ3uNM.png" alt="" /></p>
+
+<ul>
+  <li>.sass-cache	-&gt;	sass编译缓存文件的目录</li>
+  <li>_posts		-&gt;	存放博文的目录，博文文件类型必须为markdown，文件名统一格式：YEAR-MONTH-DAY-TITLE，如<code class="highlighter-rouge">2016-08-19-welcome-to-jekyll.markdown</code>或<code class="highlighter-rouge">2016-08-19-welcome-to-jekyll.md</code></li>
+  <li>_site		-&gt;	Jekyll解析完整个网站,会将源代码存在此目录</li>
+  <li>_config.yml	-&gt;	Jekyll的配置文件</li>
+</ul>
+
+<h2 id="使用jekyll写博文">使用Jekyll写博文</h2>
+
+<h3 id="把仓库克隆到本地">把仓库克隆到本地</h3>
+
+<p><strong>1、</strong>下载<a href="https://desktop.github.com/">GitHub Desktop</a></p>
+
+<p><strong>2、</strong>克隆仓库到本地</p>
+
+<p><img src="http://i.imgur.com/iyNOqSe.png" alt="" /></p>
+
+<p><strong>3、</strong>拷贝本地Jekyll创建的YazidChen.Github.io的所有子目录及文件到本地仓库中的。</p>
+
+<p><strong>4、</strong>进入仓库启动jekyll</p>
+
+<p><img src="http://i.imgur.com/c2tOmeS.png" alt="" /></p>
+
+<p><strong>5、</strong>github 提交修改并同步</p>
+
+<h2 id="参考">参考</h2>
+
+<p>本文参考以下文章，在此对原作者表示感谢！</p>
+
+<p><a href="http://jekyll.bootcss.com/docs/home/">jekyll 中文文档</a></p>
+
+<p><a href="http://jekyllrb.com/docs/home/">jekyll English Docs</a></p>
+
+<p><a href="http://pwnny.cn/original/2016/06/26/MakeBlog.html">Jekyll和Github搭建个人静态博客</a></p>
+
+<p><a href="http://kresnik.wang/works/tech/2015/06/07/%E5%9C%A8github-pages%E7%BD%91%E7%AB%99%E4%B8%8B%E7%94%A8jekyll%E5%88%B6%E4%BD%9C%E5%8D%9A%E5%AE%A2%E6%95%99%E7%A8%8B.html">在github pages网站下用jekyll制作博客教程</a></p>
+
+<p><a href="http://pizida.com/technology/2016/03/03/use-jekyll-create-blog-on-github/">Jekyll本地搭建开发环境以及Github部署流程</a></p>
+
+:ET

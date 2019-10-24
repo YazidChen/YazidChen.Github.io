@@ -1,0 +1,43 @@
+I"�<h1 id="公钥私钥数字签名">公钥、私钥、数字签名</h1>
+
+<h2 id="公钥私钥">公钥私钥</h2>
+
+<h3 id="公钥加密">公钥加密</h3>
+
+<p>假设有两个字母，<strong>S</strong>和<strong>G</strong>。我喜欢字母<strong>S</strong>，我将字母<strong>S</strong>当成私钥自己保留，此时别人并不知道我的私钥就是字母<strong>S</strong>。而字母<strong>G</strong>，我把它当成公钥，告诉了小明。此时小明知道我的公钥是字母<strong>G</strong>。</p>
+
+<p>某天，小明要给我写一封重要的信，他就给这封信用我的公钥字母<strong>G</strong>加密，然后发给我。我看到信后，用公字母<strong>S</strong>进行解密，便看到了信的真实内容。</p>
+
+<p>如果这封信路上被劫了，截获的人没有我的私钥，所以他解不开信件。</p>
+
+<p><img src="http://i.imgur.com/NMbtgGg.png" alt="" /></p>
+
+<p>这便是，<strong>公钥加密，私钥解密</strong>。</p>
+
+<h3 id="私钥数字签名">私钥数字签名</h3>
+
+<p>假如我用私钥<strong>S</strong>加密，但是我的公钥<strong>G</strong>是暴露在外的，结果所有人都可以用公钥<strong>G</strong>解密，结果加密的内容，所有人都知道了。</p>
+
+<p>那用私钥加密到底有什么作用？</p>
+
+<p>假如我写了一封信给小明，小明看到信后怎么知道信就是我写的？他表示怀疑。那么我就用我的私钥<strong>S</strong>给一段内容<strong>1</strong>加密。然后附在信件里，发给小明，然后告诉小明信件里附了一段加密的内容，真实内容是<strong>1</strong>。小明收到信后，看到了加密的内容，他用我给的公钥<strong>G</strong>解密，发现果然是内容<strong>1</strong>，于是这封信必然是我写的。</p>
+
+<p>当然，实际的会复杂一些，比如用Hash函数对信件本身做处理,得到 Digest，再加密成 Signature 。</p>
+
+<p><img src="http://i.imgur.com/fEKeIIp.png" alt="" /></p>
+
+<p>这便是，<strong>私钥数字签名，公钥验证</strong>。</p>
+
+<h3 id="数字证书">数字证书</h3>
+
+<p>有天隔壁老王偷偷潜入小明家，将我给小明的公钥<strong>G</strong>换成了他的公钥<strong>W</strong>，此后，老王变可以冒充我，用他自己的私钥做成数字签名，写信给小明。</p>
+
+<p>后来，小明觉得不对劲，便要求我去找<strong>证书中心（Certificate Authority，简称CA）</strong>，为公钥<strong>G</strong>做认证。证书中心用自己的私钥，对我的公钥和一些相关的信息一起加密，生成<strong>数字证书（Digital Certificate）</strong>。</p>
+
+<p>我拿到<strong>数字证书</strong>后，就可以放心了，以后写信个小明，只要在<strong>数字签名</strong>的同时，再加上<strong>数字证书</strong>就行了。</p>
+
+<p>小明收到我的信后，用CA的公钥解开数字证书，就可以拿到我的真实公钥，之后小明就能验签了。</p>
+
+<p><img src="http://i.imgur.com/29Dejr4.png" alt="" /></p>
+
+:ET

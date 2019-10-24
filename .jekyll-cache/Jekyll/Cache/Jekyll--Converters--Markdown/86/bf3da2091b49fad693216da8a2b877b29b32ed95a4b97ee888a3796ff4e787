@@ -1,0 +1,68 @@
+I"R<h1 id="一编写日志自动切割脚本">一、编写日志自动切割脚本</h1>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim /usr/local/nginx/sbin/cut_nginx_log.sh
+</code></pre></div></div>
+
+<p>脚本编写：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+<span class="c"># author YazidChen</span>
+
+<span class="c"># 一般设定切割时间是0点，切除昨天的日志。</span>
+<span class="nv">DATE</span><span class="o">=</span><span class="si">$(</span><span class="nb">date</span> <span class="nt">-d</span> <span class="s2">"yesterday"</span> +<span class="s2">"%Y%m%d"</span><span class="si">)</span>
+<span class="nv">LOG_PATH</span><span class="o">=</span>/usr/local/nginx/logs/
+<span class="nv">ACCESS_LOG_NAME</span><span class="o">=</span>access.log
+<span class="nv">ERROR_LOG_NAME</span><span class="o">=</span>error.log
+<span class="nv">CUT_ACCESS_LOG_NAME</span><span class="o">=</span><span class="k">${</span><span class="nv">DATE</span><span class="k">}</span>.<span class="k">${</span><span class="nv">ACCESS_LOG_NAME</span><span class="k">}</span>
+<span class="nv">CUT_ERROR_LOG_NAME</span><span class="o">=</span><span class="k">${</span><span class="nv">DATE</span><span class="k">}</span>.<span class="k">${</span><span class="nv">ERROR_LOG_NAME</span><span class="k">}</span>
+<span class="nv">PID_PATH</span><span class="o">=</span>/usr/local/nginx/logs/nginx.pid
+
+<span class="c"># 重命名原始日志文件</span>
+<span class="nb">mv</span> <span class="k">${</span><span class="nv">LOG_PATH</span><span class="k">}${</span><span class="nv">ACCESS_LOG_NAME</span><span class="k">}</span> <span class="k">${</span><span class="nv">LOG_PATH</span><span class="k">}${</span><span class="nv">CUT_ACCESS_LOG_NAME</span><span class="k">}</span>
+<span class="nb">mv</span> <span class="k">${</span><span class="nv">LOG_PATH</span><span class="k">}${</span><span class="nv">ERROR_LOG_NAME</span><span class="k">}</span> <span class="k">${</span><span class="nv">LOG_PATH</span><span class="k">}${</span><span class="nv">CUT_ERROR_LOG_NAME</span><span class="k">}</span>
+
+<span class="c"># 向nginx主进程发信号，重新打开日志文件，当原始文件不存在时，重新生成新的日志文件access.log及error.log</span>
+<span class="nb">kill</span> <span class="nt">-USR1</span> <span class="sb">`</span><span class="nb">cat</span> <span class="k">${</span><span class="nv">PID_PATH</span><span class="k">}</span><span class="sb">`</span>
+</code></pre></div></div>
+
+<h1 id="二设置定时执行脚本">二、设置定时执行脚本</h1>
+
+<p><strong>1、</strong>给脚本执行权限：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">chmod</span> +x cut_nginx_log.sh 
+</code></pre></div></div>
+
+<p><strong>2、</strong>使用crontab工具添加定时任务：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 编辑crontab文件</span>
+crontab <span class="nt">-e</span>
+</code></pre></div></div>
+
+<p><strong>3、</strong>编写定时任务，保存退出：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 每天0点执行任务</span>
+0 0 <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> /bin/sh /usr/local/nginx/sbin/cut_nginx_log.sh
+</code></pre></div></div>
+
+<p>为方便测试将时间修改：</p>
+
+<p><img src="http://i.imgur.com/PmS5NG6.png" alt="" /></p>
+
+<p>测试过程中校验了日志内容，发现没有内容缺失，测试成功：</p>
+
+<p><img src="http://i.imgur.com/cFDuNKZ.png" alt="" /></p>
+
+<p>测试中可能会使用到以下命令：</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 列出crontab文件内容</span>
+crontab <span class="nt">-l</span>
+<span class="c"># 删除crontab文件</span>
+crontab <span class="nt">-r</span>
+</code></pre></div></div>
+
+<h1 id="参考">参考</h1>
+
+<p>本文参考以下文章，在此对原作者表示感谢！</p>
+
+<p><a href="http://pvbutler.blog.51cto.com/7662323/1653088">Linux下定时切割nginx日志并删除指定天数前的日志记录</a></p>
+:ET

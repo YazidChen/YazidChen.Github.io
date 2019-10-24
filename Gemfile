@@ -1,4 +1,4 @@
-source "https://rubygems.org"
+source "https://gems.ruby-china.com"
 
 # Hello! This is where you manage which Jekyll version is used to run.
 # When you want to use a different version, change it below, save the
@@ -32,3 +32,4 @@ gem "tzinfo-data", platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'wdm', '~> 0.1.1' if Gem.win_platform?
 
 gem 'activesupport', '~> 5.2', '>= 5.2.3'
+gem "nokogiri", ">= 1.10.4"
