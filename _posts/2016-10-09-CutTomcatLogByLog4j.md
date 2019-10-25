@@ -6,36 +6,29 @@ description: 使用log4j切分tomcat日志，按时间或者按大小，Tomcat F
 keywords: Tomcat, log4j, 日志, log, log4j切分tomcat日志,log4j切分log
 ---
 
-# 一、Log4j.properties解析 #
+# Cut Tomcat Log By Log4j
+
+## 一、Log4j.properties解析
 
 ```properties  
 # 根日志的级别定义为 DEBUG，并将名为 CATALINA 的 appender 添加其上。
 log4j.rootLogger = DEBUG, CATALINA
-
 # 将名为 CATALINA 的 appender 设置为DailyRollingFileAppender。
 log4j.appender.CATALINA=org.apache.Log4j.DailyRollingFileAppender
-
 # 他将日志写入 log 目录下一个名为 log.out 的文件中。
 log4j.appender.CATALINA.File=${log}/log.out
-
 # 该标志位默认为 true，意味着每次日志追加操作都将输出流刷新至文件。
 log4j.appender.CATALINA.ImmediateFlush=true
-
 # 设置appender 对象的阀值。
 log4j.appender.CATALINA.Threshold=debug
-
 # 该值默认为 true，其含义是让日志追加至文件末尾。
 log4j.appender.CATALINA.Append=true
-
 # 设置回滚规则，在此我们设置为每分钟回滚方便测试。
 log4j.appender.CATALINA.DatePattern='.' yyyy-MM-dd-HH-mm
-
 # 设置 appender CATALINA 的 layout。
 log4j.appender.CATALINA.layout=org.apache.Log4j.PatternLayout
-
 # layout 被定义为 %m%n，即打印出来的日志信息末尾加入换行。
 log4j.appender.CATALINA.layout.conversionPattern=%m%n
-
 ```
 
 `conversionPattern`可以自定义log的格式，相关参数有：
@@ -53,25 +46,25 @@ log4j.appender.CATALINA.layout.conversionPattern=%m%n
 - %x 输出和当前线程相关联的NDC(嵌套诊断环境),尤其用到像java servlets这样的多客户多线程的应用中。
 
 
-# 二、使用Log4j接管catalina.out #
+## 二、使用Log4j接管catalina.out ##
 
-## 2.1 接管前置准备 ##
+### 2.1 接管前置准备 ###
 
 我们先来了解一下`$CATALINA_HOME/bin/`下的`catalina.sh`的日志输出代码段：
-
-![](http://i.imgur.com/XF5gMJn.png)
-
-`$CATALINA_OUT`是日志存放地址，默认为`$CATALINA_BASE/logs/catalina.out`，而`>> "$CATALINA_OUT" 2>&1 "&"`则是将启动时的主线程日志输出到`$CATALINA_OUT`中。
-
-#### 前置一 ####
-
-假如你要分割后的主日志名还是`catalina.out`，那这个文件可不必修改，跳过此步骤，只需修改接下来要讲的`log4j.properties`文件即可；倘若你要修改主日志文件名为其他文件名，则需要修改`catalina.sh`文件：
 
 ```shell
 if [ -z "$CATALINA_OUT" ] ; then
   CATALINA_OUT="$CATALINA_BASE"/logs/catalina.out
 fi
+```
 
+`$CATALINA_OUT`是日志存放地址，默认为`$CATALINA_BASE/logs/catalina.out`，而`>> "$CATALINA_OUT" 2>&1 "&"`则是将启动时的主线程日志输出到`$CATALINA_OUT`中。
+
+#### 前置一
+
+假如你要分割后的主日志名还是`catalina.out`，那这个文件可不必修改，跳过此步骤，只需修改接下来要讲的`log4j.properties`文件即可；倘若你要修改主日志文件名为其他文件名，则需要修改`catalina.sh`文件：
+
+```shell
 # 修改为你的日志路径，在这里我设置主日志文件名为"catalina."
 
 if [ -z "$CATALINA_OUT" ] ; then
@@ -81,15 +74,44 @@ fi
 
 #### 前置二 ####
 
-重命名`$CATALINA_HOME/bin/`下的`logging.properties`成其他名字，该文件不需要了，建议重命名保留:
+`$CATALINA_HOME/bin/`下的`logging.properties`有如下代码段：
 
-```shell
-mv logging.properties loggin.properties
+```properties
+handlers = 1catalina.org.apache.juli.AsyncFileHandler, 2localhost.org.apache.juli.AsyncFileHandler, 3manager.org.apache.juli.AsyncFileHandler, 4host-manager.org.apache.juli.AsyncFileHandler, java.util.logging.ConsoleHandler
+
+.handlers = 1catalina.org.apache.juli.AsyncFileHandler, java.util.logging.ConsoleHandler
+
+1catalina.org.apache.juli.AsyncFileHandler.level = FINE
+1catalina.org.apache.juli.AsyncFileHandler.directory = ${catalina.base}/logs
+1catalina.org.apache.juli.AsyncFileHandler.prefix = catalina.
+1catalina.org.apache.juli.AsyncFileHandler.maxDays = 90
+1catalina.org.apache.juli.AsyncFileHandler.encoding = UTF-8
+
+2localhost.org.apache.juli.AsyncFileHandler.level = FINE
+2localhost.org.apache.juli.AsyncFileHandler.directory = ${catalina.base}/logs
+2localhost.org.apache.juli.AsyncFileHandler.prefix = localhost.
+2localhost.org.apache.juli.AsyncFileHandler.maxDays = 90
+2localhost.org.apache.juli.AsyncFileHandler.encoding = UTF-8
+
 ```
 
-## 2.2 切分方式 ##
+将`1catalina.org.apache.juli.AsyncFileHandler`相关内容剔除:
 
-### 2.2.1 按时间切分 ###
+```properties
+handlers = 2localhost.org.apache.juli.AsyncFileHandler, 3manager.org.apache.juli.AsyncFileHandler, 4host-manager.org.apache.juli.AsyncFileHandler, java.util.logging.ConsoleHandler
+
+.handlers = java.util.logging.ConsoleHandler
+
+2localhost.org.apache.juli.AsyncFileHandler.level = FINE
+2localhost.org.apache.juli.AsyncFileHandler.directory = ${catalina.base}/logs
+2localhost.org.apache.juli.AsyncFileHandler.prefix = localhost.
+2localhost.org.apache.juli.AsyncFileHandler.maxDays = 90
+2localhost.org.apache.juli.AsyncFileHandler.encoding = UTF-8
+```
+
+### 2.2 切分方式 ###
+
+#### 2.2.1 按时间切分 ####
 
 如需按时段生成日志文件，需要使用`org.apache.Log4j.DailyRollingFileAppender`，该类继承了`FileAppender`类。该类多包涵了一个重要的属性：`DatePattern`,该属性表明什么时间回滚文件，以及文件的命名约定。缺省情况下，在每天午夜回滚文件。
 
@@ -153,7 +175,7 @@ log4j.logger.org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/hos
 
 ```
 
-### 2.2.2 按日志文件大小拆分 ###
+#### 2.2.2 按日志文件大小拆分 ####
 
 如需按日志文件大小分割日志，则需要使用 org.apache.Log4j.RollingFileAppender，该类继承了 FileAppender 类，继承了它的所有属性。
 该类多包括了以下可配置属性：
@@ -173,7 +195,8 @@ Log4j.appender.CATALINA.MaxBackupIndex=2
 
 该示例配置文件展示了每个日志文件最大为 5 MB，如果超过该最大值，则会生成一个新的日志文件。由于 `maxBackupIndex` 的值为 2，当第二个文件的大小超过最大值时，会擦去第一个日志文件的内容，所有的日志都回滚至第一个日志文件。
 
-# 参考 #
+## 参考
+
 本文参考以下文章，在此对原作者表示感谢！
 
 [Tomcat下使用Log4j 接管 catalina.out 日志文件生成方式](https://my.oschina.net/jsan/blog/205669)

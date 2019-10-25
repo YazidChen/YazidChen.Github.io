@@ -1,29 +1,31 @@
 ---
 layout: post
-title:  "WebSocket SockJS STOMP"
+title:  "WebSocket引入实践"
 categories: WebSocket
 description: WebSocket 应用实践。
 keywords: WebSocket, SockJS, STOMP
 ---
 
-# 一、为何引入WebSocket #
+# WebSocket SockJS STOMP
 
-## 1.1 遇到问题 ##
+## 一、为何引入WebSocket ##
+
+### 1.1 遇到问题 ###
 当前有一客服管理系统，有以下业务需求：
 
-#### 1、呼出业务 ####
+#### 1、呼出业务
 
-![](https://i.imgur.com/KQgXefy.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20180129154827.png?x-oss-process=style/Watermark)
 
 客服管理系统向第三方云呼系统发出呼叫请求，云呼系统异步返回呼出回调，后台服务接收到回调后，需要通知WEB端提示用户呼出的结果，此时有后台服务主动通知WEB的需求。
 
 #### 2、呼入业务 ####
 
-![](https://i.imgur.com/kDPC13M.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20180129154843.png?x-oss-process=style/Watermark)
 
 当有电话呼入时，云呼系统发起呼入通知给客服管理系统，客服管理系统后台服务接收到呼入通知后，需要及时让WEB发起界面提醒，此时也有后台服务主动通知WEB的需求。
 
-## 1.2 解决方案 ##
+### 1.2 解决方案
 
 1. WEB通过HTTP轮询后台服务（不满足及时性，消耗资源大）;
 2. HTTP长轮询(基本满足及时性，消耗资源较大）
@@ -31,12 +33,12 @@ keywords: WebSocket, SockJS, STOMP
 
 初步判断，WebSocket可以作为解决方案。下面开始深入研究WebSocket。
 
-# 二、WebSocket是什么 #
+## 二、WebSocket是什么 ##
 
 **WebSocket协议**由HTML5定义，能更好的**节省**服务器资源和带宽，并且能够更实时地进行**双向**通讯。它是一种持久化的协议。
 我们拿WebSocket与HTTP进行对比。
 
-![](https://i.imgur.com/LLATtBY.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20180130171453.png?x-oss-process=style/Watermark)
 
 
 首先是HTTP轮询，浏览器通过ajax每隔几秒就向服务器发起一次请求，询问服务器是否有新的消息。每次发起的请求，即Request，它都包含header头部，多次轮询相当于多次发送了header头部信息，这便会造成带宽资源的浪费。每次返回的Response亦是如此。
@@ -49,21 +51,21 @@ keywords: WebSocket, SockJS, STOMP
 首先，客户端会向服务端发起一次Handshake握手的请求，服务端收到请求并确认无误后，返回确认通知。这两步操作还是通过HTTP协议进行通信的。确认通知返回成功后，通信协议由HTTP协议升级为WebSocket协议。之后，服务端就能主动推送消息给客户端，当然，客户端也能主动推消息给服务端。真真正正实现了双向通讯。如果要关闭通信链接，客户端可以给服务端发送断开链接的请求，当然，服务端也可以主动断开链接。这样，整个通信链接的生命周期也就结束了。
 由此看来，WebSocket只需要一次HTTP请求进行建立链接，之后所有的通信都不需要有复杂的header头部信息，也无需多次鉴权了，从而省下了很多资源。
 
-![](https://i.imgur.com/jjDjhHU.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20180131094724.png?x-oss-process=style/Watermark)
 
 继续深入学习WebSocket，我们发现他同HTTP协议一样，也是属于OSI模型的应用层，也是建立在TCP协议之上的。WebSocket协议的**统一资源标识符**是`ws`，如果加密，则是`wss`,这和HTTP如出一辙，都是由TSL进行加密的。
 
-![](https://i.imgur.com/lhwKS1T.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20180131095930.png?x-oss-process=style/Watermark)
 
 服务器的网址，即为URL：`ws://example.com:80/test`
 
-# 三、SpringMVC如何引入WebSocket #
+## 三、SpringMVC如何引入WebSocket ##
 
 这里有三种API，分别是`WebSocket API`，`SockJS`以及`STOMP`。`WebSocket API`是发送和接收消息的底层API，`SockJS`在`WebSocket API`之上，而`STOMP`是基于`SockJS`的高级API。
 
-## 3.1 WebSocket API ##
+### 3.1 WebSocket API ###
 
-### 3.1.1 服务端配置 ###
+#### 3.1.1 服务端配置 ####
 
 1、创建Handler
 
@@ -160,7 +162,7 @@ public class WsConfig implements WebSocketConfigurer {
 - `addInterceptors()`添加拦截器。
 
 
-### 3.1.2 客户端配置 ###
+#### 3.1.2 客户端配置 ####
 
 客户端发起WebSocket链接请求：
 
@@ -181,11 +183,11 @@ let ws = new WebSocket("wss://www.xxx.com/chat");//发起连接
             };
 ```
 
-### 3.1.3 运行结果 ###
+#### 3.1.3 运行结果 ####
 
-![](https://i.imgur.com/s1QA73A.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20180131150456.png?x-oss-process=style/Watermark)
 
-![](https://i.imgur.com/etFw6Kx.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20180131150249.png?x-oss-process=style/Watermark)
 
 - `Connection`为Upgrade，表示客户端希望连接升级；
 - `Upgrade`为Websocket，表示希望升级到Websocket协议；
@@ -194,11 +196,11 @@ let ws = new WebSocket("wss://www.xxx.com/chat");//发起连接
 - Websocket通过`HTTP/1.1`协议的`101`状态码进行握手，此时握手成功。
 
 
-## 3.2 SockJS ##
+### 3.2 SockJS ###
 
 在`WebSocket API`的基础上，稍加修改，就变为`SockJS`形式。
 
-### 3.2.1 服务端配置 ###
+#### 3.2.1 服务端配置 ####
 
 ```java
 import com.*.websocket.handler.WsHandler;
@@ -230,7 +232,7 @@ public class WsConfig implements WebSocketConfigurer {
 
 方法`withSockJS()`用SockJS改造了原始的API
 
-### 3.2.2 客户端配置 ###
+#### 3.2.2 客户端配置 ####
 
 ```js
 <!--引入sockjs-->
@@ -254,17 +256,17 @@ public class WsConfig implements WebSocketConfigurer {
 
 **SockJS**将`http`或`https`协议处理成为`ws`或`wss`协议。
 
-### 3.2.3 运行结果 ###
+#### 3.2.3 运行结果 ####
 
-![](https://i.imgur.com/d91tSia.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20180131155239.png?x-oss-process=style/Watermark)
 
-![](https://i.imgur.com/kPp9A4P.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20180131155113.png?x-oss-process=style/Watermark)
 
-## 3.3 STOMP ##
+### 3.3 STOMP ###
 
 此处为XML配置形式示例。
 
-### 3.3.1 服务端配置 ###
+#### 3.3.1 服务端配置 ####
 
 1、创建拦截器：
 
@@ -581,7 +583,7 @@ public class WsController extends AbstractController {
 
 ```
 
-### 3.3.2 客户端配置 ###
+#### 3.3.2 客户端配置 ####
 
 需要引入stomp.js:
 
@@ -615,22 +617,22 @@ let socket = new SockJS('https://www.xxx.com/portfolio');
             });
 ```
 
-### 3.3.3 运行结果 ###
+#### 3.3.3 运行结果 ####
 
 1、连接结果：
 
-![](https://i.imgur.com/84b2sN9.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20180131163732.png?x-oss-process=style/Watermark)
 
 2、发送全局消息：
 
-![](https://i.imgur.com/SMssDZ0.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20180131163745.png?x-oss-process=style/Watermark)
 
 3、用户目的地消息发送：
 
-![](https://i.imgur.com/2hxYU27.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20180131163910.png?x-oss-process=style/Watermark)
 
 
-# 参考 #
+## 参考 ##
 
 
 本文参考以下文章，在此对原作者表示感谢！
@@ -642,3 +644,4 @@ let socket = new SockJS('https://www.xxx.com/portfolio');
 [WebSocket维基百科](https://zh.wikipedia.org/wiki/WebSocket)
 
 [WebSocket 是什么原理？为什么可以实现持久连接？](https://www.zhihu.com/question/20215561)
+

@@ -1,14 +1,14 @@
 ---
 layout: post
-title:  "Lambda Of StreamAPI"
+title:  "Stream API——Lambda表达式的核心包"
 categories: Java
 description: Stream API——Lambda表达式的核心包。
 keywords: Lambda, lambda, Stream, Stream API, Java8, JAVA8
 ---
 
-# Stream API——Lambda表达式的核心包 #
+# Lambda Of StreamAPI
 
-## 一、Lambda表达式 ##
+## 一、Lambda表达式
 
 ### 1.1 What ###
 **Lambda表达式**只是一个匿名函数。什么是匿名函数？
@@ -116,7 +116,7 @@ List<Integer> numbers = Arrays.asList(1, 2, 3);
 numbers.stream().mapToInt(n -> n * n).sum();
 ```
 Stream处理过程分为三个部分，创建、转换、聚合：
-![](https://i.imgur.com/tYojHrm.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20181022114451.png?x-oss-process=style/Watermark)
 
 ### 2.1 构建流 ###
 
@@ -432,7 +432,7 @@ public class StreamDemo {
 ```
 
 
-# 参考 #
+## 参考 ##
 
 本文参考以下文章，在此对原作者表示感谢！
 

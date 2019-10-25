@@ -14,13 +14,13 @@ keywords: Tomcat, Linux, 安全, Security, Tomcat安全
 为了提高系统安全，tomcat不应该使用root运行。为它创建一个新用户和组。
 创建一个tomcat组：
 
-```
+```shell
 sudo groupadd tomcat
 ```
 
 创建一个叫tomcat的用户：
 
-```
+```shell
 sudo useradd -s /bin/false -g tomcat -d /opt/tomcat tomcat
 ```
 
@@ -30,7 +30,7 @@ tomcat用户属于tomcat组，家目录是`/opt/tomcat`，我要把tomcat安装�
 
 赋给tomcat用户各种权限：
 
-```
+```shell
 cd /opt
 sudo chgrp -R tomcat tomcat
 
@@ -38,12 +38,11 @@ cd /opt/tomcat
 sudo chgrp -R tomcat conf
 sudo chmod g+rwx conf
 sudo chmod g+r conf/*
-
 ```
 
 修改各种目录的所有者：
 
-```
+```shell
 cd /opt
 sudo chown -R tomcat tomcat
 
@@ -55,7 +54,7 @@ sudo chown -R tomcat webapps/ work/ temp/ logs/ bin/ lib/
 
 如果使用启用了Tomcat用户，则需要设置Tomcat定时登出，将`$CATALINA_HOME\conf\server.xml`配置如下：
 
-```
+```xml
 <Connector port="8080" protocol="HTTP/1.1"
            connectionTimeout="20000"
            redirectPort="8443" />
@@ -67,19 +66,19 @@ sudo chown -R tomcat webapps/ work/ temp/ logs/ bin/ lib/
 
 使用下面命令查看Java安装路径：
 
-```
+```shell
 sudo update-java-alternatives -l
 ```
 
 现在在`/etc/systemd/system`目录创建服务文件tomcat.service：
 
-```
+```shell
 sudo vim /etc/systemd/system/tomcat.service
 ```
 
 tomcat.service内容如下：
 
-```
+```shell
 [Unit]
 Description=Apache Tomcat Web Application Container
 After=network.target
@@ -108,24 +107,22 @@ WantedBy=multi-user.target
 
 修改完成之后，重新加载systemd：
 
-```
+```shell
 sudo systemctl daemon-reload
 ```
 
 启动tomcat：
 
-```
+```shell
 sudo systemctl enable tomcat
 sudo systemctl start tomcat
 ```
 
 确认tomcat启动状态：
 
-```
+```shell
 sudo systemctl status tomcat
 ```
-
-![](http://i.imgur.com/wD55zo0.png)
 
 
 ## 三、安全加固配置 ##
@@ -134,7 +131,7 @@ sudo systemctl status tomcat
 
 除了需要部署上去的应用，其余位于`$CATALINA_HOME\webapps`文件夹中的应用如docs、examples、host-manager、manager和ROOT，若无业务必要，请执行删除上述的应用包。
 
-```
+```shell
 rm -rf docs/ examples/ host-manager/ manager/ ROOT/
 ```
 
@@ -142,12 +139,11 @@ rm -rf docs/ examples/ host-manager/ manager/ ROOT/
 
 确保`$CATALINA_HOME\conf\web.xml`中listings的值为false：
 
-```
+```xml
 <init-param>
     <param-name>listings</param-name>
     <param-value>false</param-value>
 </init-param>
-
 ```
 
 ### 3.3 设置Cookie的HttpOnly属性 ###
@@ -156,24 +152,22 @@ rm -rf docs/ examples/ host-manager/ manager/ ROOT/
 
 在`$CATALINA_HOME\conf\context.xml`文件中添加`useHttpOnly="true"`配置如下：
 
-```
+```xml
 <Context useHttpOnly="true">
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
     <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
 </Context>
-
 ```
 
 进入项目路径找到web.xml：
 
-```
+```shell
 root@yazid-chen:/opt/tomcat/webapps/api/WEB-INF# vim web.xml 
-
 ```
 
 加入http-only配置：
 
-```
+```xml
 <session-config>
       <session-timeout>30</session-timeout>
       <cookie-config>
@@ -193,34 +187,32 @@ root@yazid-chen:/opt/tomcat/webapps/api/WEB-INF# vim web.xml
 
 配置如下：
 
-```
-<Serverport="未被占用的端口" shutdown="较为复杂的字符串">
+```xml
 #注：配置的端口需要大于1024。
+<Serverport="未被占用的端口" shutdown="较为复杂的字符串">
 ```
 
 ### 3.5 隐藏Tomcat版本信息 ###
 
 在默认配置下，当应用出现异常时，客户端会显示Tomcat的版本信息。攻击者可以根据Tomcat版本信息选择漏洞库攻击，所以需要将Tomcat的版本信息隐藏，解压`$CATALINA_HOME\lib\catalina.jar`：
 
-```
+```shell
 root@yazid-chen:/opt/tomcat/lib# jar xf catalina.jar 
-
 ```
 
 将`\org\apache\catalina\util`中的配置ServerInfo.properties如下,info和number随意：
 
-```
+```properties
 server.info=Server
 server.number=Y
 server.built=Jul 4 2016 18:22:47 UTC
-
 ```
 
 ### 3.6 关闭war自动部署 ###
 
 默认的配置war放在`$CATALINA_HOME\webapps`中会自动部署，所以关闭war自动部署防止被植入木马等恶意程序。将`$CATALINA_HOME\conf\server.xml`配置如下：
 
-```
+```xml
 <Host name="localhost"  appBase="webapps"
       unpackWARs="false" autoDeploy="false">
 
@@ -230,7 +222,7 @@ server.built=Jul 4 2016 18:22:47 UTC
 
 AJP是为 Tomcat 与 HTTP 服务器之间通信而定制的协议，能提供较高的通信速度和效率。如果tomcat前端放的是apache的时候，会使用到AJP这个连接器。如果用nginx做的反向代理，因此不使用此连接器，因此需要注销掉该连接器。
 
-```
+```xml
 <!--
     <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
 -->
@@ -242,12 +234,10 @@ AJP是为 Tomcat 与 HTTP 服务器之间通信而定制的协议，能提供较
 
 权限修改见上文1.2所示。
 
-```
+```shell
 #查看由哪个用户启动
 ps aux | grep tomcat 
 ```
-
-![](http://i.imgur.com/24sEcMq.png)
 
 
 ## 参考 ##

@@ -5,9 +5,9 @@ categories: Security
 description: 公钥、私钥、数字签名之间的联系。
 keywords: 公钥, 私钥, 数字签名, public key, private key, digital signature
 ---
-# 公钥、私钥、数字签名 #
+#  Public key, Private key, Digital signature #
 
-## 公钥私钥 ##
+## 公钥私钥
 
 ### 公钥加密 ###
 
@@ -17,7 +17,7 @@ keywords: 公钥, 私钥, 数字签名, public key, private key, digital signatu
 
 如果这封信路上被劫了，截获的人没有我的私钥，所以他解不开信件。
 
-![](http://i.imgur.com/NMbtgGg.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025094845.png?x-oss-process=style/Watermark)
 
 这便是，**公钥加密，私钥解密**。
 
@@ -31,7 +31,7 @@ keywords: 公钥, 私钥, 数字签名, public key, private key, digital signatu
 
 当然，实际的会复杂一些，比如用Hash函数对信件本身做处理,得到 Digest，再加密成 Signature 。
 
-![](http://i.imgur.com/fEKeIIp.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025094926.png?x-oss-process=style/Watermark)
 
 这便是，**私钥数字签名，公钥验证**。
 
@@ -45,6 +45,6 @@ keywords: 公钥, 私钥, 数字签名, public key, private key, digital signatu
 
 小明收到我的信后，用CA的公钥解开数字证书，就可以拿到我的真实公钥，之后小明就能验签了。
 
-![](http://i.imgur.com/29Dejr4.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025094947.png?x-oss-process=style/Watermark)
 
 

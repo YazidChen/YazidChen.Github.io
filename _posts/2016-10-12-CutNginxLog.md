@@ -6,7 +6,9 @@ description: 设定定时任务自动切分Nginx日志，Tomcat For Ubuntu16.04�
 keywords: Nginx,日志,log,切分Nginx日志,定时切割Nginx日志，切分日志
 ---
 
-# 一、编写日志自动切割脚本 #
+# Cut Nginx Log
+
+## 一、编写日志自动切割脚本 ##
 
 ```shell
 vim /usr/local/nginx/sbin/cut_nginx_log.sh
@@ -35,7 +37,7 @@ mv ${LOG_PATH}${ERROR_LOG_NAME} ${LOG_PATH}${CUT_ERROR_LOG_NAME}
 kill -USR1 `cat ${PID_PATH}`
 ```
 
-# 二、设置定时执行脚本 #
+## 二、设置定时执行脚本 ##
 
 **1、**给脚本执行权限：
 
@@ -57,14 +59,6 @@ crontab -e
 0 0 * * * /bin/sh /usr/local/nginx/sbin/cut_nginx_log.sh
 ```
 
-为方便测试将时间修改：
-
-![](http://i.imgur.com/PmS5NG6.png)
-
-测试过程中校验了日志内容，发现没有内容缺失，测试成功：
-
-![](http://i.imgur.com/cFDuNKZ.png)
-
 测试中可能会使用到以下命令：
 
 ```shell
@@ -74,7 +68,7 @@ crontab -l
 crontab -r
 ```
 
-# 参考 #
+## 参考 ##
 
 本文参考以下文章，在此对原作者表示感谢！
 

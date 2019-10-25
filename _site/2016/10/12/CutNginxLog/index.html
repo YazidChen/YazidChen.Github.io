@@ -30,8 +30,8 @@
     <meta name="keywords" content="Nginx,日志,log,切分Nginx日志,定时切割Nginx日志，切分日志">
     <meta name="og:keywords" content="Nginx,日志,log,切分Nginx日志,定时切割Nginx日志，切分日志">
       
-    <meta name="description" content="一、编写日志自动切割脚本">
-    <meta name="og:description" content="一、编写日志自动切割脚本">
+    <meta name="description" content="Cut Nginx Log">
+    <meta name="og:description" content="Cut Nginx Log">
       
     
     
@@ -121,7 +121,9 @@
 <div class="columns">
   <div class="column three-fourths" >
     <article class="article-content markdown-body">
-    <h1 id="一编写日志自动切割脚本">一、编写日志自动切割脚本</h1>
+    <h1 id="cut-nginx-log">Cut Nginx Log</h1>
+
+<h2 id="一编写日志自动切割脚本">一、编写日志自动切割脚本</h2>
 
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim /usr/local/nginx/sbin/cut_nginx_log.sh
 </code></pre></div></div>
@@ -148,7 +150,7 @@
 <span class="nb">kill</span> <span class="nt">-USR1</span> <span class="sb">`</span><span class="nb">cat</span> <span class="k">${</span><span class="nv">PID_PATH</span><span class="k">}</span><span class="sb">`</span>
 </code></pre></div></div>
 
-<h1 id="二设置定时执行脚本">二、设置定时执行脚本</h1>
+<h2 id="二设置定时执行脚本">二、设置定时执行脚本</h2>
 
 <p><strong>1、</strong>给脚本执行权限：</p>
 
@@ -167,14 +169,6 @@ crontab <span class="nt">-e</span>
 0 0 <span class="k">*</span> <span class="k">*</span> <span class="k">*</span> /bin/sh /usr/local/nginx/sbin/cut_nginx_log.sh
 </code></pre></div></div>
 
-<p>为方便测试将时间修改：</p>
-
-<p><img src="http://i.imgur.com/PmS5NG6.png" alt="" /></p>
-
-<p>测试过程中校验了日志内容，发现没有内容缺失，测试成功：</p>
-
-<p><img src="http://i.imgur.com/cFDuNKZ.png" alt="" /></p>
-
 <p>测试中可能会使用到以下命令：</p>
 
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 列出crontab文件内容</span>
@@ -183,7 +177,7 @@ crontab <span class="nt">-l</span>
 crontab <span class="nt">-r</span>
 </code></pre></div></div>
 
-<h1 id="参考">参考</h1>
+<h2 id="参考">参考</h2>
 
 <p>本文参考以下文章，在此对原作者表示感谢！</p>
 

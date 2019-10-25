@@ -1,12 +1,12 @@
 ---
 layout: post
-title:  "部署平台设计与研发"
+title:  "部署平台设计实践"
 categories: Architecture
 description: 部署平台设计与研发实践。
 keywords: deploy, 部署, 部署平台, Jenkins, Java, pipeline
 ---
 
-## Platform Of Deploy
+# Platform Of Deploy
 
 ## 一、简介
 

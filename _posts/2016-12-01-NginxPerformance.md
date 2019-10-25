@@ -6,11 +6,11 @@ description: Linux环境Nginx性能优化，Nginx For Ubuntu16.04。
 keywords: Nginx, Linux, 性能, performance, Nginx性能, Nginx performance
 ---
 
-# Nginx performance optimize#
+# Nginx Performance Optimize
 
 ## 一、主配置文件 ##
 
-### 主配置文件结构 ###
+### 1.1 主配置文件结构 ###
 
 ```shell
 # 主配置段，也即全局配置段；
@@ -37,7 +37,7 @@ keywords: Nginx, Linux, 性能, performance, Nginx性能, Nginx performance
     }
 ```
 
-#### 主配置段相关配置 ####
+### 1.2 主配置段相关配置 ###
 
 ```shell
 ##定义执行权限的用户及组，如果省略组，则组名为用户所在组。
@@ -105,15 +105,15 @@ cat /proc/cpuinfo| grep "processor"| wc -l
 
 通过上述指令，查询到本机仅有1个CPU。
 
-![](http://i.imgur.com/Uet4kiq.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025100310.png?x-oss-process=style/Watermark)
 
 该CPU具有4个内核。
 
-![](http://i.imgur.com/ql0WpC5.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025100323.png?x-oss-process=style/Watermark)
 
 每核虚拟出2个超线程，作为处理器，共8个处理器。
 
-![](http://i.imgur.com/aOpCeLn.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025100341.png?x-oss-process=style/Watermark)
 
 0号和4号处理器同在0号内核上，1号和5号处理器同在1号内核上，以此类推。
 
@@ -124,11 +124,11 @@ cat /proc/cpuinfo| grep "processor"| wc -l
 
 `worker_cpu_affinity 00000001 00000010 00000100 00001000;`绑定处理器，将`worker`进程均分在不同的内核上。
 
-![](http://i.imgur.com/QmDO3Sy.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025095703.png?x-oss-process=style/Watermark)
 
 **3)** `./nginx -t` 校验配置项正确性：
 
-![](http://i.imgur.com/XVnd5TH.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025095739.png?x-oss-process=style/Watermark)
 
 `./nginx -s reload`重启nginx后，可用以下方法校验：
 
@@ -138,7 +138,7 @@ cat /proc/cpuinfo| grep "processor"| wc -l
 ps -aux | grep nginx
 ```
 
-![](http://i.imgur.com/xqHVZPS.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025095800.png?x-oss-process=style/Watermark)
 
 查看`worker_cpu_affinity auto;`是否生效：
 
@@ -147,7 +147,7 @@ ps -aux | grep nginx
 ps -axo pid,user,comm,psr |grep nginx
 ```
 
-![](http://i.imgur.com/25fLoOI.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025095821.png?x-oss-process=style/Watermark)
 
 可以看到，所有的`worker`进程都均匀的分布在不同的内核上，而`master`进程与`pid`为2517的`worker`进程都绑定在0号内核上。其他内核上剩余的处理器共3个，便用作计算机其他进程的处理。
 
@@ -157,11 +157,11 @@ ps -axo pid,user,comm,psr |grep nginx
 
 正常执行中的`nginx`会有多个进程，最基本的有`master process`（主进程）和`worker process`（工作进程）。`master`充当监控进程，而由主进程`fork()`出来的`worker`则充当工作进程。
 
-![](http://i.imgur.com/22Euu68.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025095845.png?x-oss-process=style/Watermark)
 
 `master`进程充当整个进程组与用户的交互接口，同时对进程进行监护。它不需要处理网络事件，不负责业务的执行，只会通过管理`worker`进程来实现重启服务、平滑升级、更换日志文件、配置文件实时生效等功能。
 
-![](http://i.imgur.com/Ouirijn.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025095857.png?x-oss-process=style/Watermark)
 
 `worker`进程的主要任务是完成具体的任务逻辑。其主要关注点是与客户端或后端真实服务器（此时nginx作为中间代理）之间的数据可读/可写等I/O交互事件。
 
@@ -189,7 +189,7 @@ Linux系统为了给**CPU消耗型进程**多一些处理器时间，而给**I/O
 
 我们来执行一个简单的命令：`ps -l`。
 
-![](http://i.imgur.com/f6erFS3.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025095914.png?x-oss-process=style/Watermark)
 
 其中有两个参数：**PRI**和**NI**：
 
@@ -206,7 +206,7 @@ Linux系统是抢占式的，系统当前运行一个进程，但这个时候一
 ps axo pid,user,comm,psr,nice | grep nginx
 ```
 
-![](http://i.imgur.com/VErMiA9.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025095932.png?x-oss-process=style/Watermark)
 
 可看出`worker`进程的`nice`值都为0。
 
@@ -220,11 +220,9 @@ worker_priority -5;
 
 **3）** 查询修改后的状态：
 
-![](http://i.imgur.com/MueCDqM.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025100001.png?x-oss-process=style/Watermark)
 
 可以看到，`worker`进程的`nice`值已经修改成了-5。
-
-
 
 ### 2.2 gzip压缩传输数据 ###
 
@@ -289,23 +287,11 @@ gzip_vary off;
 
 我们对nginx做如下配置：
 
-![](http://i.imgur.com/pZ25sfm.png)
+![](https://yazid-public.oss-cn-shenzhen.aliyuncs.com/blog/images/20191025100106.png?x-oss-process=style/Watermark)
 
-保存重启后有：
+保存重启后，响应头中已经存在`Content-Encoding:gzip`，并且有返回我们设置的Vary值`Vary:Accept-Encoding`。
 
-![](https://i.imgur.com/3PKtSgS.png)
-
-而未开启gzip压缩的同一页面，其响应大小及时间如下：
-
-![](https://i.imgur.com/dNqJZ35.png)
-
-我们再来看一下响应头信息：
-
-![](https://i.imgur.com/JOnIK5R.png)
-
-可以看到，响应头中已经存在`Content-Encoding:gzip`，并且有返回我们设置的Vary值`Vary:Accept-Encoding`。
-
-在响应头中我们还看到`Transfer-Encoding:chunked`。
+在响应头中有`Transfer-Encoding:chunked`：
 
 **1)** `Transfer-Encoding`字面意思是**传输编码**，而`Content-Encoding`字面意思是**内容编码**。
 
@@ -334,8 +320,7 @@ HTTP协议中有一个重要概念：`Persistent Connection`（持久连接，�
 
 既然`gzip`是内容编码，则压缩是在传输之前进行的，所以传输的分块是按照压缩后的数据分块的。
 
-
-## 参考 ##
+## 参考
 
 [nginx源码解析(4)-深入http模块](http://blog.liwenxin.com/2010/11/25/nginx-code-reading-4.html)
 
