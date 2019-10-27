@@ -2,7 +2,7 @@
 #   Main Configs   #
 # ---------------- #
 baseurl:
-url: www.yazidchen.com
+url: https://www.yazidchen.com
 date_format: "ordinal"
 title: YazidChen Blog
 subtitle: "路途甚远，早些起行"
